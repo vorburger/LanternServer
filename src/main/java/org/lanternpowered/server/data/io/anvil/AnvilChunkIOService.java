@@ -32,6 +32,7 @@ import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
+import org.lanternpowered.server.block.tile.LanternTileEntity;
 import org.lanternpowered.server.data.io.ChunkIOService;
 import org.lanternpowered.server.data.persistence.nbt.NbtDataContainerInputStream;
 import org.lanternpowered.server.data.persistence.nbt.NbtDataContainerOutputStream;
@@ -39,6 +40,7 @@ import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.util.NibbleArray;
 import org.lanternpowered.server.world.chunk.LanternChunk;
 import org.lanternpowered.server.world.chunk.LanternChunk.ChunkSection;
+import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
@@ -184,43 +186,43 @@ public class AnvilChunkIOService implements ChunkIOService {
 
         levelTag.getViewList(ENTITIES).ifPresent(entities -> {
             for(DataView entityView : entities) {
-                boolean failed = false;
-                Optional<Entity> entity = chunk.getWorld().createEntity(entityView.copy());
-                if(entity.isPresent()) {
-                    Cause cause = Cause.of(SpawnCause.builder().type(SpawnTypes.CHUNK_LOAD).build());
-                    if(!chunk.getWorld().spawnEntity(entity.get(), cause)) failed = true;
-                } else {
-                    failed = true;
-                }
+                try {
+                    Optional<Entity> entity = chunk.getWorld().createEntity(entityView.copy());
+                    if(entity.isPresent()) {
+                        Cause cause = Cause.of(SpawnCause.builder().type(SpawnTypes.CHUNK_LOAD).build());
+                        if(!chunk.getWorld().spawnEntity(entity.get(), cause)) throw new Exception("Could not spawn entity!");
+                    } else {
+                        throw new Exception("Could not create entity!");
+                    }
 
-                if(failed) {
+                } catch (Exception e) {
                     String id = entityView.getString(ENTITY_ID).orElse("<missing>");
-                    LanternGame.log().warn("Error loading entity in " + chunk + ": " + id);
+                    LanternGame.log().warn("Error loading entity in " + chunk + ": " + id, e);
                 }
             }
         });
 
-        /*
-        // read tile entities
-        List<CompoundTag> storedTileEntities = levelTag.getCompoundList("TileEntities");
-        for (CompoundTag tileEntityTag : storedTileEntities) {
-            int tx = tileEntityTag.getInt("x");
-            int ty = tileEntityTag.getInt("y");
-            int tz = tileEntityTag.getInt("z");
-            TileEntity tileEntity = chunk.getEntity(tx & 0xf, ty, tz & 0xf);
-            if (tileEntity != null) {
+        levelTag.getViewList(of("TileEntities")).ifPresent(tiles -> {
+            for(DataView tileView : tiles) {
                 try {
-                    tileEntity.loadNbt(tileEntityTag);
-                } catch (Exception ex) {
-                    String id = tileEntityTag.isString("id") ? tileEntityTag.getString("id") : "<missing>";
-                    GlowServer.logger.log(Level.SEVERE, "Error loading tile entity at " + tileEntity.getBlock() + ": " + id, ex);
+                    int tx = tileView.getInt(of("x")).get();
+                    int ty = tileView.getInt(of("y")).get();
+                    int tz = tileView.getInt(of("z")).get();
+
+                    Optional<TileEntity> tile = chunk.getTileEntity(tx, ty, tz);
+
+                    if(tile.isPresent()) {
+                        ((LanternTileEntity) tile.get()).loadData(tileView);
+                    } else {
+                        throw new Exception("Tile entity on a non-tile block " + tx + ", " + ty + ", " + tz + "!");
+                    }
+                } catch (Exception e) {
+                    String id = tileView.getString(ENTITY_ID).orElse("<missing>");
+                    LanternGame.log().warn("Error loading tile entity in " + chunk + ": " + id, e);
                 }
-            } else {
-                String id = tileEntityTag.isString("id") ? tileEntityTag.getString("id") : "<missing>";
-                GlowServer.logger.warning("Unknown tile entity at " + chunk.getWorld().getName() + "," + tx + "," + ty + "," + tz + ": " + id);
+
             }
-        }
-        */
+        });
 
         return true;
     }

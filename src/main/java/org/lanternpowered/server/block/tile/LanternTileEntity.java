@@ -62,4 +62,8 @@ public abstract class LanternTileEntity extends LanternDataHolder implements Til
         // TODO Auto-generated method stub
         return null;
     }
+
+    public void loadData(DataView data) {
+        //TODO: Implement
+    }
 }

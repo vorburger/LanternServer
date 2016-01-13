@@ -25,6 +25,7 @@
 package org.lanternpowered.server.data.io.anvil;
 
 import static org.lanternpowered.server.data.io.anvil.RegionFileCache.REGION_FILE_PATTERN;
+import static org.spongepowered.api.data.DataQuery.of;
 
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.Lists;
@@ -42,6 +43,10 @@ import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.MemoryDataContainer;
+import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.entity.spawn.SpawnCause;
+import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.storage.ChunkDataStream;
 import org.spongepowered.api.world.storage.WorldProperties;
@@ -65,28 +70,32 @@ public class AnvilChunkIOService implements ChunkIOService {
     private static final int REGION_MASK = REGION_SIZE - 1;
 
     // TODO: Not sure if it's actually the version, but is set to 1 in 1.8 (forge)
-    private static final DataQuery VERSION = DataQuery.of("V"); // byte
-    private static final DataQuery LEVEL = DataQuery.of("Level"); // compound
-    private static final DataQuery SECTIONS = DataQuery.of("Sections"); // array
-    private static final DataQuery X = DataQuery.of("xPos"); // int
-    private static final DataQuery Z = DataQuery.of("zPos"); // int
-    private static final DataQuery Y = DataQuery.of("Y"); // byte
-    private static final DataQuery BLOCKS = DataQuery.of("Blocks"); // byte array
-    private static final DataQuery BLOCKS_EXTRA = DataQuery.of("Add"); // byte array
-    private static final DataQuery DATA = DataQuery.of("Data"); // (nibble) byte array
-    private static final DataQuery BLOCK_LIGHT = DataQuery.of("BlockLight"); // (nibble) byte array
-    private static final DataQuery SKY_LIGHT = DataQuery.of("SkyLight"); // (nibble) byte array
-    private static final DataQuery POPULATED = DataQuery.of("TerrainPopulated"); // (boolean) byte
-    private static final DataQuery BIOMES = DataQuery.of("Biomes"); // byte array
+    private static final DataQuery VERSION = of("V"); // byte
+    private static final DataQuery LEVEL = of("Level"); // compound
+    private static final DataQuery SECTIONS = of("Sections"); // array
+    private static final DataQuery X = of("xPos"); // int
+    private static final DataQuery Z = of("zPos"); // int
+    private static final DataQuery Y = of("Y"); // byte
+    private static final DataQuery BLOCKS = of("Blocks"); // byte array
+    private static final DataQuery BLOCKS_EXTRA = of("Add"); // byte array
+    private static final DataQuery DATA = of("Data"); // (nibble) byte array
+    private static final DataQuery BLOCK_LIGHT = of("BlockLight"); // (nibble) byte array
+    private static final DataQuery SKY_LIGHT = of("SkyLight"); // (nibble) byte array
+    private static final DataQuery POPULATED = of("TerrainPopulated"); // (boolean) byte
+    private static final DataQuery BIOMES = of("Biomes"); // byte array
     // A extra tag for the biomes to support the custom biomes
-    private static final DataQuery BIOMES_EXTRA = DataQuery.of("BiomesE"); // byte array
-    private static final DataQuery HEIGHT_MAP = DataQuery.of("HeightMap");  // int array
-    private static final DataQuery LAST_UPDATE = DataQuery.of("LastUpdate"); // long
+    private static final DataQuery BIOMES_EXTRA = of("BiomesE"); // byte array
+    private static final DataQuery HEIGHT_MAP = of("HeightMap");  // int array
 
+    private static final DataQuery ENTITIES = of("Entitites"); // compound array
+    private final static DataQuery ENTITY_ID = of("id"); // string
+
+    private static final DataQuery LAST_UPDATE = of("LastUpdate"); // long
     private final ListeningExecutorService service = MoreExecutors.listeningDecorator(Executors.newCachedThreadPool());
     private final WorldProperties properties;
     private final RegionFileCache cache;
     private final File dir;
+
 
     // TODO: Consider the session.lock file
 
@@ -130,7 +139,7 @@ public class AnvilChunkIOService implements ChunkIOService {
         ChunkSection[] sections = new ChunkSection[16];
 
         for (DataView sectionTag : sectionList) {
-            int y = (int) sectionTag.getInt(Y).get();
+            int y = sectionTag.getInt(Y).get();
             byte[] rawTypes = (byte[]) sectionTag.get(BLOCKS).get();
 
             byte[] extTypes = sectionTag.contains(BLOCKS_EXTRA) ? (byte[]) sectionTag.get(BLOCKS_EXTRA).get() : null;
@@ -173,24 +182,23 @@ public class AnvilChunkIOService implements ChunkIOService {
             }
         }
 
-        /*
-        // read entities
-        if (levelTag.isList("Entities", TagType.COMPOUND)) {
-            for (CompoundTag entityTag : levelTag.getCompoundList("Entities")) {
-                try {
-                    // note that creating the entity is sufficient to add it to the world
-                    EntityStorage.loadEntity(chunk.getWorld(), entityTag);
-                } catch (Exception e) {
-                    String id = entityTag.isString("id") ? entityTag.getString("id") : "<missing>";
-                    if (e.getMessage() != null && e.getMessage().startsWith("Unknown entity type to load:")) {
-                        GlowServer.logger.warning("Unknown entity in " + chunk + ": " + id);
-                    } else {
-                        GlowServer.logger.log(Level.WARNING, "Error loading entity in " + chunk + ": " + id, e);
-                    }
+        levelTag.getViewList(ENTITIES).ifPresent(entities -> {
+            for(DataView entityView : entities) {
+                boolean failed = false;
+                Optional<Entity> entity = chunk.getWorld().createEntity(entityView.copy());
+                if(entity.isPresent()) {
+                    Cause cause = Cause.of(SpawnCause.builder().type(SpawnTypes.CHUNK_LOAD).build());
+                    if(!chunk.getWorld().spawnEntity(entity.get(), cause)) failed = true;
+                } else {
+                    failed = true;
+                }
+
+                if(failed) {
+                    String id = entityView.getString(ENTITY_ID).orElse("<missing>");
+                    LanternGame.log().warn("Error loading entity in " + chunk + ": " + id);
                 }
             }
-        }
-        */
+        });
 
         /*
         // read tile entities

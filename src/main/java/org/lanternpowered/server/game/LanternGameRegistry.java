@@ -66,6 +66,7 @@ import org.lanternpowered.server.game.registry.type.data.persistence.DataFormatR
 import org.lanternpowered.server.game.registry.type.effect.ParticleTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.effect.SoundTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.entity.player.GameModeRegistryModule;
+import org.lanternpowered.server.game.registry.type.entity.spawn.SpawnTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
 import org.lanternpowered.server.game.registry.type.text.ArgumentTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.text.ChatTypeRegistryModule;
@@ -132,6 +133,7 @@ import org.spongepowered.api.entity.ai.task.AITaskType;
 import org.spongepowered.api.entity.ai.task.AbstractAITask;
 import org.spongepowered.api.entity.living.Agent;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
+import org.spongepowered.api.event.cause.entity.spawn.SpawnType;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.recipe.RecipeRegistry;
 import org.spongepowered.api.network.status.Favicon;
@@ -265,6 +267,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(WorldGeneratorModifier.class, new GeneratorModifierRegistryModule())
                 .registerModule(GeneratorType.class, new GeneratorTypeRegistryModule())
                 .registerModule(Weather.class, new WeatherTypeRegistryModule())
+                .registerModule(SpawnType.class, new SpawnTypeRegistryModule())
                 ;
         this.registerBuilderSupplier(LanternAttributeBuilder.class, LanternAttributeBuilder::new)
                 .registerBuilderSupplier(BlockState.Builder.class, LanternBlockStateBuilder::new)

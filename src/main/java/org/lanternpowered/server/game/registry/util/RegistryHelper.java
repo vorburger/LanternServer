@@ -24,6 +24,7 @@
  */
 package org.lanternpowered.server.game.registry.util;
 
+import com.google.common.collect.Sets;
 import org.lanternpowered.server.util.ReflectionHelper;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 
@@ -31,6 +32,7 @@ import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 
 @NonnullByDefault
@@ -81,6 +83,22 @@ public final class RegistryHelper {
             return false;
         }
     }
+
+    public static Set<String> getFields(Class<?> apiClass) {
+        return getFields(apiClass, Collections.emptySet());
+    }
+
+    public static Set<String> getFields(Class<?> apiClass, Collection<String> ignored) {
+        Set<String> ret = Sets.newHashSet();
+        for(Field field : apiClass.getDeclaredFields()) {
+            if(!ignored.contains(field.getName())) {
+                ret.add(field.getName().toLowerCase());
+            }
+        }
+
+        return ret;
+    }
+
 
     private RegistryHelper() {
     }

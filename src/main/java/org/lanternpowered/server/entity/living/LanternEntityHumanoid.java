@@ -1,7 +1,7 @@
 /*
  * This file is part of LanternServer, licensed under the MIT License (MIT).
  *
- * Copyright (c) LanternPowered <https://github.com/LanternPowered>
+ * Copyright (c) LanternPowered <https://github.com/LanternPowered/LanternServer>
  * Copyright (c) Contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -22,9 +22,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.entity;
+package org.lanternpowered.server.entity.living;
 
-import com.flowpowered.math.vector.Vector3d;
+import java.util.Optional;
+
+import org.lanternpowered.server.entity.AbstractArmorEquipable;
+import org.spongepowered.api.data.DataView;
+import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.Humanoid;
 import org.spongepowered.api.entity.projectile.Projectile;
 import org.spongepowered.api.item.inventory.Carrier;
@@ -32,14 +36,15 @@ import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
 import org.spongepowered.api.item.inventory.type.CarriedInventory;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
-import java.util.Optional;
+import com.flowpowered.math.vector.Vector3d;
+import org.spongepowered.api.world.World;
 
-import javax.annotation.Nullable;
+public abstract class LanternEntityHumanoid extends LanternEntityLiving implements Humanoid, AbstractArmorEquipable {
 
-@NonnullByDefault
-public class LanternEntityHumanoid extends LanternEntityLiving implements Humanoid, AbstractArmorEquipable {
+    public LanternEntityHumanoid(DataView data, Transform<World> position) {
+        super(data, position);
+    }
 
     @Override
     public <T extends Projectile> Optional<T> launchProjectile(Class<T> projectileClass) {
@@ -60,7 +65,7 @@ public class LanternEntityHumanoid extends LanternEntityLiving implements Humano
     }
 
     @Override
-    public boolean canEquip(EquipmentType type, @Nullable ItemStack equipment) {
+    public boolean canEquip(EquipmentType type, ItemStack equipment) {
         // TODO Auto-generated method stub
         return false;
     }
@@ -72,7 +77,7 @@ public class LanternEntityHumanoid extends LanternEntityLiving implements Humano
     }
 
     @Override
-    public boolean equip(EquipmentType type, @Nullable ItemStack equipment) {
+    public boolean equip(EquipmentType type, ItemStack equipment) {
         if (!this.canEquip(type, equipment)) {
             return false;
         }
@@ -115,5 +120,4 @@ public class LanternEntityHumanoid extends LanternEntityLiving implements Humano
         // TODO Auto-generated method stub
         
     }
-
 }

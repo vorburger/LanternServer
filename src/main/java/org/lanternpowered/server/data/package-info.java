@@ -22,44 +22,4 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.block.tile;
-
-import com.google.common.base.Preconditions;
-import org.lanternpowered.server.data.LanternDataHolder;
-import org.lanternpowered.server.data.property.AbstractPropertyHolder;
-import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.block.tileentity.TileEntity;
-import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
-
-public abstract class LanternTileEntity extends LanternDataHolder implements TileEntity, AbstractPropertyHolder {
-
-    private Location<World> location;
-
-    public LanternTileEntity(DataView data, Location<World> location) {
-        super(data);
-        this.location = Preconditions.checkNotNull(location);
-    }
-
-    @Override
-    public boolean isValid() {
-        return false; //TODO: Implement
-    }
-
-    @Override
-    public void setValid(boolean valid) {
-        //TODO: Implement
-    }
-
-    @Override
-    public Location<World> getLocation() {
-        return this.location;
-    }
-
-    @Override
-    public BlockState getBlock() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-}
+@org.spongepowered.api.util.annotation.NonnullByDefault package org.lanternpowered.server.data;

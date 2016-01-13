@@ -25,14 +25,29 @@
 package org.lanternpowered.server.entity;
 
 import com.flowpowered.math.vector.Vector3d;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
-import org.lanternpowered.server.component.BaseComponentHolder;
-import org.lanternpowered.server.component.misc.Health;
+import com.google.common.collect.Lists;
+import org.lanternpowered.server.data.LanternDataHolder;
+import org.lanternpowered.server.data.manipulator.mutable.entity.LanternHealthData;
 import org.lanternpowered.server.data.property.AbstractPropertyHolder;
+import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataTransactionResult;
+import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Key;
+import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.manipulator.mutable.DisplayNameData;
+import org.spongepowered.api.data.manipulator.mutable.entity.BreathingData;
+import org.spongepowered.api.data.manipulator.mutable.entity.FallDistanceData;
+import org.spongepowered.api.data.manipulator.mutable.entity.HealthData;
+import org.spongepowered.api.data.manipulator.mutable.entity.IgniteableData;
+import org.spongepowered.api.data.manipulator.mutable.entity.InvisibilityData;
+import org.spongepowered.api.data.manipulator.mutable.entity.InvulnerabilityData;
+import org.spongepowered.api.data.manipulator.mutable.entity.PassengerData;
+import org.spongepowered.api.data.manipulator.mutable.entity.SizeData;
+import org.spongepowered.api.data.manipulator.mutable.entity.VelocityData;
 import org.spongepowered.api.data.merge.MergeFunction;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 import org.spongepowered.api.data.value.BaseValue;
@@ -41,8 +56,10 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.Transform;
+import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
+import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.text.translation.Translation;
 import org.spongepowered.api.util.RelativePositions;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
@@ -59,20 +76,35 @@ import java.util.function.Function;
 import javax.annotation.Nullable;
 
 @NonnullByDefault
-public class LanternEntity extends BaseComponentHolder implements Entity, AbstractPropertyHolder {
+public abstract class LanternEntity extends LanternDataHolder implements Entity, AbstractPropertyHolder {
+
+    static {
+        defaultManipulators.add(IgniteableData.class);
+        defaultManipulators.add(VelocityData.class);
+        defaultManipulators.add(DisplayNameData.class);
+        defaultManipulators.add(InvisibilityData.class);
+        defaultManipulators.add(FallDistanceData.class);
+        defaultManipulators.add(SizeData.class);
+        defaultManipulators.add(InvulnerabilityData.class);
+        defaultManipulators.add(BreathingData.class);
+        defaultManipulators.add(PassengerData.class);
+    }
 
     protected final static float EPSILON = 1.0e-004f;
 
-    protected double x;
-    protected double y;
-    protected double z;
+    private final World world;
 
-    protected float yaw;
-    protected float pitch;
+    protected Transform<World> position;
 
-    protected float motionX;
-    protected float motionY;
-    protected float motionZ;
+    protected Vector3d motion;
+
+    public LanternEntity(DataView data, Transform<World> position) {
+        super(data);
+        this.world = position.getExtent();
+        this.position = position;
+
+        //TODO: Load from data
+    }
 
     @Override
     public UUID getUniqueId() {
@@ -89,7 +121,7 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
     @Override
     public void setRawData(DataContainer container) throws InvalidDataException {
         // TODO Auto-generated method stub
-        
+
     }
 
     @Override
@@ -111,37 +143,44 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
 
     @Override
     public World getWorld() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.world;
     }
 
     @Override
     public Location<World> getLocation() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.position.getLocation();
     }
 
     @Override
     public void setLocation(Location<World> location) {
-        // TODO Auto-generated method stub
+        this.position = this.position.setLocation(location);
         
     }
 
     @Override
     public void setLocationAndRotation(Location<World> location, Vector3d rotation) {
-        // TODO Auto-generated method stub
-        
+        this.position = this.position.setLocation(location).setRotation(rotation);
     }
 
     @Override
     public boolean setLocationSafely(Location<World> location) {
-        // TODO Auto-generated method stub
+        Optional<Location<World>> safe = LanternGame.get().getTeleportHelper().getSafeLocation(location);
+        if(safe.isPresent()) {
+            setLocation(safe.get());
+            return true;
+        }
+
         return false;
     }
 
     @Override
     public boolean setLocationAndRotationSafely(Location<World> location, Vector3d rotation) {
-        // TODO Auto-generated method stub
+        Optional<Location<World>> safe = LanternGame.get().getTeleportHelper().getSafeLocation(location);
+        if(safe.isPresent()) {
+            setLocationAndRotation(safe.get(), rotation);
+            return true;
+        }
+        setRotation(rotation);
         return false;
     }
 
@@ -184,14 +223,12 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
 
     @Override
     public Vector3d getRotation() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.position.getRotation();
     }
 
     @Override
     public void setRotation(Vector3d rotation) {
-        // TODO Auto-generated method stub
-        
+        this.position = this.position.setRotation(rotation);
     }
 
     @Override
@@ -323,12 +360,6 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
     }
 
     @Override
-    public Collection<org.spongepowered.api.data.manipulator.DataManipulator<?, ?>> getContainers() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
     public <E> Optional<E> get(Key<? extends BaseValue<E>> key) {
         // TODO Auto-generated method stub
         return null;
@@ -384,26 +415,22 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
 
     @Override
     public Vector3d getScale() {
-        // TODO Auto-generated method stub
-        return null;
+        return Vector3d.ONE;
     }
 
     @Override
     public void setScale(Vector3d scale) {
-        // TODO Auto-generated method stub
-        
+        // Not used currently
     }
 
     @Override
     public Transform<World> getTransform() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.position;
     }
 
     @Override
     public void setTransform(Transform<World> transform) {
-        // TODO Auto-generated method stub
-        
+        this.position = Preconditions.checkNotNull(transform);
     }
 
     @Override
@@ -432,9 +459,20 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
 
     @Override
     public boolean damage(double damage, DamageSource damageSource, Cause cause) {
-        Optional<Health> health = this.getComponent(Health.class);
-        if (health.isPresent()) {
-            return health.get().damage(damage, damageSource, cause);
+        // TODO: Damage modifiers, etc.
+        DamageEntityEvent event = SpongeEventFactory.createDamageEntityEvent(
+                cause, Lists.newArrayList(), this, damage);
+        // TODO: Not cancellable?
+        damage = event.getFinalDamage();
+        if (damage > 0) {
+            LanternHealthData data = (LanternHealthData) getOrCreate(HealthData.class).get();
+            double health = get(Keys.HEALTH).get() - damage;
+
+            this.offer(Keys.HEALTH, health);
+            if (health <= 0.0) {
+                // TODO: Notify stuff
+            }
+            return true;
         }
         return false;
     }

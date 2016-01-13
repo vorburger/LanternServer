@@ -24,17 +24,16 @@
  */
 package org.lanternpowered.server.entity.living.player;
 
+import org.lanternpowered.server.data.LanternDataHolder;
 import org.lanternpowered.server.data.property.AbstractPropertyHolder;
 import org.lanternpowered.server.entity.AbstractArmorEquipable;
-import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.permission.AbstractSubject;
-import org.lanternpowered.server.permission.AbstractSubjectBase;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataTransactionResult;
-import org.spongepowered.api.data.Property;
+import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.merge.MergeFunction;
@@ -48,17 +47,12 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
 import org.spongepowered.api.item.inventory.type.CarriedInventory;
 import org.spongepowered.api.profile.GameProfile;
-import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
-import org.spongepowered.api.service.permission.SubjectCollection;
-import org.spongepowered.api.service.permission.SubjectData;
 import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.lang.ref.WeakReference;
-import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -66,13 +60,31 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 
 @NonnullByDefault
-public class LanternUser extends AbstractSubjectBase implements AbstractPropertyHolder, AbstractArmorEquipable, User {
+public class LanternUser extends LanternDataHolder implements AbstractPropertyHolder, AbstractArmorEquipable, User, AbstractSubject {
 
     private final LanternGameProfile gameProfile;
     @Nullable private WeakReference<Player> player;
+    @Nullable private volatile Subject subject;
 
-    public LanternUser(LanternGameProfile gameProfile) {
+    public LanternUser(DataView data, LanternGameProfile gameProfile) {
+        super(data);
         this.gameProfile = gameProfile;
+        this.initSubject();
+    }
+
+    // We are unable to extend AbstractSubjectBase here :(
+    @Override
+    public void setInternalSubject(@Nullable Subject subj) {
+        this.subject = subj;
+    }
+
+    @Nullable
+    @Override
+    public Subject getInternalSubject() {
+        if (this.subject == null) {
+            this.subject = this.findPermissionSubject();
+        }
+        return this.subject;
     }
 
     @Override
@@ -153,12 +165,6 @@ public class LanternUser extends AbstractSubjectBase implements AbstractProperty
     }
 
     @Override
-    public Collection<DataManipulator<?, ?>> getContainers() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
     public <E> Optional<E> get(Key<? extends BaseValue<E>> key) {
         // TODO Auto-generated method stub
         return null;
@@ -178,8 +184,7 @@ public class LanternUser extends AbstractSubjectBase implements AbstractProperty
 
     @Override
     public DataHolder copy() {
-        // TODO Auto-generated method stub
-        return null;
+        return new LanternUser(this.toContainer(), this.gameProfile);
     }
 
     @Override
@@ -234,6 +239,7 @@ public class LanternUser extends AbstractSubjectBase implements AbstractProperty
         return this.gameProfile.getUniqueId().toString();
     }
 
+    @SuppressWarnings({"unchecked", "rawtypes"})
     @Override
     public Optional<CommandSource> getCommandSource() {
         return (Optional) this.getPlayer();

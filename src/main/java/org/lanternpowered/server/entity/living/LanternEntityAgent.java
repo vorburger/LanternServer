@@ -22,44 +22,49 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.block.tile;
+package org.lanternpowered.server.entity.living;
 
-import com.google.common.base.Preconditions;
-import org.lanternpowered.server.data.LanternDataHolder;
-import org.lanternpowered.server.data.property.AbstractPropertyHolder;
-import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.world.Location;
+import org.spongepowered.api.data.manipulator.mutable.entity.AgentData;
+import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.Transform;
+import org.spongepowered.api.entity.ai.Goal;
+import org.spongepowered.api.entity.ai.GoalType;
+import org.spongepowered.api.entity.living.Agent;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.World;
 
-public abstract class LanternTileEntity extends LanternDataHolder implements TileEntity, AbstractPropertyHolder {
+import java.util.Optional;
 
-    private Location<World> location;
+import javax.annotation.Nullable;
 
-    public LanternTileEntity(DataView data, Location<World> location) {
-        super(data);
-        this.location = Preconditions.checkNotNull(location);
+public abstract class LanternEntityAgent extends LanternEntityLiving implements Agent {
+
+    static {
+        defaultManipulators.add(AgentData.class);
+    }
+
+    public LanternEntityAgent(DataView container, Transform<World> position) {
+        super(container, position);
     }
 
     @Override
-    public boolean isValid() {
-        return false; //TODO: Implement
+    public <T extends Agent> Optional<Goal<T>> getGoal(GoalType type) {
+        return null; //TODO: Implement
     }
 
     @Override
-    public void setValid(boolean valid) {
-        //TODO: Implement
+    public Optional<Entity> getTarget() {
+        return null;
     }
 
     @Override
-    public Location<World> getLocation() {
-        return this.location;
+    public void setTarget(@Nullable Entity target) {
+
     }
 
     @Override
-    public BlockState getBlock() {
-        // TODO Auto-generated method stub
+    public Text getTeamRepresentation() {
         return null;
     }
 }

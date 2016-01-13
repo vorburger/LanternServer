@@ -35,6 +35,17 @@ public final class DataQueries {
     private DataQueries() {
     }
 
+    // Sponge Data
+    public static final DataQuery SPONGE_DATA = of("SpongeData");
+    public static final DataQuery SPONGE_UUID_MOST = of("uuid_most");
+    public static final DataQuery SPONGE_UUID_LEAST = of("uuid_most");
+    public static final DataQuery SPONGE_ENTITY_CREATOR = of("Creator");
+    public static final DataQuery SPONGE_BLOCK_POS_TABLE = of("BlockPosTable");
+    public static final DataQuery SPONGE_PLAYER_UUID_TABLE = of("PlayerIdTable");
+    public static final DataQuery CUSTOM_MANIPULATOR_TAG_LIST = of("CustomManipulators");
+
+    public static final DataQuery ENTITY_ID = of("id");
+
     // General DataQueries
     public static final DataQuery UNSAFE_NBT = of("UnsafeData");
     public static final DataQuery DATA_MANIPULATORS = of("Data");
@@ -46,10 +57,28 @@ public final class DataQueries {
 
     // Blocks
     public static final DataQuery BLOCK_STATE = of("BlockState");
+    public static final DataQuery BLOCK_EXTENDED_STATE = of("BlockExtendedState");
     public static final DataQuery BLOCK_TYPE = of("BlockType");
     public static final DataQuery BLOCK_STATE_UNSAFE_META = of("UnsafeMeta");
 
-    // Sponge data
-    public static final DataQuery SPONGE_DATA = of("SpongeData");
+    // TileEntities
+    public static final DataQuery BLOCK_ENTITY_TILE_TYPE = of("TileType");
+    public static final DataQuery BLOCK_ENTITY_CUSTOM_NAME = of("CustomName");
+    public static final DataQuery BLOCK_ENTITY_BREWING_TIME = of("BrewTime");
+    public static final DataQuery BLOCK_ENTITY_LOCK_CODE = of("Lock");
+    public static final DataQuery BLOCK_ENTITY_ITEM_CONTENTS = of("Contents");
+    public static final DataQuery BLOCK_ENTITY_SLOT = of("SlotId");
+    public static final DataQuery BLOCK_ENTITY_SLOT_ITEM = of("Item");
 
+    // Entities
+    public static final DataQuery ENTITY_CLASS = of("EntityClass");
+    public static final DataQuery ENTITY_SNAPSHOT_ID = of("EntityUniqueId");
+    public static final DataQuery ENTITY_TYPE = of("EntityType");
+    public static final DataQuery ENTITY_ROTATION = of("Rotation");
+    public static final DataQuery ENTITY_SCALE = of("Scale");
+
+    // ItemStacks
+    public static final DataQuery ITEM_COUNT = of("Count");
+    public static final DataQuery ITEM_TYPE = of("ItemType");
+    public static final DataQuery ITEM_DAMAGE_VALUE = of("UnsafeDamage");
 }

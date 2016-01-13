@@ -24,17 +24,22 @@
  */
 package org.lanternpowered.server.world;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static org.lanternpowered.server.world.chunk.LanternChunkLayout.SPACE_MAX;
-import static org.lanternpowered.server.world.chunk.LanternChunkLayout.SPACE_MIN;
+import java.nio.file.Path;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Random;
+import java.util.UUID;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
-import com.flowpowered.math.vector.Vector2i;
-import com.flowpowered.math.vector.Vector3d;
-import com.flowpowered.math.vector.Vector3i;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import org.lanternpowered.server.component.BaseComponentHolder;
+import javax.annotation.Nullable;
+
 import org.lanternpowered.server.config.world.WorldConfig;
 import org.lanternpowered.server.data.io.ChunkIOService;
 import org.lanternpowered.server.data.io.anvil.AnvilChunkIOService;
@@ -46,12 +51,13 @@ import org.lanternpowered.server.network.objects.LocalizedText;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutChatMessage;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutParticleEffect;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSoundEffect;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWorldSky;
 import org.lanternpowered.server.text.title.LanternTitles;
 import org.lanternpowered.server.util.VecHelper;
 import org.lanternpowered.server.world.chunk.ChunkLoadingTicket;
 import org.lanternpowered.server.world.chunk.LanternChunk;
-import org.lanternpowered.server.world.chunk.LanternChunkManager;
 import org.lanternpowered.server.world.chunk.LanternChunkTicketManager;
+import org.lanternpowered.server.world.chunk.LanternChunkManager;
 import org.lanternpowered.server.world.dimension.LanternDimensionType;
 import org.lanternpowered.server.world.extent.AbstractExtent;
 import org.lanternpowered.server.world.extent.ExtentViewDownsize;
@@ -59,8 +65,8 @@ import org.lanternpowered.server.world.extent.ExtentViewTransform;
 import org.lanternpowered.server.world.extent.worker.LanternMutableBiomeAreaWorker;
 import org.lanternpowered.server.world.extent.worker.LanternMutableBlockVolumeWorker;
 import org.lanternpowered.server.world.rules.Rule;
-import org.lanternpowered.server.world.rules.RuleType;
 import org.lanternpowered.server.world.rules.RuleHolder;
+import org.lanternpowered.server.world.rules.RuleType;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
@@ -109,22 +115,18 @@ import org.spongepowered.api.world.storage.WorldStorage;
 import org.spongepowered.api.world.weather.Weather;
 import org.spongepowered.api.world.weather.Weathers;
 
-import java.nio.file.Path;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
+import com.flowpowered.math.vector.Vector2i;
+import com.flowpowered.math.vector.Vector3d;
+import com.flowpowered.math.vector.Vector3i;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
-import javax.annotation.Nullable;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static org.lanternpowered.server.world.chunk.LanternChunkLayout.SPACE_MAX;
+import static org.lanternpowered.server.world.chunk.LanternChunkLayout.SPACE_MIN;
 
-public class LanternWorld extends BaseComponentHolder implements AbstractExtent, World, AbstractViewer, RuleHolder {
+public class LanternWorld implements AbstractExtent, World, AbstractViewer, RuleHolder {
 
     public static final Vector3i BLOCK_MIN = new Vector3i(-30000000, 0, -30000000);
     public static final Vector3i BLOCK_MAX = new Vector3i(30000000, 256, 30000000).sub(1, 1, 1);
@@ -132,6 +134,8 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     public static final Vector2i BIOME_MIN = BLOCK_MIN.toVector2(true);
     public static final Vector2i BIOME_MAX = BLOCK_MAX.toVector2(true);
     public static final Vector2i BIOME_SIZE = BIOME_MAX.sub(BIOME_MIN).add(1, 1);
+
+    private static final float FADE_SPEED = 0.01f;
 
     // The spawn size starting from the spawn point and expanded
     // by this size in the directions +x, +z, -x, -z
@@ -145,9 +149,6 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
 
     // The world border
     final LanternWorldBorder worldBorder;
-
-    // The weather universe
-    @Nullable final LanternWeatherUniverse weatherUniverse;
 
     // The chunk manager of this world
     private final LanternChunkManager chunkManager;
@@ -166,6 +167,21 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     // The context of this world
     private volatile Context worldContext;
 
+    // The random used for the random weather times
+    private final Random random = new Random();
+
+    // The current weather
+    private LanternWeather weather = (LanternWeather) Weathers.CLEAR;
+
+    private long duration = Long.MAX_VALUE;
+    private long remaining = Long.MAX_VALUE;
+
+    private float rainStrengthTarget;
+    private float rainStrength;
+
+    private float darknessTarget;
+    private float darkness;
+
     public LanternWorld(LanternGame game, WorldConfig worldConfig, Path worldFolder,
             LanternWorldProperties properties) {
         this.worldConfig = worldConfig;
@@ -177,14 +193,9 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
         final LanternChunkTicketManager chunkLoadService = game.getChunkTicketManager();
         // Get the dimension type
         final LanternDimensionType<?> dimensionType = (LanternDimensionType<?>) properties.getDimensionType();
-        // Create the weather universe if needed
-        if (dimensionType.hasSky()) {
-            this.weatherUniverse = this.addComponent(LanternWeatherUniverse.class);
-        } else {
-            this.weatherUniverse = null;
-        }
+
         // Create the world border
-        this.worldBorder = this.addComponent(LanternWorldBorder.class);
+        this.worldBorder = new LanternWorldBorder(this);
         // Create the new dimension instance
         this.dimension = dimensionType.newDimension(this);
         // Create a new world generator
@@ -651,42 +662,46 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
 
     @Override
     public Weather getWeather() {
-        if (this.weatherUniverse != null) {
-            return this.weatherUniverse.getWeather();
-        }
-        return Weathers.CLEAR;
+        return this.weather;
     }
 
     @Override
     public long getRemainingDuration() {
-        if (this.weatherUniverse != null) {
-            return this.weatherUniverse.getRemainingDuration();
-        }
-        // Will always be clear
-        return Long.MAX_VALUE;
+        return this.remaining;
     }
 
     @Override
     public long getRunningDuration() {
-        if (this.weatherUniverse != null) {
-            return this.weatherUniverse.getRunningDuration();
-        }
-        // Will always be clear
-        return Long.MAX_VALUE;
+        return this.duration;
     }
 
     @Override
     public void setWeather(Weather weather) {
-        if (this.weatherUniverse != null) {
-            this.weatherUniverse.setWeather(weather);
-        }
+        if(!this.dimension.hasSky()) return;
+        this.setWeather(weather, (300 + this.random.nextInt(600)) * 20);
     }
 
     @Override
     public void setWeather(Weather weather, long duration) {
-        if (this.weatherUniverse != null) {
-            this.weatherUniverse.setWeather(weather, duration);
+        if(!this.dimension.hasSky()) return;
+        LanternWeather weather0 = (LanternWeather) checkNotNull(weather, "weather");
+        boolean rain = weather0.getRainStrength() > 0f;
+        boolean thunder = weather0.getThunderRate() > 0f;
+        this.properties.raining = rain;
+        // Lets just assume for now that it won't throw errors
+        this.properties.rainTime = rain ? (int) duration : 0;
+        this.properties.thundering = thunder;
+        // Lets just assume for now that it won't throw errors
+        this.properties.thunderTime = thunder ? (int) duration : 0;
+        if (this.weather == weather) {
+            this.duration += duration;
+            this.remaining += duration;
+        } else {
+            this.duration = duration;
+            this.remaining = duration;
         }
+        this.darknessTarget = weather0.getDarkness();
+        this.rainStrengthTarget = weather0.getRainStrength();
     }
 
     @Override
@@ -922,9 +937,109 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
             this.properties.time %= 24000;
         }
         this.properties.age++;
-        if (this.weatherUniverse != null) {
-            this.weatherUniverse.pulse();
+        pulseWeather();
+    }
+
+    private void pulseWeather() {
+        if(!this.dimension.hasSky()) return;
+
+        if (this.properties.raining && this.properties.rainTime > 0) {
+            this.properties.rainTime--;
         }
+        if (this.properties.thundering && this.properties.thunderTime > 0) {
+            this.properties.thunderTime--;
+        }
+        if (!this.properties.thundering && !this.properties.raining &&
+                this.properties.clearWeatherTime > 0) {
+            this.properties.clearWeatherTime--;
+        }
+        if (--this.remaining <= 0) {
+            this.setWeather(this.nextWeather());
+        }
+        boolean updateSky = false;
+        if (this.darkness != this.darknessTarget) {
+            if (Math.abs(this.darkness - this.darknessTarget) < FADE_SPEED) {
+                this.darkness = this.darknessTarget;
+            } else if (this.darkness > this.darknessTarget) {
+                this.darkness -= FADE_SPEED;
+            } else {
+                this.darkness += FADE_SPEED;
+            }
+            updateSky = true;
+        }
+        if (this.rainStrength != this.rainStrengthTarget) {
+            if (Math.abs(this.rainStrength - this.rainStrengthTarget) < FADE_SPEED) {
+                this.rainStrength = this.rainStrengthTarget;
+            } else if (this.rainStrength > this.rainStrengthTarget) {
+                this.rainStrength -= FADE_SPEED;
+            } else {
+                this.rainStrength += FADE_SPEED;
+            }
+            updateSky = true;
+        }
+        if (updateSky) {
+            List<LanternPlayer> players = this.getPlayers();
+            if (!players.isEmpty()) {
+                MessagePlayOutWorldSky message = this.createSkyUpdateMessage();
+                players.forEach(player -> player.getConnection().send(message));
+            }
+        }
+    }
+
+    void setRaining(boolean raining) {
+        if (raining && this.properties.rainTime > 0) {
+            this.setWeather(Weathers.RAIN, this.properties.rainTime);
+        } else {
+            this.properties.raining = false;
+        }
+    }
+
+    void setRainTime(int time) {
+        if (!this.properties.raining) {
+            return;
+        }
+        if (this.weather.getRainStrength() > 0f) {
+            this.duration += time;
+            this.remaining += time;
+        } else {
+            this.setWeather(Weathers.RAIN, time);
+        }
+    }
+
+    void setThundering(boolean thundering) {
+        if (thundering && this.properties.raining && this.properties.rainTime > 0
+                && this.properties.thunderTime > 0) {
+            this.setWeather(Weathers.THUNDER_STORM, this.properties.thunderTime);
+        } else {
+            this.properties.thundering = false;
+        }
+    }
+
+    void setThunderTime(int time) {
+        if (!this.properties.raining || !this.properties.thundering) {
+            return;
+        }
+        if (this.weather.getThunderRate() > 0f) {
+            this.duration += time;
+            this.remaining += time;
+        } else {
+            this.setWeather(Weathers.THUNDER_STORM, time);
+        }
+    }
+
+    MessagePlayOutWorldSky createSkyUpdateMessage() {
+        return new MessagePlayOutWorldSky(this.rainStrength, this.darkness);
+    }
+
+    LanternWeather nextWeather() {
+        List<Weather> weathers = Lists.newArrayList(this.game.getRegistry().getAllOf(Weather.class));
+        while (weathers.size() > 1) {
+            LanternWeather next = (LanternWeather) weathers.remove(this.random.nextInt(weathers.size()));
+            if (next != this.weather) {
+                return next;
+            }
+        }
+        return weathers.isEmpty() ? this.weather : (LanternWeather) weathers.get(0);
     }
 
     public void broadcast(Supplier<Message> message) {

@@ -1,7 +1,7 @@
 /*
  * This file is part of LanternServer, licensed under the MIT License (MIT).
  *
- * Copyright (c) LanternPowered <https://github.com/LanternPowered>
+ * Copyright (c) LanternPowered <https://github.com/LanternPowered/LanternServer>
  * Copyright (c) Contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -22,31 +22,49 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.entity;
+package org.lanternpowered.server.entity.living.animal;
 
-import org.spongepowered.api.data.manipulator.mutable.entity.DamageableData;
-import org.spongepowered.api.data.manipulator.mutable.entity.HealthData;
-import org.spongepowered.api.entity.living.Living;
+import org.lanternpowered.server.entity.living.LanternEntityAgent;
+import org.spongepowered.api.data.DataHolder;
+import org.spongepowered.api.data.DataView;
+import org.spongepowered.api.data.manipulator.mutable.entity.AgeableData;
+import org.spongepowered.api.data.manipulator.mutable.entity.BreedableData;
+import org.spongepowered.api.entity.EntityType;
+import org.spongepowered.api.entity.EntityTypes;
+import org.spongepowered.api.entity.Transform;
+import org.spongepowered.api.entity.living.animal.Cow;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
+import org.spongepowered.api.world.World;
 
-@NonnullByDefault
-public class LanternEntityLiving extends LanternEntity implements Living {
+public class LanternEntityCow extends LanternEntityAgent implements Cow {
 
-    @Override
-    public HealthData getHealthData() {
-        return this.get(HealthData.class).get();
+    static {
+        defaultManipulators.add(AgeableData.class);
+        defaultManipulators.add(BreedableData.class);
+    }
+
+    public LanternEntityCow(DataView container, Transform<World> position) {
+        super(container, position);
     }
 
     @Override
-    public DamageableData getMortalData() {
-        return this.get(DamageableData.class).get();
+    public EntityType getType() {
+        return EntityTypes.COW;
     }
 
     @Override
     public Text getTeamRepresentation() {
-        // TODO Auto-generated method stub
-        return null;
+        return null; //TODO: Implement
+    }
+
+    @Override
+    public void setScaleForAge() {
+        //TODO: Implement
+    }
+
+    @Override
+    public DataHolder copy() {
+        return new LanternEntityCow(this.toContainer(), this.getTransform());
     }
 
 }

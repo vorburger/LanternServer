@@ -22,44 +22,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.block.tile;
+package org.lanternpowered.server.entity.living;
 
-import com.google.common.base.Preconditions;
-import org.lanternpowered.server.data.LanternDataHolder;
-import org.lanternpowered.server.data.property.AbstractPropertyHolder;
-import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.block.tileentity.TileEntity;
+import org.lanternpowered.server.entity.LanternEntity;
 import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.world.Location;
+import org.spongepowered.api.data.manipulator.mutable.PotionEffectData;
+import org.spongepowered.api.data.manipulator.mutable.entity.DamageableData;
+import org.spongepowered.api.data.manipulator.mutable.entity.HealthData;
+import org.spongepowered.api.data.manipulator.mutable.entity.LeashData;
+import org.spongepowered.api.data.manipulator.mutable.entity.PersistingData;
+import org.spongepowered.api.entity.Transform;
+import org.spongepowered.api.entity.living.Living;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.World;
 
-public abstract class LanternTileEntity extends LanternDataHolder implements TileEntity, AbstractPropertyHolder {
+public abstract class LanternEntityLiving extends LanternEntity implements Living {
 
-    private Location<World> location;
-
-    public LanternTileEntity(DataView data, Location<World> location) {
-        super(data);
-        this.location = Preconditions.checkNotNull(location);
+    static {
+        defaultManipulators.add(HealthData.class);
+        defaultManipulators.add(DamageableData.class);
+        defaultManipulators.add(PotionEffectData.class);
+        defaultManipulators.add(LeashData.class);
+        defaultManipulators.add(PersistingData.class);
     }
 
-    @Override
-    public boolean isValid() {
-        return false; //TODO: Implement
-    }
-
-    @Override
-    public void setValid(boolean valid) {
-        //TODO: Implement
-    }
-
-    @Override
-    public Location<World> getLocation() {
-        return this.location;
-    }
-
-    @Override
-    public BlockState getBlock() {
-        // TODO Auto-generated method stub
-        return null;
+    public LanternEntityLiving(DataView data, Transform<World> position) {
+        super(data, position);
     }
 }

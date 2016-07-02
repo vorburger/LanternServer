@@ -29,9 +29,7 @@ import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
 import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.command.element.GenericArguments2;
-import org.lanternpowered.server.command.element.RelativeDouble;
-import org.lanternpowered.server.command.element.RelativeVector3d;
-import org.spongepowered.api.command.CommandException;
+import org.lanternpowered.server.world.LanternWorldProperties;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
@@ -39,12 +37,17 @@ import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.util.RelativeDouble;
+import org.spongepowered.api.util.RelativeVector3d;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import java.util.Optional;
 
 public final class CommandTp extends CommandProvider {
+
+    private static final String TARGET = "target";
+    private static final String DESTINATION = "destination";
 
     public CommandTp() {
         super(2, "tp");
@@ -54,34 +57,25 @@ public final class CommandTp extends CommandProvider {
     public void completeSpec(PluginContainer pluginContainer, CommandSpec.Builder specBuilder) {
         specBuilder
                 .arguments(
-                        GenericArguments.optional(GenericArguments.player(Text.of("target"))),
+                        GenericArguments.playerOrSource(Text.of(TARGET)),
                         GenericArguments.firstParsing(
-                                GenericArguments.player(Text.of("destination")),
+                                GenericArguments.player(Text.of(DESTINATION)),
                                 GenericArguments.seq(
-                                        /*
                                         GenericArguments.flags()
                                                 .valueFlag(GenericArguments.world(CommandHelper.WORLD_KEY),
                                                         "-world", "w")
                                                 .buildWith(GenericArguments.none()),
-                                        */
-                                        GenericArguments.optional(GenericArguments.world(CommandHelper.WORLD_KEY)),
-                                        GenericArguments2.targetedRelativeVector3d(Text.of("coordinates")),
+                                        GenericArguments.targetedBlockRelativePosition(Text.of("coordinates")),
                                         GenericArguments.optional(GenericArguments.seq(
-                                                GenericArguments2.relativeDoubleNum(Text.of("y-rot")),
-                                                GenericArguments2.relativeDoubleNum(Text.of("x-rot"))
-                                        ))
+                                                        GenericArguments2.relativeDoubleNum(Text.of("y-rot")),
+                                                        GenericArguments2.relativeDoubleNum(Text.of("x-rot")))
+                                                )
+                                        )
                                 )
-                        )
                 )
                 .executor((src, args) -> {
-                    Player target = args.<Player>getOne("target").orElse(null);
-                    if (target == null) {
-                        if (!(src instanceof Player)) {
-                            throw new CommandException(t("The target parameter is only optional for players."));
-                        }
-                        target = (Player) src;
-                    }
-                    final Optional<Player> optDestination = args.getOne("destination");
+                    Player target = args.<Player>getOne(TARGET).get();
+                    final Optional<Player> optDestination = args.getOne(DESTINATION);
                     if (optDestination.isPresent()) {
                         final Player destination = optDestination.get();
                         target.setTransform(destination.getTransform());
@@ -89,7 +83,8 @@ public final class CommandTp extends CommandProvider {
                     } else {
                         final RelativeVector3d coords = args.<RelativeVector3d>getOne("coordinates").get();
                         final Transform<World> transform = target.getTransform();
-                        World world = args.<World>getOne(CommandHelper.WORLD_KEY).orElse(transform.getExtent());
+                        World world = args.<LanternWorldProperties>getOne(CommandHelper.WORLD_KEY)
+                                .map(props -> (World) props.getWorld().get()).orElse(transform.getExtent());
                         Vector3d position = coords.applyToValue(transform.getPosition());
 
                         final Optional<RelativeDouble> optYRot = args.getOne("y-rot");

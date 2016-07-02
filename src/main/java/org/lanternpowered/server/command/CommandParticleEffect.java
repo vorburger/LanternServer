@@ -28,7 +28,6 @@ package org.lanternpowered.server.command;
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
 import com.flowpowered.math.vector.Vector3d;
-import org.lanternpowered.server.command.element.GenericArguments2;
 import org.lanternpowered.server.effect.particle.LanternParticleEffectBuilder;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.command.CommandResult;
@@ -59,16 +58,16 @@ public final class CommandParticleEffect extends CommandProvider {
         specBuilder
                 .arguments(
                         GenericArguments.catalogedElement(Text.of("type"), ParticleType.class),
-                        GenericArguments2.targetedVector3d(Text.of("position")),
-                        GenericArguments2.integer(Text.of("count"), 1),
+                        GenericArguments.targetedBlockPosition(Text.of("position")),
+                        GenericArguments.integer(Text.of("count"), 1),
                         // TODO: Can we place the world arg after the position without that the parsing system complains
                         // TODO: Tab complaining is currently throwing errors, but it's a small bug in SpongeAPI
                         GenericArguments.optional(GenericArguments.world(CommandHelper.WORLD_KEY)),
                         GenericArguments.flags()
-                                .valueFlag(GenericArguments2.vector3d(Text.of("offset"), Vector3d.ZERO), "-offset", "o")
-                                .valueFlag(GenericArguments2.vector3d(Text.of("motion"), Vector3d.ZERO), "-motion", "m")
-                                .valueFlag(GenericArguments2.color(Text.of("color"), Color.CYAN), "-color", "c")
-                                .valueFlag(GenericArguments2.doubleNum(Text.of("size"), 1.0), "-size", "s")
+                                .valueFlag(GenericArguments.vector3d(Text.of("offset"), Vector3d.ZERO), "-offset", "o")
+                                .valueFlag(GenericArguments.vector3d(Text.of("motion"), Vector3d.ZERO), "-motion", "m")
+                                .valueFlag(GenericArguments.color(Text.of("color"), Color.CYAN), "-color", "c")
+                                .valueFlag(GenericArguments.doubleNum(Text.of("size"), 1.0), "-size", "s")
                                 .valueFlag(GenericArguments.catalogedElement(Text.of("note"), NotePitch.class), "-note", "n")
                                 .valueFlag(GenericArguments.catalogedElement(Text.of("block"), BlockState.class), "-block", "b")
                                 .valueFlag(GenericArguments.catalogedElement(Text.of("item"), ItemType.class), "-item", "i")

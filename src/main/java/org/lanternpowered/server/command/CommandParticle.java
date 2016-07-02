@@ -29,7 +29,6 @@ import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3f;
-import org.lanternpowered.server.command.element.GenericArguments2;
 import org.lanternpowered.server.effect.particle.LanternParticleType;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnParticle;
@@ -47,16 +46,12 @@ import org.spongepowered.api.effect.particle.ParticleType;
 import org.spongepowered.api.effect.particle.ParticleTypes;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.util.StartsWithPredicate;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import javax.annotation.Nullable;
 
 public final class CommandParticle extends CommandProvider {
 
@@ -69,29 +64,12 @@ public final class CommandParticle extends CommandProvider {
         specBuilder
                 .arguments(
                         GenericArguments.catalogedElement(Text.of("type"), ParticleType.class),
-                        GenericArguments2.targetedVector3d(Text.of("position")),
+                        GenericArguments.targetedBlockPosition(Text.of("position")),
                         // The default value should be 0 for x, y and z
-                        GenericArguments2.vector3d(Text.of("offset"), Vector3d.ZERO),
-                        GenericArguments2.doubleNum(Text.of("speed"), 1.0),
-                        GenericArguments.optional(GenericArguments2.integer(Text.of("count"), 1)),
-                        GenericArguments.optional(new CommandElement(Text.of("mode")) {
-                            @Nullable
-                            @Override
-                            protected Object parseValue(CommandSource source, CommandArgs args) throws ArgumentParseException {
-                                return args.next();
-                            }
-
-                            @Override
-                            public List<String> complete(CommandSource src, CommandArgs args, CommandContext context) {
-                                Optional<String> arg = args.nextIfPresent();
-                                if (arg.isPresent()) {
-                                    return Arrays.asList("normal", "force").stream()
-                                            .filter(new StartsWithPredicate(arg.get()))
-                                            .collect(Collectors.toList());
-                                }
-                                return Collections.emptyList();
-                            }
-                        }),
+                        GenericArguments.vector3d(Text.of("offset"), Vector3d.ZERO),
+                        GenericArguments.doubleNum(Text.of("speed"), 1.0),
+                        GenericArguments.optional(GenericArguments.integer(Text.of("count"), 1)),
+                        GenericArguments.optional(GenericArguments.enumValue(Text.of("mode"), Mode.class)),
                         GenericArguments.optional(GenericArguments.player(Text.of("player"))),
                         GenericArguments.optional(new CommandElement(Text.of("params")) {
 
@@ -125,7 +103,7 @@ public final class CommandParticle extends CommandProvider {
                     int count = args.<Integer>getOne("count").orElse(1);
                     boolean longDistance = args.<String>getOne("mode").map(mode -> mode.equalsIgnoreCase("force")).orElse(false);
                     int[] params = args.<int[]>getOne("params").orElse(new int[0]);
-                    LanternWorld world = (LanternWorld) CommandHelper.getWorld(src, args);
+                    LanternWorld world = CommandHelper.getWorld(src, args);
 
                     // TODO: Make this not hardcoded
                     int dataLength = 0;
@@ -152,5 +130,16 @@ public final class CommandParticle extends CommandProvider {
                     src.sendMessage(t("commands.particle.success", particleType.getName(), count));
                     return CommandResult.success();
                 });
+    }
+
+    private enum Mode {
+        NORMAL,
+        FORCE,
+        ;
+
+        @Override
+        public String toString() {
+            return super.toString().toLowerCase();
+        }
     }
 }

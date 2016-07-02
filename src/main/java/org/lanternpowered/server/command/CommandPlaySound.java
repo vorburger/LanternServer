@@ -27,7 +27,6 @@ package org.lanternpowered.server.command;
 
 import com.flowpowered.math.GenericMath;
 import com.flowpowered.math.vector.Vector3d;
-import org.lanternpowered.server.command.element.GenericArguments2;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -52,20 +51,21 @@ public final class CommandPlaySound extends CommandProvider {
                         GenericArguments.catalogedElement(Text.of("sound"), SoundType.class),
                         GenericArguments.catalogedElement(Text.of("category"), SoundCategory.class),
                         GenericArguments.player(Text.of("player")),
-                        GenericArguments.optional(GenericArguments2.targetedVector3d(Text.of("position"))),
-                        GenericArguments.optional(GenericArguments2.doubleNum(Text.of("volume")), 1.0),
-                        GenericArguments.optional(GenericArguments2.doubleNum(Text.of("pitch"), 1.0)),
-                        GenericArguments.optional(GenericArguments2.doubleNum(Text.of("minimum-volume"), 0.0)))
+                        GenericArguments.optional(GenericArguments.targetedBlockPosition(Text.of("position"))),
+                        GenericArguments.optional(GenericArguments.doubleNum(Text.of("volume"), 1.0), 1.0),
+                        GenericArguments.optional(GenericArguments.doubleNum(Text.of("pitch"), 1.0), 1.0),
+                        GenericArguments.optional(GenericArguments.doubleNum(Text.of("minimum-volume"), 0.0), 0.0)
+                )
                 .executor((src, args) -> {
                     SoundType soundType = args.<SoundType>getOne("sound").get();
                     SoundCategory soundCategory = args.<SoundCategory>getOne("category").get();
                     LanternPlayer player = args.<LanternPlayer>getOne("player").get();
 
-                    double volume = GenericMath.clamp(args.<Double>getOne("volume").orElse(1.0), 0.0, Double.MAX_VALUE);
+                    double volume = GenericMath.clamp(args.<Double>getOne("volume").get(), 0.0, Double.MAX_VALUE);
                     // Volume greater then 1 will increase the distance the sound can be heared
                     double soundDistance = volume <= 1.0 ? 16.0 : volume * 16.0;
-                    double pitch = GenericMath.clamp(args.<Double>getOne("pitch").orElse(1.0), 0.5, 2.0);
-                    double minVolume = GenericMath.clamp(args.<Double>getOne("minimum-volume").orElse(0.0), 0.0, 1.0);
+                    double pitch = GenericMath.clamp(args.<Double>getOne("pitch").get(), 0.5, 2.0);
+                    double minVolume = GenericMath.clamp(args.<Double>getOne("minimum-volume").get(), 0.0, 1.0);
 
                     Vector3d playerPos = player.getPosition();
                     Vector3d position = args.<Vector3d>getOne("position").orElse(playerPos);

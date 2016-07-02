@@ -844,11 +844,12 @@ public final class LanternWorldManager {
         // refreshed if needed
         this.dimensionMap = new BitSet();
 
+        LanternWorldProperties rootWorldProperties0 = rootWorldProperties;
         // Generate the root (default) world if missing
-        if (rootWorldProperties == null) {
+        if (rootWorldProperties0 == null) {
             final String name = "Overworld";
             // TODO: Use the default generator type once implemented
-            this.createWorld(WorldArchetype.builder()
+            rootWorldProperties0 = (LanternWorldProperties) this.createWorld(WorldArchetype.builder()
                     .from(WorldArchetypes.OVERWORLD)
                     .generator(GeneratorTypes.FLAT)
                     .build(name, name), "", 0);
@@ -911,13 +912,16 @@ public final class LanternWorldManager {
                 throw e;
             }
             // Store the world properties
-            WorldLookupEntry lookupEntry = this.addWorldProperties(rootWorldProperties, entry.getValue().getFirst(), entry.getKey());
+            WorldLookupEntry lookupEntry = this.addWorldProperties(rootWorldProperties0, entry.getValue().getFirst(), entry.getKey());
             // Check if it should be loaded on startup
             if (worldProperties.loadOnStartup()) {
                 loadQueue.add(lookupEntry);
             }
         }
         idToLevelData.clear();
+
+        // The root world must be enabled
+        rootWorldProperties0.setEnabled(true);
 
         // Load all the worlds
         loadQueue.forEach(this::loadWorld);

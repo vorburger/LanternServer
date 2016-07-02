@@ -29,7 +29,6 @@ import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
-import org.lanternpowered.server.command.element.GenericArguments2;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -52,7 +51,7 @@ public final class CommandSetSpawn extends CommandProvider {
                         GenericArguments.flags()
                                 .valueFlag(GenericArguments.world(CommandHelper.WORLD_KEY), "-world", "w")
                                 .buildWith(GenericArguments.none()),
-                        GenericArguments.optional(GenericArguments2.targetedVector3d(Text.of("coordinates")))
+                        GenericArguments.optional(GenericArguments.targetedBlockPosition(Text.of("coordinates")))
                 )
                 .executor((src, args) -> {
                     WorldProperties world = CommandHelper.getWorldProperties(src, args);

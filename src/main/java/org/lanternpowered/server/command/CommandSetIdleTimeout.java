@@ -27,9 +27,9 @@ package org.lanternpowered.server.command;
 
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
-import org.lanternpowered.server.command.element.GenericArguments2;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandResult;
+import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
@@ -44,7 +44,7 @@ public final class CommandSetIdleTimeout extends CommandProvider {
     public void completeSpec(PluginContainer pluginContainer, CommandSpec.Builder specBuilder) {
         specBuilder
                 .arguments(
-                        GenericArguments2.integer(Text.of("timeout-minutes"), 0)
+                        GenericArguments.integer(Text.of("timeout-minutes"), 0)
                 )
                 .executor((src, args) -> {
                     final int timeout = args.<Integer>getOne("timeout-minutes").get();

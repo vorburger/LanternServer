@@ -300,20 +300,8 @@ public class LanternCommandManager implements CommandManager {
     @Override
     public List<String> getSuggestions(CommandSource source, String arguments, @Nullable Location<World> targetPosition) {
         try {
-            final List<String> suggestions;
+            final List<String> suggestions = this.dispatcher.getSuggestions(source, arguments, targetPosition);
             final String[] argSplit = arguments.split(" ", 2);
-            // TODO: Fix this in the SimpleDispatcher -> in 'getSuggestions' add after
-            // 'argSplit.length == 1' the check '&& !arguments.endsWith(" ")'
-            if (argSplit.length == 1 && !arguments.endsWith(" ")) {
-                suggestions = this.dispatcher.getSuggestions(source, arguments, targetPosition);
-            } else {
-                Optional<? extends CommandMapping> cmdOptional = this.dispatcher.get(argSplit[0], source);
-                if (!cmdOptional.isPresent()) {
-                    suggestions = ImmutableList.of();
-                } else {
-                    suggestions = cmdOptional.get().getCallable().getSuggestions(source, argSplit[1], targetPosition);
-                }
-            }
             final List<String> rawSuggestions = new ArrayList<>(suggestions);
             final TabCompleteEvent.Command event = SpongeEventFactory.createTabCompleteEventCommand(Cause.source(source).build(),
                     ImmutableList.copyOf(suggestions), rawSuggestions, argSplit.length > 1 ? argSplit[1] : "", argSplit[0], arguments);

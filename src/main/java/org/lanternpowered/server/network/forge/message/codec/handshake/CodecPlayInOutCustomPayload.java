@@ -51,11 +51,6 @@ public final class CodecPlayInOutCustomPayload extends AbstractCodecPlayInOutCus
     private static final int FML_HANDSHAKE_ACK = -1;
     private static final int FML_HANDSHAKE_RESET = -2;
 
-    // We will still use protocol 1, so we don't have to send
-    // the overridden dimension id (maybe once we add support for that)
-    // we could change it to 2 or higher future versions
-    private final static int FORGE_PROTOCOL = 1;
-
     @Override
     protected MessageResult encode0(CodecContext context, Message message) throws CodecException {
         if (message instanceof MessageForgeHandshakeInOutAck) {
@@ -66,9 +61,10 @@ public final class CodecPlayInOutCustomPayload extends AbstractCodecPlayInOutCus
                     .writeByte((byte) ((ForgeServerHandshakePhase) ((MessageForgeHandshakeInOutAck) message).getPhase()).ordinal()));
         } else if (message instanceof MessageForgeHandshakeInOutHello) {
             return new MessageResult("FML|HS", context.byteBufAlloc()
-                    .buffer(2)
+                    .buffer(3)
                     .writeByte((byte) FML_HANDSHAKE_SERVER_HELLO)
-                    .writeByte((byte) FORGE_PROTOCOL));
+                    .writeByte((byte) 2) // Forge protocol version
+                    .writeInteger(0)); // Overridden dimension, 0 to disable
         } else if (message instanceof MessageForgeHandshakeInOutModList) {
             Map<String, String> entries = ((MessageForgeHandshakeInOutModList) message).getEntries();
             ByteBuffer buf = context.byteBufAlloc().buffer();
@@ -95,7 +91,7 @@ public final class CodecPlayInOutCustomPayload extends AbstractCodecPlayInOutCus
                     // server -> client message: ignore
                     break;
                 case FML_HANDSHAKE_ACK:
-                    ForgeClientHandshakePhase phase = ForgeClientHandshakePhase.values()[content.readByte()];
+                    final ForgeClientHandshakePhase phase = ForgeClientHandshakePhase.values()[content.readByte()];
                     return new MessageForgeHandshakeInOutAck(phase);
                 case FML_HANDSHAKE_SERVER_HELLO:
                     // server -> client message: ignore
@@ -104,8 +100,8 @@ public final class CodecPlayInOutCustomPayload extends AbstractCodecPlayInOutCus
                     content.readByte(); // The forge protocol version on the client
                     return new MessageForgeHandshakeInOutHello();
                 case FML_HANDSHAKE_MOD_LIST:
-                    int size = content.readVarInt();
-                    Map<String, String> entries = Maps.newHashMapWithExpectedSize(size);
+                    final int size = content.readVarInt();
+                    final Map<String, String> entries = Maps.newHashMapWithExpectedSize(size);
                     for (int i = 0; i < size; i++) {
                         entries.put(content.readString(), content.readString());
                     }

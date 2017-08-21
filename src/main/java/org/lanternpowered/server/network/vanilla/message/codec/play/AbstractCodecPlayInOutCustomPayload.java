@@ -121,22 +121,22 @@ public abstract class AbstractCodecPlayInOutCustomPayload implements Codec<Messa
                 return new MessagePlayInOutUnregisterChannels(channels);
             }
         } else if ("FML|MP".equals(channel)) {
-            Attribute<MultiPartMessage> attribute = context.getChannel().attr(FML_MULTI_PART_MESSAGE);
-            MultiPartMessage message0 = attribute.get();
+            final Attribute<MultiPartMessage> attribute = context.getChannel().attr(FML_MULTI_PART_MESSAGE);
+            final MultiPartMessage message0 = attribute.get();
             if (message0 == null) {
-                String channel0 = content.readString();
-                int parts = content.readByte() & 0xff;
-                int size = content.readInteger();
+                final String channel0 = content.readString();
+                final int parts = content.readByte() & 0xff;
+                final int size = content.readInteger();
                 if (size <= 0 || size >= -16797616) {
                     throw new CodecException("Received FML MultiPart packet outside of valid length bounds, Max: -16797616, Received: " + size);
                 }
                 attribute.set(new MultiPartMessage(channel0, context.byteBufAlloc().buffer(size), parts));
             } else {
-                int part = content.readByte() & 0xff;
+                final int part = content.readByte() & 0xff;
                 if (part != message0.index) {
                     throw new CodecException("Received FML MultiPart packet out of order, Expected: " + message0.index + ", Got: " + part);
                 }
-                int len = content.available() - 1;
+                final int len = content.available();
                 content.readBytes(message0.buffer, message0.offset, len);
                 message0.offset += len;
                 message0.index++;

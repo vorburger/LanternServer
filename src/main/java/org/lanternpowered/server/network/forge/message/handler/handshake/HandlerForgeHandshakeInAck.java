@@ -29,18 +29,22 @@ import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
 import io.netty.util.Attribute;
 import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
+import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
+import org.lanternpowered.server.game.registry.type.world.biome.BiomeRegistryModule;
 import org.lanternpowered.server.network.NetworkContext;
+import org.lanternpowered.server.network.NetworkSession;
 import org.lanternpowered.server.network.forge.handshake.ForgeClientHandshakePhase;
 import org.lanternpowered.server.network.forge.handshake.ForgeHandshakePhase;
 import org.lanternpowered.server.network.forge.handshake.ForgeServerHandshakePhase;
 import org.lanternpowered.server.network.forge.message.type.handshake.MessageForgeHandshakeInOutAck;
 import org.lanternpowered.server.network.forge.message.type.handshake.MessageForgeHandshakeOutRegistryData;
 import org.lanternpowered.server.network.message.handler.Handler;
-import org.lanternpowered.server.network.NetworkSession;
 import org.lanternpowered.server.network.protocol.ProtocolState;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 public final class HandlerForgeHandshakeInAck implements Handler<MessageForgeHandshakeInOutAck> {
@@ -56,8 +60,12 @@ public final class HandlerForgeHandshakeInAck implements Handler<MessageForgeHan
                             message.getPhase(), ForgeClientHandshakePhase.WAITING_SERVER_DATA));
                 } else {
                     final List<MessageForgeHandshakeOutRegistryData.Entry> entries = new ArrayList<>();
-                    entries.add(new MessageForgeHandshakeOutRegistryData.Entry("minecraft:items", new HashMap<>(), new ArrayList<>()));
-                    entries.add(new MessageForgeHandshakeOutRegistryData.Entry("minecraft:blocks", new HashMap<>(), new ArrayList<>()));
+                    entries.add(new MessageForgeHandshakeOutRegistryData.Entry("minecraft:blocks",
+                            BlockRegistryModule.get().getRegistryData(), new HashMap<>(), new HashSet<>()));
+                    entries.add(new MessageForgeHandshakeOutRegistryData.Entry("minecraft:items",
+                            ItemRegistryModule.get().getRegistryData(), new HashMap<>(), new HashSet<>()));
+                    entries.add(new MessageForgeHandshakeOutRegistryData.Entry("minecraft:biomes",
+                            BiomeRegistryModule.get().getRegistryData(), new HashMap<>(), new HashSet<>()));
                     session.send(new MessageForgeHandshakeOutRegistryData(entries));
                     session.send(new MessageForgeHandshakeInOutAck(ForgeServerHandshakePhase.WAITING_ACK));
                     phase.set(ForgeServerHandshakePhase.COMPLETE);

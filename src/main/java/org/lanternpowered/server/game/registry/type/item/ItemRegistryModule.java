@@ -148,6 +148,19 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         Lantern.getGame().getPropertyRegistry().registerItemPropertyStores(((LanternItemType) itemType).getPropertyProviderCollection());
     }
 
+    public Object2IntMap<String> getRegistryData() {
+        final Object2IntMap<String> map = new Object2IntOpenHashMap<>();
+        this.itemTypeByInternalId.int2ObjectEntrySet().forEach(entry -> map.put(entry.getValue().getId(), entry.getIntKey()));
+        // The forge/vanilla client doesn't have a
+        // of a none item type like in sponge, however they
+        // use air (like the block) in this case.
+        // AIR MAY NEVER BE REMOVED, you can expect some
+        // crashes if you do so.
+        map.remove("minecraft:none");
+        map.put("minecraft:air", 0);
+        return map;
+    }
+
     @Override
     public int getInternalId(ItemType itemType) {
         checkNotNull(itemType, "itemType");

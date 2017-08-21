@@ -35,7 +35,7 @@ public final class MessagePlayInCreativeWindowAction implements Message {
     private final int slot;
     @Nullable private final ItemStack itemStack;
 
-    public MessagePlayInCreativeWindowAction(int slot, ItemStack itemStack) {
+    public MessagePlayInCreativeWindowAction(int slot, @Nullable ItemStack itemStack) {
         this.itemStack = itemStack;
         this.slot = slot;
     }

@@ -28,6 +28,8 @@ package org.lanternpowered.server.game.registry.type.world.biome;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ShortMap;
 import it.unimi.dsi.fastutil.objects.Object2ShortOpenHashMap;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectMap;
@@ -55,6 +57,12 @@ public final class BiomeRegistryModule extends AdditionalPluginCatalogRegistryMo
 
     private BiomeRegistryModule() {
         super(BiomeTypes.class);
+    }
+
+    public Object2IntMap<String> getRegistryData() {
+        final Object2IntMap<String> map = new Object2IntOpenHashMap<>();
+        this.biomeTypeByInternalId.short2ObjectEntrySet().forEach(entry -> map.put(entry.getValue().getId(), entry.getShortKey()));
+        return map;
     }
 
     @Override

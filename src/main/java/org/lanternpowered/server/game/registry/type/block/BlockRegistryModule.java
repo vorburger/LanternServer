@@ -40,6 +40,8 @@ import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
 
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectMap;
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ShortMap;
 import it.unimi.dsi.fastutil.objects.Object2ShortOpenHashMap;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectMap;
@@ -140,6 +142,12 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
     @Override
     public int getBlockStatesCount() {
         return this.blockStateByPackedType.size();
+    }
+
+    public Object2IntMap<String> getRegistryData() {
+        final Object2IntMap<String> map = new Object2IntOpenHashMap<>();
+        this.blockTypeByInternalId.short2ObjectEntrySet().forEach(entry -> map.put(entry.getValue().getId(), entry.getShortKey()));
+        return map;
     }
 
     private void register0(int internalId, LanternBlockType blockType, BlockState2DataFunction stateToDataConverter) {
@@ -1064,11 +1072,6 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                                 .withTrait(LanternEnumTraits.TREE_TYPE, LanternTreeType.OAK).get())
                         .translation(TranslationProvider.of(LanternEnumTraits.TREE_TYPE, type ->
                                 tr("tile.woodSlab." + type.getTranslationKeyBase() + ".name")))
-                        .itemType(builder -> builder
-                                .keysProvider(collection -> collection
-                                        .register(Keys.TREE_TYPE, LanternTreeType.OAK)
-                                )
-                        )
                         .properties(builder -> builder
                                 .add(hardness(2.0))
                                 .add(blastResistance(5.0)))
@@ -1725,11 +1728,6 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .withTrait(enumTrait, defaultValue).get()
                         .withTrait(LanternBooleanTraits.SEAMLESS, false).get())
                 .translation(TranslationProvider.of(enumTrait))
-                .itemType(builder -> builder
-                        .keysProvider(collection -> collection
-                                .register(Keys.SLAB_TYPE, defaultValue)
-                        )
-                )
                 .properties(builder -> builder
                         .add(hardness(2.0))
                         .add(blastResistance(10.0)));

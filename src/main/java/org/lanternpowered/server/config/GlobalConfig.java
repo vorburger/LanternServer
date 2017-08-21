@@ -127,7 +127,7 @@ public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
     }
 
     @ConfigSerializable
-    private static final class Server {
+    public static final class Server {
 
         @Setting(value = "ip", comment =
                 "The ip address that should be bound, leave it empty\n " +
@@ -199,6 +199,24 @@ public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
         @Setting(value = "prevent-proxy-connections", comment = "Whether proxy connections should be prevented.\n"
                 + "This is only supported in the online mode.")
         private boolean preventProxyConnections = false;
+
+        @Setting(value = "forge", comment = "Settings related to forge protocol or forge related features.")
+        private Forge forge = new Forge();
+
+        @ConfigSerializable
+        public static final class Forge {
+
+            @Setting(value = "enabled", comment = "Whether the forge protocol should be enabled,"
+                    + "\ndisabling this won't block forge users from joining."
+                    + "\nAdvantages:"
+                    + "\n - Hides modded items in the creative menu"
+                    + "\n - ...")
+            private boolean enabled = true;
+
+            public boolean isEnabled() {
+                return this.enabled;
+            }
+        }
     }
 
     @ConfigSerializable
@@ -278,6 +296,10 @@ public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
             this.chat.urls = new Chat.Urls();
         }
         super.load();
+    }
+
+    public Server.Forge getForge() {
+        return this.server.forge;
     }
 
     public Chat getChat() {

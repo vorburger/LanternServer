@@ -1,0 +1,172 @@
+package org.lanternpowered.server.inventory.neww;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
+
+import com.flowpowered.math.vector.Vector2i;
+import org.spongepowered.api.data.Property;
+import org.spongepowered.api.item.inventory.Inventory;
+import org.spongepowered.api.item.inventory.InventoryProperty;
+import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.Slot;
+import org.spongepowered.api.item.inventory.property.InventoryDimension;
+import org.spongepowered.api.item.inventory.property.SlotPos;
+import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
+
+import java.util.List;
+import java.util.Optional;
+
+import javax.annotation.Nullable;
+
+/**
+ * A base inventory for inventories that have slots in the x-y plane
+ * that are combined into a grid/row/column.
+ */
+@SuppressWarnings("unchecked")
+abstract class AbstractInventory2D extends AbstractOrderedSlotsInventory implements IInventory2D {
+
+    private int columns;
+    private int rows;
+
+    void init(List<AbstractSlot> slots, int columns, int rows) {
+        checkState(columns * rows == slots.size());
+
+        this.columns = columns;
+        this.rows = rows;
+
+        super.init(slots);
+    }
+
+    @Override
+    void init(List<AbstractSlot> slots) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public int getRows() {
+        return this.rows;
+    }
+
+    @Override
+    public int getColumns() {
+        return this.columns;
+    }
+
+    @Override
+    public Vector2i getDimensions() {
+        return new Vector2i(getColumns(), getRows());
+    }
+
+    @Override
+    public InventoryTransactionResult set(int x, int y, ItemStack stack) {
+        return getSlot(x, y).map(slot -> slot.set(stack)).orElse(CachedInventoryTransactionResults.FAIL_NO_TRANSACTIONS);
+    }
+
+    @Override
+    public Optional<ItemStack> peek(int x, int y, int limit) {
+        return getSlot(x, y).flatMap(slot -> slot.peek(limit));
+    }
+
+    @Override
+    public Optional<ItemStack> peek(int x, int y) {
+        return getSlot(x, y).flatMap(Slot::peek);
+    }
+
+    @Override
+    public Optional<ItemStack> poll(int x, int y, int limit) {
+        return getSlot(x, y).flatMap(slot -> slot.poll(limit));
+    }
+
+    @Override
+    public Optional<ItemStack> poll(int x, int y) {
+        return getSlot(x, y).flatMap(Slot::poll);
+    }
+
+    @Override
+    public Optional<Slot> getSlot(int x, int y) {
+        if (x < 0 || y < 0) {
+            return Optional.empty();
+        }
+        final int index = y * this.columns + x;
+        return (Optional) getSlot(index);
+    }
+
+    @Override
+    public Optional<ItemStack> poll(SlotPos pos) {
+        return getSlot(pos).flatMap(Inventory::poll);
+    }
+
+    @Override
+    public Optional<ItemStack> poll(SlotPos pos, int limit) {
+        return getSlot(pos).flatMap(slot -> slot.poll(limit));
+    }
+
+    @Override
+    public Optional<ItemStack> peek(SlotPos pos) {
+        return getSlot(pos).flatMap(Inventory::peek);
+    }
+
+    @Override
+    public Optional<ItemStack> peek(SlotPos pos, int limit) {
+        return getSlot(pos).flatMap(slot -> slot.peek(limit));
+    }
+
+    @Override
+    public InventoryTransactionResult set(SlotPos index, ItemStack stack) {
+        return getSlot(index).map(slot -> slot.set(stack)).orElse(CachedInventoryTransactionResults.FAIL_NO_TRANSACTIONS);
+    }
+
+    @Override
+    public Optional<Slot> getSlot(SlotPos pos) {
+        checkNotNull(pos, "slotPos");
+        if (pos.getOperator() != Property.Operator.EQUAL || pos.getValue() == null) {
+            return Optional.empty();
+        }
+        return getSlot(pos.getX(), pos.getY());
+    }
+
+    @Override
+    protected <T extends InventoryProperty<?, ?>> Optional<T> tryGetProperty(Inventory child, Class<T> property, @Nullable Object key) {
+        if (property == SlotPos.class && child instanceof Slot) {
+            final int index = getSlotIndex((Slot) child);
+            if (index == -1) {
+                return Optional.empty();
+            }
+            final int x = index % this.columns;
+            final int y = index / this.columns;
+            return Optional.of((T) SlotPos.of(x, y));
+        }
+        return super.tryGetProperty(child, property, key);
+    }
+
+    @Override
+    protected <T extends InventoryProperty<?, ?>> List<T> tryGetProperties(Inventory child, Class<T> property) {
+        final List<T> properties = super.tryGetProperties(child, property);
+        if (property == SlotPos.class && child instanceof Slot) {
+            final int index = getSlotIndex((Slot) child);
+            if (index != -1) {
+                final int x = index % this.columns;
+                final int y = index / this.columns;
+                properties.add((T) SlotPos.of(x, y));
+            }
+        }
+        return properties;
+    }
+
+    @Override
+    protected <T extends InventoryProperty<?, ?>> Optional<T> tryGetProperty(Class<T> property, @Nullable Object key) {
+        if (property == InventoryDimension.class) {
+            return Optional.of((T) new InventoryDimension(getDimensions()));
+        }
+        return super.tryGetProperty(property, key);
+    }
+
+    @Override
+    protected <T extends InventoryProperty<?, ?>> List<T> tryGetProperties(Class<T> property) {
+        final List<T> list = super.tryGetProperties(property);
+        if (property == InventoryDimension.class) {
+            list.add((T) new InventoryDimension(getDimensions()));
+        }
+        return list;
+    }
+}

@@ -23,35 +23,5 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.util.collect;
-
-import java.util.Iterator;
-import java.util.NoSuchElementException;
-
-public final class EmptyIterator<E> implements Iterator<E> {
-
-    private static final EmptyIterator<Object> INSTANCE = new EmptyIterator<>();
-
-    public static <E> Iterator<E> get() {
-        //noinspection unchecked
-        return (Iterator<E>) INSTANCE;
-    }
-
-    private EmptyIterator() {
-    }
-
-    @Override
-    public boolean hasNext() {
-        return false;
-    }
-
-    @Override
-    public E next() {
-        throw new NoSuchElementException("Attempted to iterate over an empty iterator");
-    }
-
-    @Override
-    public void remove() {
-        throw new NoSuchElementException("Attempted to remove an element from an empty collection");
-    }
-}
+@org.spongepowered.api.util.annotation.NonnullByDefault
+package org.lanternpowered.server.inventory.neww;

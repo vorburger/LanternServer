@@ -23,7 +23,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory;
+package org.lanternpowered.server.inventory.client;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -37,11 +37,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Map;
 
-public final class DefaultStackSizes {
+final class ClientItemStackSizes {
 
     private static final Object2IntMap<String> STACK_SIZES = new Object2IntOpenHashMap<>();
 
-    public static int getOriginalMaxSize(ItemType itemType) {
+    static int getOriginalMaxSize(ItemType itemType) {
         final int size = STACK_SIZES.getInt(itemType.getId());
         return size == 0 ? itemType.getMaxStackQuantity() : size;
     }
@@ -49,7 +49,7 @@ public final class DefaultStackSizes {
     static {
         final Gson gson = new Gson();
 
-        final InputStream is = DefaultStackSizes.class.getResourceAsStream("/internal/max_stack_sizes.json");
+        final InputStream is = ClientItemStackSizes.class.getResourceAsStream("/internal/max_stack_sizes.json");
         final JsonObject json = gson.fromJson(new BufferedReader(new InputStreamReader(is)), JsonObject.class);
 
         for (Map.Entry<String, JsonElement> entry : json.entrySet()) {

@@ -38,7 +38,6 @@ import it.unimi.dsi.fastutil.ints.IntSet;
 import org.apache.commons.lang3.ArrayUtils;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.inventory.DefaultStackSizes;
 import org.lanternpowered.server.inventory.IInventory;
 import org.lanternpowered.server.inventory.LanternItemStack;
 import org.lanternpowered.server.inventory.behavior.ContainerInteractionBehavior;
@@ -1060,7 +1059,7 @@ public abstract class ClientContainer implements ContainerBase {
     private void handleDoubleClick(int slotIndex) {
         if (this.doubleClickItem != null) {
             final ItemStack itemStack = this.doubleClickItem;
-            final int maxStack = DefaultStackSizes.getOriginalMaxSize(itemStack.getType());
+            final int maxStack = ClientItemStackSizes.getOriginalMaxSize(itemStack.getType());
             final int[] flags = getSlotFlags();
             for (int i = 0; i < flags.length; i++) {
                 // The stack is full, stop
@@ -1163,7 +1162,7 @@ public abstract class ClientContainer implements ContainerBase {
         final int end = reverse ? 0 : flags.length - 1;
         final int step = reverse ? -1 : 1;
         // Get the max stack size for the shifted item
-        final int maxStack = DefaultStackSizes.getOriginalMaxSize(itemStack.getType());
+        final int maxStack = ClientItemStackSizes.getOriginalMaxSize(itemStack.getType());
         final IntList retrySlots = new IntArrayList();
         final IntList mainSlots = new IntArrayList();
         for (int i = start; i != end; i += step) {

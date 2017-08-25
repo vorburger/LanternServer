@@ -29,7 +29,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.inventory.slot.SlotChangeListener;
-import org.lanternpowered.server.util.collect.EmptyIterator;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.EmptyInventory;
 import org.spongepowered.api.item.inventory.Inventory;
@@ -263,7 +262,7 @@ class LanternEmptyInventory extends AbstractInventory implements EmptyInventory 
 
     @Override
     public Iterator<Inventory> iterator() {
-        return EmptyIterator.get();
+        return Collections.emptyIterator();
     }
 
     @Override

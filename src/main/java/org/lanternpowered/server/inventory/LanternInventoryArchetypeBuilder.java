@@ -37,6 +37,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+
+@SuppressWarnings({"unchecked", "ConstantConditions"})
 public class LanternInventoryArchetypeBuilder implements InventoryArchetype.Builder {
 
     private final List<InventoryArchetype> types = new ArrayList<>();
@@ -47,9 +50,7 @@ public class LanternInventoryArchetypeBuilder implements InventoryArchetype.Buil
     public LanternInventoryArchetypeBuilder from(InventoryArchetype value) {
         checkNotNull(value, "value");
         this.types.addAll(value.getChildArchetypes());
-        //noinspection unchecked
         this.inventoryPropertiesByName.putAll(value.getProperties());
-        //noinspection unchecked
         this.inventoryProperties.putAll((Map) ((LanternInventoryArchetype) value).getPropertiesByClass());
         return this;
     }
@@ -62,9 +63,8 @@ public class LanternInventoryArchetypeBuilder implements InventoryArchetype.Buil
         return this;
     }
 
-    public LanternInventoryArchetypeBuilder property(String key, InventoryProperty<String, ?> property) {
+    public LanternInventoryArchetypeBuilder property(@Nullable String key, InventoryProperty<String, ?> property) {
         checkNotNull(property, "property");
-        //noinspection ConstantConditions
         if (key != null) {
             this.inventoryPropertiesByName.put(key, property);
         }
@@ -107,7 +107,6 @@ public class LanternInventoryArchetypeBuilder implements InventoryArchetype.Buil
         final Map<InventoryPropertyKey, InventoryProperty<?,?>> inventoryProperties = new HashMap<>();
         this.inventoryProperties.values().forEach(property ->
                 inventoryProperties.put(new InventoryPropertyKey(property.getClass(), property.getKey()), property));
-        //noinspection unchecked
         return new LanternInventoryArchetype(pluginId, id, name, this.types, (Map) this.inventoryPropertiesByName, inventoryProperties);
     }
 }

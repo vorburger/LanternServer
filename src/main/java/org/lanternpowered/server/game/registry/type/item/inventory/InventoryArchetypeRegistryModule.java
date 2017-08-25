@@ -54,7 +54,7 @@ public class InventoryArchetypeRegistryModule extends PluginCatalogRegistryModul
     public List<CatalogMappingData> getCatalogMappings() {
         return ImmutableList.<CatalogMappingData>builder()
                 .addAll(super.getCatalogMappings())
-                .add(new CatalogMappingData(LanternInventoryArchetypes.class, this.provideCatalogMap()))
+                .add(new CatalogMappingData(LanternInventoryArchetypes.class, provideCatalogMap()))
                 .build();
     }
 

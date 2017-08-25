@@ -30,7 +30,6 @@ import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.collect.ImmutableList;
 import org.lanternpowered.server.inventory.slot.LanternSlot;
-import org.lanternpowered.server.util.collect.EmptyIterator;
 import org.spongepowered.api.effect.Viewer;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.EmptyInventory;
@@ -46,6 +45,7 @@ import org.spongepowered.api.text.Text;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -69,7 +69,7 @@ public abstract class AbstractInventory implements IInventory {
     @SuppressWarnings("unchecked")
     @Override
     public Iterator<Inventory> iterator() {
-        return EmptyIterator.get();
+        return Collections.emptyIterator();
     }
 
     @Override

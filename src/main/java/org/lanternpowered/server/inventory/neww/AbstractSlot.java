@@ -5,10 +5,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.lanternpowered.server.inventory.LanternContainer;
 import org.lanternpowered.server.inventory.LanternItemStack;
+import org.lanternpowered.server.inventory.neww.filter.ItemFilter;
 import org.lanternpowered.server.util.collect.Lists2;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -18,12 +20,17 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
 
 public abstract class AbstractSlot extends AbstractMutableInventory implements ISlot {
 
     public static final int DEFAULT_MAX_STACK_SIZE = 64;
+
+    public static Builder builder() {
+        return new Builder();
+    }
 
     /**
      * The {@link LanternItemStack} that is stored in this slot.
@@ -47,6 +54,11 @@ public abstract class AbstractSlot extends AbstractMutableInventory implements I
      * have to be removed manually after they are no longer needed.
      */
     private final List<SlotChangeListener> changeListeners = Lists2.nonNullArrayList();
+
+    /**
+     * The {@link ItemFilter} that defines which {@link ItemStack}s can be put in this slot.
+     */
+    @Nullable private ItemFilter itemFilter;
 
     /**
      * Adds the {@link SlotChangeTracker}.
@@ -89,16 +101,46 @@ public abstract class AbstractSlot extends AbstractMutableInventory implements I
         this.itemStack = (LanternItemStack) itemStack;
     }
 
+    void init(@Nullable ItemFilter itemFilter) {
+        this.itemFilter = itemFilter;
+    }
+
+    @Nullable
+    ItemFilter getFilter() {
+        return this.itemFilter;
+    }
+
     /**
      * Queues this slot to be updated and trigger the listeners.
      */
-    void queueUpdate() {
+    private void queueUpdate() {
         for (SlotChangeListener listener : this.changeListeners) {
             listener.accept(this);
         }
         for (SlotChangeTracker tracker : this.trackers) {
             tracker.queueSlotChange(this);
         }
+    }
+
+    @Override
+    protected List<AbstractSlot> getSlotInventories() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public boolean hasChildren() {
+        return false;
+    }
+
+    @Override
+    public int getStackSize() {
+        return LanternItemStack.isEmpty(this.itemStack) ? 0 : this.itemStack.getQuantity();
+    }
+
+    @Override
+    public boolean isValidItem(ItemStack stack) {
+        checkNotNull(stack, "stack");
+        return this.itemFilter == null || this.itemFilter.isValid(stack);
     }
 
     @Override
@@ -158,6 +200,46 @@ public abstract class AbstractSlot extends AbstractMutableInventory implements I
             itemStack.setQuantity(limit);
         }
         return Optional.of(itemStack);
+    }
+
+    @Override
+    public InventoryTransactionResult set(@Nullable ItemStack stack) {
+        stack = LanternItemStack.toNullable(stack);
+        boolean fail = false;
+        if (stack != null) {
+            if (stack.getQuantity() <= 0) {
+                stack = null;
+            } else {
+                fail = !isValidItem(stack);
+            }
+        }
+        if (fail) {
+            return InventoryTransactionResult.builder()
+                    .type(InventoryTransactionResult.Type.FAILURE)
+                    .reject(stack)
+                    .build();
+        }
+        InventoryTransactionResult.Builder resultBuilder = InventoryTransactionResult.builder()
+                .type(InventoryTransactionResult.Type.SUCCESS);
+        if (this.itemStack != null) {
+            resultBuilder.replace(this.itemStack);
+        }
+        if (stack != null) {
+            stack = stack.copy();
+            final int maxStackSize = Math.min(stack.getMaxStackQuantity(), this.maxStackSize);
+            final int quantity = stack.getQuantity();
+            if (quantity > maxStackSize) {
+                stack.setQuantity(maxStackSize);
+                // Create the rest stack that was rejected,
+                // because the inventory doesn't allow so many items
+                stack = stack.copy();
+                stack.setQuantity(quantity - maxStackSize);
+                resultBuilder.reject(stack);
+            }
+        }
+        this.itemStack = (LanternItemStack) stack;
+        queueUpdate();
+        return resultBuilder.build();
     }
 
     @Override
@@ -228,4 +310,32 @@ public abstract class AbstractSlot extends AbstractMutableInventory implements I
         return Collections.emptyIterator();
     }
 
+    public static final class Builder {
+
+        @Nullable private ItemFilter itemFilter;
+
+        /**
+         * Sets the {@link ItemFilter}.
+         *
+         * @param itemFilter The item filter
+         * @return This builder, for chaining
+         */
+        public Builder filter(ItemFilter itemFilter) {
+            this.itemFilter = itemFilter;
+            return this;
+        }
+
+        /**
+         * Constructs a {@link AbstractSlot}.
+         *
+         * @param supplier The slot supplier
+         * @param <T> The slot type
+         * @return The slot
+         */
+        public <T extends AbstractSlot> T build(Supplier<T> supplier) {
+            final T slot = supplier.get();
+            slot.init(this.itemFilter);
+            return slot;
+        }
+    }
 }

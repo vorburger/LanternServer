@@ -93,8 +93,6 @@ public abstract class AbstractInventory implements IInventory {
         return (T) empty();
     }
 
-    protected abstract <T extends Inventory> T query(Predicate<Inventory> matcher, boolean nested);
-
     /**
      * Gets all the {@link AbstractSlot}s that could be found in the
      * children inventories. This method may return a empty {@link List}

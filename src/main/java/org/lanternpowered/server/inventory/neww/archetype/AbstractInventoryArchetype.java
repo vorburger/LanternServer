@@ -26,16 +26,16 @@
 package org.lanternpowered.server.inventory.neww.archetype;
 
 import org.lanternpowered.server.catalog.PluginCatalogType;
+import org.lanternpowered.server.inventory.InventoryPropertyHolder;
 import org.lanternpowered.server.inventory.neww.AbstractInventory;
 import org.lanternpowered.server.inventory.neww.LanternInventoryBuilder;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
 import org.spongepowered.api.item.inventory.InventoryProperty;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public abstract class AbstractInventoryArchetype extends PluginCatalogType.Base implements InventoryArchetype {
+public abstract class AbstractInventoryArchetype extends PluginCatalogType.Base implements InventoryArchetype, InventoryPropertyHolder {
 
     public AbstractInventoryArchetype(String pluginId, String name) {
         super(pluginId, name);
@@ -56,9 +56,16 @@ public abstract class AbstractInventoryArchetype extends PluginCatalogType.Base 
     }
 
     @Override
+    public <T extends InventoryProperty<String, ?>> Optional<T> getProperty(Class<T> property) {
+        return Optional.empty();
+    }
+
+    @Override
     public <T extends InventoryProperty<String, ?>> Optional<T> getProperty(Class<T> type, String key) {
         return null;
     }
+
+    protected abstract void preConstruct(ConstructionContext context);
 
     /**
      * Constructs a inventory for the given context.
@@ -66,5 +73,5 @@ public abstract class AbstractInventoryArchetype extends PluginCatalogType.Base 
      * @param context The context
      * @return The inventory
      */
-    protected abstract AbstractInventory construct(LanternInventoryBuilder.Context context);
+    protected abstract AbstractInventory construct(ConstructionContext context);
 }

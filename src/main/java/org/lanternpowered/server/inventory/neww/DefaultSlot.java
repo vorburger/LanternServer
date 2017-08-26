@@ -17,14 +17,6 @@ import javax.annotation.Nullable;
 
 public class DefaultSlot extends AbstractSlot {
 
-    @Nullable @Override ItemStack getRawItemStack() {
-        return null;
-    }
-
-    @Override protected <T extends Inventory> T query(Predicate<Inventory> matcher, boolean nested) {
-        return null;
-    }
-
     @Override protected List<AbstractSlot> getSlotInventories() {
         return null;
     }
@@ -67,10 +59,6 @@ public class DefaultSlot extends AbstractSlot {
 
     @Override public boolean isValidItem(ItemStack stack) {
         return false;
-    }
-
-    @Override public int slotCount() {
-        return 0;
     }
 
     @Override public <T extends Inventory> T first() {

@@ -41,7 +41,7 @@ public class LanternInventoryBuilder implements Inventory.Builder {
 
         @Override
         public <T extends InventoryProperty<String, ?>> Optional<T> getProperty(Class<T> property) {
-            return null;
+            return Optional.empty();
         }
     }
 

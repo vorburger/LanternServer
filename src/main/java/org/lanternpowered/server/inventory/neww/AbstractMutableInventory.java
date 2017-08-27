@@ -2,6 +2,7 @@ package org.lanternpowered.server.inventory.neww;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import org.lanternpowered.server.inventory.ContainerViewListener;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.EmptyInventory;
 import org.spongepowered.api.item.inventory.Inventory;
@@ -11,7 +12,9 @@ import org.spongepowered.api.plugin.PluginContainer;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.Nullable;
 

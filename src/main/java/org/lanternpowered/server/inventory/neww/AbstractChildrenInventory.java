@@ -4,6 +4,8 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import org.lanternpowered.server.inventory.LanternItemStack;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.Carrier;
@@ -11,6 +13,7 @@ import org.spongepowered.api.item.inventory.EmptyInventory;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.Slot;
+import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -20,6 +23,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 
+import javax.annotation.Nullable;
+
 /**
  * A base class for all the {@link Inventory}s that have multiple children,
  * this should be every {@link Inventory} except {@link EmptyInventory}
@@ -28,6 +33,8 @@ import java.util.function.Predicate;
 @SuppressWarnings("unchecked")
 public abstract class AbstractChildrenInventory<C extends AbstractMutableInventory> extends AbstractMutableInventory {
 
+    @Nullable Object2IntMap<C> inventoryToIndex;
+
     /**
      * Gets a {@link List} with all the children
      * in this inventory.
@@ -35,6 +42,27 @@ public abstract class AbstractChildrenInventory<C extends AbstractMutableInvento
      * @return The children list
      */
     protected abstract List<C> getChildren();
+
+    @Nullable
+    @Override
+    AbstractInventory getChild(int index) {
+        final List<C> children = getChildren();
+        return index < 0 || index >= children.size() ? null : children.get(index);
+    }
+
+    @SuppressWarnings("SuspiciousMethodCalls")
+    @Override
+    int getChildIndex(AbstractInventory inventory) {
+        if (this.inventoryToIndex == null) {
+            this.inventoryToIndex = new Object2IntOpenHashMap<>();
+            this.inventoryToIndex.defaultReturnValue(AbstractOrderedInventory.INVALID_INDEX);
+            final List<C> children = getChildren();
+            for (int i = 0; i < children.size(); i++) {
+                this.inventoryToIndex.put(children.get(i), i);
+            }
+        }
+        return this.inventoryToIndex.get(inventory);
+    }
 
     @Override
     protected <T extends Inventory> T queryInventories(Predicate<AbstractMutableInventory> predicate) {
@@ -75,6 +103,11 @@ public abstract class AbstractChildrenInventory<C extends AbstractMutableInvento
     @Override
     public void clear() {
         getChildren().forEach(AbstractMutableInventory::clear);
+    }
+
+    @Override
+    public InventoryTransactionResult set(ItemStack stack) {
+        return InventoryTransactionResult.builder().type(InventoryTransactionResult.Type.FAILURE).reject(stack).build();
     }
 
     @Override

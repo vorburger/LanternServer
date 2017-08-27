@@ -32,11 +32,11 @@ public abstract class AbstractGridInventory extends AbstractInventory2D implemen
     @Nullable private List<AbstractInventoryColumn> columns;
 
     @Override
-    void init(List<AbstractSlot> slots, int columns, int rows) {
+    void init(List<? extends AbstractSlot> slots, int columns, int rows) {
         throw new UnsupportedOperationException();
     }
 
-    void init(List<AbstractSlot> slots, List<AbstractInventoryRow> rows, List<AbstractInventoryColumn> columns) {
+    void init(List<? extends AbstractSlot> slots, List<AbstractInventoryRow> rows, List<AbstractInventoryColumn> columns) {
         super.init(slots, rows.size(), columns.size());
 
         this.columns = columns;

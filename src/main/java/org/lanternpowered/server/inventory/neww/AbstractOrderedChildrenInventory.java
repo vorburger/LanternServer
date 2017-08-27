@@ -12,6 +12,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+@SuppressWarnings("unchecked")
 public abstract class AbstractOrderedChildrenInventory extends AbstractOrderedInventory<AbstractMutableInventory> {
 
     @Nullable private List<AbstractMutableInventory> children;
@@ -63,7 +64,6 @@ public abstract class AbstractOrderedChildrenInventory extends AbstractOrderedIn
         return this.slotsToIndex == null ? Object2IntMaps.emptyMap() : this.slotsToIndex;
     }
 
-
     public static final class Builder<T extends AbstractOrderedChildrenInventory>
             extends AbstractBuilder<T, AbstractOrderedChildrenInventory, Builder<T>>  {
 
@@ -86,7 +86,7 @@ public abstract class AbstractOrderedChildrenInventory extends AbstractOrderedIn
         @Override
         protected void build(AbstractOrderedChildrenInventory inventory) {
             final List<AbstractMutableInventory> inventories = this.inventories.stream()
-                    .map(archetype -> archetype.builder.build())
+                    .map(LanternInventoryArchetype::build)
                     .collect(ImmutableList.toImmutableList());
             inventory.init(inventories);
         }
@@ -96,6 +96,11 @@ public abstract class AbstractOrderedChildrenInventory extends AbstractOrderedIn
             final Builder<T> copy = new Builder<>();
             copy.inventories.addAll(this.inventories);
             return copy;
+        }
+
+        @Override
+        protected List<InventoryArchetype> getArchetypes() {
+            return (List) this.inventories;
         }
     }
 }

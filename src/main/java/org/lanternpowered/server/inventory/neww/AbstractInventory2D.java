@@ -28,7 +28,7 @@ abstract class AbstractInventory2D extends AbstractOrderedSlotsInventory impleme
     private int columns;
     private int rows;
 
-    void init(List<AbstractSlot> slots, int columns, int rows) {
+    void init(List<? extends AbstractSlot> slots, int columns, int rows) {
         checkState(columns * rows == slots.size());
 
         this.columns = columns;
@@ -38,7 +38,7 @@ abstract class AbstractInventory2D extends AbstractOrderedSlotsInventory impleme
     }
 
     @Override
-    void init(List<AbstractSlot> slots) {
+    void init(List<? extends AbstractSlot> slots) {
         throw new UnsupportedOperationException();
     }
 

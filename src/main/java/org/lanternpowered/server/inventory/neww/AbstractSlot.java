@@ -11,6 +11,7 @@ import org.lanternpowered.server.util.collect.Lists2;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.Inventory;
+import org.spongepowered.api.item.inventory.InventoryArchetype;
 import org.spongepowered.api.item.inventory.InventoryProperty;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.property.AcceptsItems;
@@ -369,6 +370,11 @@ public abstract class AbstractSlot extends AbstractMutableInventory implements I
         return Collections.emptyIterator();
     }
 
+    @Override
+    protected <T extends Inventory> T queryInventories(Predicate<AbstractMutableInventory> predicate) {
+        return genericEmpty();
+    }
+
     public static final class Builder<T extends AbstractSlot> extends AbstractBuilder<T, AbstractSlot, Builder<T>> {
 
         private static final Supplier<AbstractSlot> DEFAULT_SUPPLIER = DefaultSlot::new;
@@ -414,7 +420,7 @@ public abstract class AbstractSlot extends AbstractMutableInventory implements I
         @Override
         protected void build(AbstractSlot inventory) {
             if (this.cachedResultItemFilter == null && this.hasItemFilter) {
-                ItemFilter itemFilter = null;
+                ItemFilter itemFilter = this.itemFilter;
                 // Attempt to generate the ItemFilter
                 final AcceptsItems acceptsItems = (AcceptsItems) this.properties.get(AcceptsItems.class);
                 if (acceptsItems != null) {
@@ -449,6 +455,11 @@ public abstract class AbstractSlot extends AbstractMutableInventory implements I
             copy.hasItemFilter = this.hasItemFilter;
             copy.cachedResultItemFilter = this.cachedResultItemFilter;
             return copy;
+        }
+
+        @Override
+        protected List<InventoryArchetype> getArchetypes() {
+            return Collections.emptyList();
         }
     }
 }

@@ -43,17 +43,19 @@ public class LanternInventoryArchetype<T extends AbstractInventory> extends Plug
 
     protected final AbstractBuilder<T, ? super T, ?> builder;
     private final Map<String, InventoryProperty<String, ?>> propertiesByName;
+    private final List<InventoryArchetype> childArchetypes;
 
     LanternInventoryArchetype(String pluginId, String name,
             AbstractBuilder<T, ? super T, ?> builder) {
         super(pluginId, name);
         this.propertiesByName = Collections.unmodifiableMap(builder.propertiesByName);
+        this.childArchetypes = Collections.unmodifiableList(builder.getArchetypes());
         this.builder = builder;
     }
 
     @Override
     public List<InventoryArchetype> getChildArchetypes() {
-        return null;
+        return this.childArchetypes;
     }
 
     @Override
@@ -63,7 +65,8 @@ public class LanternInventoryArchetype<T extends AbstractInventory> extends Plug
 
     @Override
     public Optional<InventoryProperty<String, ?>> getProperty(String key) {
-        return this.builder.asPropertyHolder().getProperty(key);
+        checkNotNull(key, "key");
+        return Optional.ofNullable(this.propertiesByName.get(key));
     }
 
     @Override
@@ -74,6 +77,16 @@ public class LanternInventoryArchetype<T extends AbstractInventory> extends Plug
 
     @Override
     public <P extends InventoryProperty<String, ?>> Optional<P> getProperty(Class<P> type, String key) {
-        return this.builder.asPropertyHolder().getProperty(type, key);
+        // return this.builder.asPropertyHolder().getProperty(type, key);
+        return Optional.empty();
+    }
+
+    /**
+     * Constructs a {@link AbstractInventory}.
+     *
+     * @return The inventory
+     */
+    public T build() {
+        return this.builder.build();
     }
 }

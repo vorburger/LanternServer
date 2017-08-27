@@ -5,11 +5,12 @@ import static com.google.common.base.Preconditions.checkState;
 import static org.lanternpowered.server.util.Conditions.checkPlugin;
 
 import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.inventory.*;
+import org.spongepowered.api.item.inventory.InventoryArchetype;
 import org.spongepowered.api.item.inventory.InventoryProperty;
 import org.spongepowered.api.plugin.PluginContainer;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Supplier;
@@ -22,7 +23,9 @@ public abstract class AbstractBuilder<R extends T, T extends AbstractInventory, 
     @Nullable protected Supplier<R> supplier;
     protected final Map<Class<?>, InventoryProperty<String, ?>> properties = new HashMap<>();
     protected final Map<String, InventoryProperty<String, ?>> propertiesByName = new HashMap<>();
-    @Nullable protected LanternInventoryArchetype<R> cachedArchetype;
+    @Nullable private LanternInventoryArchetype<R> cachedArchetype;
+
+    // Catalog properties
     @Nullable protected PluginContainer pluginContainer;
 
     protected void invalidateCachedArchetype() {
@@ -58,6 +61,13 @@ public abstract class AbstractBuilder<R extends T, T extends AbstractInventory, 
         return (B) this;
     }
 
+    /**
+     * Sets the plugin that provides the {@link AbstractInventory}
+     * or archetype.
+     *
+     * @param plugin The plugin instance
+     * @return This builder, for chaining
+     */
     public B plugin(Object plugin) {
         this.pluginContainer = checkPlugin(plugin, "plugin");
         return (B) this;
@@ -69,11 +79,26 @@ public abstract class AbstractBuilder<R extends T, T extends AbstractInventory, 
      * @return The inventory
      */
     public R build() {
+        return build(this.pluginContainer);
+    }
+
+    /**
+     * Constructs a {@link AbstractInventory}.
+     *
+     * @param plugin The plugin that constructs the inventory
+     * @return The inventory
+     */
+    public R build(Object plugin) {
+        return build(checkPlugin(plugin, "plugin"));
+    }
+
+    private R build(@Nullable PluginContainer pluginContainer) {
         checkState(this.supplier != null);
         final R inventory = this.supplier.get();
         if (inventory instanceof AbstractMutableInventory) {
-            final String pluginId = (this.pluginContainer == null ? Lantern.getImplementationPlugin() : this.pluginContainer).getId();
-            ((AbstractMutableInventory) inventory).setArchetype(buildArchetype(pluginId, UUID.randomUUID().toString()));
+            final AbstractMutableInventory mutableInventory = (AbstractMutableInventory) inventory;
+            final String pluginId = (pluginContainer == null ? Lantern.getImplementationPlugin() : pluginContainer).getId();
+            mutableInventory.setArchetype(buildArchetype(pluginId, UUID.randomUUID().toString()));
         }
         build(inventory);
         return inventory;
@@ -108,11 +133,9 @@ public abstract class AbstractBuilder<R extends T, T extends AbstractInventory, 
     protected abstract B copy();
 
     /**
-     * Gets this builder as a {@link InventoryPropertyHolder}.
+     * Gets a {@link List} with all the children {@link InventoryArchetype}s.
      *
-     * @return The property holder
+     * @return The inventory archetypes
      */
-    public InventoryPropertyHolder asPropertyHolder() {
-        return null;
-    }
+    protected abstract List<InventoryArchetype> getArchetypes();
 }

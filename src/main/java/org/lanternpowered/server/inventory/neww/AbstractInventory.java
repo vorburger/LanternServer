@@ -1,6 +1,7 @@
 package org.lanternpowered.server.inventory.neww;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
 
 import com.google.common.collect.ImmutableList;
@@ -35,7 +36,7 @@ import javax.annotation.Nullable;
 /**
  * The base implementation for all the {@link Inventory}s.
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "ConstantConditions"})
 public abstract class AbstractInventory implements IInventory {
 
     static class Name {
@@ -44,6 +45,7 @@ public abstract class AbstractInventory implements IInventory {
 
     @Nullable private Translation name;
     @Nullable private AbstractInventory parent;
+    @Nullable private AbstractInventory cachedRoot;
 
     /**
      * Sets the name of this inventory.
@@ -61,6 +63,7 @@ public abstract class AbstractInventory implements IInventory {
      */
     void setParent(@Nullable AbstractInventory parent) {
         this.parent = parent;
+        this.cachedRoot = null;
     }
 
     /**
@@ -71,7 +74,7 @@ public abstract class AbstractInventory implements IInventory {
      */
     void setParentSafely(AbstractInventory parent) {
         if (this.parent == null) {
-            this.parent = parent;
+            setParent(parent);
         }
     }
 
@@ -137,7 +140,62 @@ public abstract class AbstractInventory implements IInventory {
 
     @Override
     public AbstractInventory root() {
-        return null;
+        if (this.cachedRoot != null) {
+            return this.cachedRoot;
+        }
+        AbstractInventory parent = this;
+        AbstractInventory parent1;
+        while ((parent1 = parent.parent()) != parent) {
+            parent = parent1;
+        }
+        return this.cachedRoot = parent;
+    }
+
+    /**
+     * Gets the child {@link AbstractInventory} at
+     * the index, if present.
+     * <p>
+     * INTERNAL USE ONLY, is used for {@link #first()}
+     * and {@link #next()} operations.
+     *
+     * @param index The index
+     * @return The child inventory
+     */
+    @Nullable
+    AbstractInventory getChild(int index) {
+        return genericEmpty();
+    }
+
+    /**
+     * Gets the index of the child inventory, or -1
+     * if the inventory isn't a child.
+     * <p>
+     * INTERNAL USE ONLY, is used for {@link #first()}
+     * and {@link #next()} operations.
+     *
+     * @param inventory The child inventory
+     * @return The index
+     */
+    int getChildIndex(AbstractInventory inventory) {
+        return -1;
+    }
+
+    @Override
+    public <T extends Inventory> T first() {
+        final Inventory inventory = getChild(0);
+        return inventory instanceof EmptyInventory ? (T) this : (T) inventory;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T extends Inventory> T next() {
+        final AbstractInventory parent = parent();
+        if (parent == this) {
+            return (T) empty();
+        }
+        final int index = parent.getChildIndex(this);
+        checkState(index != -1);
+        return (T) parent.getChild(index + 1);
     }
 
     // Queries

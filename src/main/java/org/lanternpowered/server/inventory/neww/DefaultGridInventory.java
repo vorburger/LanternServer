@@ -12,10 +12,6 @@ import org.spongepowered.api.text.translation.Translation;
 
 public class DefaultGridInventory extends AbstractGridInventory {
 
-    @Override public void addChangeListener(SlotChangeListener listener) {
-
-    }
-
     @Override public void addViewListener(ContainerViewListener listener) {
 
     }
@@ -23,21 +19,4 @@ public class DefaultGridInventory extends AbstractGridInventory {
     @Override public void addCloseListener(InventoryCloseListener listener) {
 
     }
-
-    @Override public <T extends Inventory> T first() {
-        return null;
-    }
-
-    @Override public <T extends Inventory> T next() {
-        return null;
-    }
-
-    @Override public InventoryTransactionResult offer(ItemStack stack) {
-        return null;
-    }
-
-    @Override public InventoryTransactionResult set(ItemStack stack) {
-        return null;
-    }
-
 }

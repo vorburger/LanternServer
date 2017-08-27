@@ -61,7 +61,6 @@ public class InventoryArchetypeRegistryModule extends PluginCatalogRegistryModul
     @Override
     public void registerDefaults() {
         final LanternInventoryArchetypeBuilder builder = new LanternInventoryArchetypeBuilder();
-        builder.property(InventoryDimension.PROPERTY_NAME, new InventoryDimension(1, 1));
 
         final InventoryArchetype slotArchetype = builder.build("minecraft:slot", "Slot");
         register(slotArchetype);
@@ -71,9 +70,7 @@ public class InventoryArchetypeRegistryModule extends PluginCatalogRegistryModul
 
         builder.reset();
         for (int i = 0; i < 9; i++) {
-            builder.with(new LanternInventoryArchetypeBuilder()
-                    .from(slotArchetype)
-                    .build("minecraft:slot_" + i, "Slot"));
+            builder.with(slotArchetype);
         }
 
         final InventoryArchetype menuRowArchetype = builder.property(new InventoryDimension(9, 1))

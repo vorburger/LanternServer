@@ -6,12 +6,10 @@ import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.inventory.ContainerViewListener;
 import org.lanternpowered.server.inventory.InventoryCloseListener;
 import org.lanternpowered.server.inventory.LanternInventoryArchetypes;
-import org.lanternpowered.server.inventory.slot.SlotChangeListener;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.EmptyInventory;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
-import org.spongepowered.api.item.inventory.InventoryProperty;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
 import org.spongepowered.api.plugin.PluginContainer;
@@ -87,23 +85,18 @@ final class LanternEmptyInventory extends AbstractInventory implements EmptyInve
     }
 
     @Override
-    public <T extends Inventory> T query(Predicate<Inventory> matcher, boolean nested) {
-        return genericEmpty();
-    }
-
-    @Override
     protected List<AbstractSlot> getSlotInventories() {
         return Collections.emptyList();
     }
 
     @Override
-    public boolean isValidItem(ItemStack stack) {
-        return false;
+    protected FastOfferResult offerFast(ItemStack stack) {
+        return new FastOfferResult(stack.copy(), false);
     }
 
     @Override
-    public int slotCount() {
-        return 0;
+    public boolean isValidItem(ItemStack stack) {
+        return false;
     }
 
     @Override
@@ -210,42 +203,7 @@ final class LanternEmptyInventory extends AbstractInventory implements EmptyInve
     }
 
     @Override
-    public <T extends Inventory> T query(Class<?>... types) {
-        return genericEmpty();
-    }
-
-    @Override
-    public <T extends Inventory> T query(ItemType... types) {
-        return genericEmpty();
-    }
-
-    @Override
-    public <T extends Inventory> T query(ItemStack... types) {
-        return genericEmpty();
-    }
-
-    @Override
-    public <T extends Inventory> T query(InventoryProperty<?, ?>... props) {
-        return genericEmpty();
-    }
-
-    @Override
-    public <T extends Inventory> T query(Translation... names) {
-        return genericEmpty();
-    }
-
-    @Override
-    public <T extends Inventory> T query(String... names) {
-        return genericEmpty();
-    }
-
-    @Override
-    public <T extends Inventory> T query(Object... args) {
-        return genericEmpty();
-    }
-
-    @Override
-    public <T extends Inventory> T queryAny(ItemStack... types) {
+    protected <T extends Inventory> T queryInventories(Predicate<AbstractMutableInventory> predicate) {
         return genericEmpty();
     }
 

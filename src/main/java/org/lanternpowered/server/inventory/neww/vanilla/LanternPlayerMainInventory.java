@@ -33,10 +33,6 @@ public class LanternPlayerMainInventory extends AbstractGridInventory implements
 
     // TODO
 
-    @Override public void addChangeListener(SlotChangeListener listener) {
-
-    }
-
     @Override public void addViewListener(ContainerViewListener listener) {
 
     }

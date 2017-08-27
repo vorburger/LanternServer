@@ -3,13 +3,21 @@ package org.lanternpowered.server.inventory.neww;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.lanternpowered.server.inventory.LanternContainer;
-import org.lanternpowered.server.inventory.LanternItemStack;
+import org.lanternpowered.server.inventory.*;
+import org.lanternpowered.server.inventory.neww.filter.EquipmentItemFilter;
 import org.lanternpowered.server.inventory.neww.filter.ItemFilter;
+import org.lanternpowered.server.inventory.neww.filter.PropertyItemFilters;
 import org.lanternpowered.server.util.collect.Lists2;
 import org.spongepowered.api.item.ItemType;
+import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.Inventory;
+import org.spongepowered.api.item.inventory.InventoryProperty;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.property.AcceptsItems;
+import org.spongepowered.api.item.inventory.property.ArmorSlotType;
+import org.spongepowered.api.item.inventory.property.EquipmentSlotType;
+import org.spongepowered.api.item.inventory.property.InventoryCapacity;
+import org.spongepowered.api.item.inventory.property.SlotIndex;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
 
 import java.util.Collections;
@@ -24,11 +32,17 @@ import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
 
+@SuppressWarnings("unchecked")
 public abstract class AbstractSlot extends AbstractMutableInventory implements ISlot {
 
     public static final int DEFAULT_MAX_STACK_SIZE = 64;
 
-    public static Builder builder() {
+    /**
+     * Constructs a new {@link Builder}.
+     *
+     * @return The builder
+     */
+    public static Builder<?> builder() {
         return new Builder();
     }
 
@@ -123,6 +137,16 @@ public abstract class AbstractSlot extends AbstractMutableInventory implements I
     }
 
     @Override
+    protected void setCarrier(Carrier carrier) {
+    }
+
+    @Override
+    public void addChangeListener(SlotChangeListener listener) {
+        checkNotNull(listener, "listener");
+        this.changeListeners.add(listener);
+    }
+
+    @Override
     protected List<AbstractSlot> getSlotInventories() {
         return Collections.emptyList();
     }
@@ -200,6 +224,41 @@ public abstract class AbstractSlot extends AbstractMutableInventory implements I
             itemStack.setQuantity(limit);
         }
         return Optional.of(itemStack);
+    }
+
+    @Override
+    public FastOfferResult offerFast(ItemStack stack) {
+        checkNotNull(stack, "stack");
+        if (LanternItemStack.toNullable(stack) == null) {
+            return new FastOfferResult(stack, false);
+        }
+        final int maxStackSize = Math.min(stack.getMaxStackQuantity(), this.maxStackSize);
+        if (this.itemStack != null && (!this.itemStack.similarTo(stack) ||
+                this.itemStack.getQuantity() >= maxStackSize) || !isValidItem(stack)) {
+            return new FastOfferResult(stack, false);
+        }
+        // Get the amount of space we have left
+        final int availableSpace = this.itemStack == null ? maxStackSize :
+                maxStackSize - this.itemStack.getQuantity();
+        final int quantity = stack.getQuantity();
+        if (quantity > availableSpace) {
+            if (this.itemStack == null) {
+                this.itemStack = (LanternItemStack) stack.copy();
+            }
+            this.itemStack.setQuantity(maxStackSize);
+            stack = stack.copy();
+            stack.setQuantity(quantity - availableSpace);
+            queueUpdate();
+            return new FastOfferResult(stack, true);
+        } else {
+            if (this.itemStack == null) {
+                this.itemStack = (LanternItemStack) stack.copy();
+            } else {
+                this.itemStack.setQuantity(this.itemStack.getQuantity() + quantity);
+            }
+            queueUpdate();
+            return FastOfferResult.SUCCESS_NO_REJECTED_ITEM;
+        }
     }
 
     @Override
@@ -310,9 +369,17 @@ public abstract class AbstractSlot extends AbstractMutableInventory implements I
         return Collections.emptyIterator();
     }
 
-    public static final class Builder {
+    public static final class Builder<T extends AbstractSlot> extends AbstractBuilder<T, AbstractSlot, Builder<T>> {
 
+        private static final Supplier<AbstractSlot> DEFAULT_SUPPLIER = DefaultSlot::new;
         @Nullable private ItemFilter itemFilter;
+
+        @Nullable private ItemFilter cachedResultItemFilter;
+        private boolean hasItemFilter;
+
+        private Builder() {
+            typeSupplier(DEFAULT_SUPPLIER);
+        }
 
         /**
          * Sets the {@link ItemFilter}.
@@ -320,22 +387,68 @@ public abstract class AbstractSlot extends AbstractMutableInventory implements I
          * @param itemFilter The item filter
          * @return This builder, for chaining
          */
-        public Builder filter(ItemFilter itemFilter) {
+        public Builder<T> filter(ItemFilter itemFilter) {
+            checkNotNull(itemFilter, "itemFilter");
             this.itemFilter = itemFilter;
+            // Regenerate the result item filter
+            this.hasItemFilter = true;
+            this.cachedResultItemFilter = null;
+            invalidateCachedArchetype();
             return this;
         }
 
-        /**
-         * Constructs a {@link AbstractSlot}.
-         *
-         * @param supplier The slot supplier
-         * @param <T> The slot type
-         * @return The slot
-         */
-        public <T extends AbstractSlot> T build(Supplier<T> supplier) {
-            final T slot = supplier.get();
-            slot.init(this.itemFilter);
-            return slot;
+        @Override
+        public Builder<T> property(InventoryProperty<String, ?> property) {
+            checkArgument(!(property instanceof SlotIndex), "The slot index may not be set through a property.");
+            checkArgument(!(property instanceof InventoryCapacity), "The slot capacity cannot be set.");
+            super.property(property);
+            // Regenerate the result item filter
+            if (property instanceof EquipmentSlotType || property instanceof AcceptsItems) {
+                this.hasItemFilter = true;
+                this.cachedResultItemFilter = null;
+                invalidateCachedArchetype();
+            }
+            return this;
+        }
+
+        @Override
+        protected void build(AbstractSlot inventory) {
+            if (this.cachedResultItemFilter == null && this.hasItemFilter) {
+                ItemFilter itemFilter = null;
+                // Attempt to generate the ItemFilter
+                final AcceptsItems acceptsItems = (AcceptsItems) this.properties.get(AcceptsItems.class);
+                if (acceptsItems != null) {
+                    itemFilter = PropertyItemFilters.of(acceptsItems);
+                }
+                final EquipmentSlotType equipmentSlotType = (EquipmentSlotType) this.properties.get(EquipmentSlotType.class);
+                if (equipmentSlotType != null) {
+                    EquipmentItemFilter equipmentItemFilter = EquipmentItemFilter.of(equipmentSlotType);
+                    if (itemFilter != null) {
+                        equipmentItemFilter = equipmentItemFilter.andThen(itemFilter);
+                    }
+                    itemFilter = equipmentItemFilter;
+                }
+                final ArmorSlotType armorSlotType = (ArmorSlotType) this.properties.get(ArmorSlotType.class);
+                if (armorSlotType != null) {
+                    EquipmentItemFilter equipmentItemFilter = EquipmentItemFilter.of(armorSlotType);
+                    if (itemFilter != null) {
+                        equipmentItemFilter = equipmentItemFilter.andThen(itemFilter);
+                    }
+                    itemFilter = equipmentItemFilter;
+                }
+                this.cachedResultItemFilter = itemFilter;
+            }
+            inventory.init(this.cachedResultItemFilter);
+        }
+
+        @Override
+        protected Builder<T> copy() {
+            final Builder<T> copy = new Builder<>();
+            copy.supplier = this.supplier;
+            copy.itemFilter = this.itemFilter;
+            copy.hasItemFilter = this.hasItemFilter;
+            copy.cachedResultItemFilter = this.cachedResultItemFilter;
+            return copy;
         }
     }
 }

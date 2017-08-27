@@ -18,7 +18,7 @@ import javax.annotation.Nullable;
 /**
  * A ordered children inventory that only supports slots.
  */
-public abstract class AbstractOrderedSlotsInventory extends LanternOrderedInventory<AbstractSlot> {
+public abstract class AbstractOrderedSlotsInventory extends AbstractOrderedInventory<AbstractSlot> {
 
     public static Builder builder() {
         return new Builder();
@@ -133,7 +133,7 @@ public abstract class AbstractOrderedSlotsInventory extends LanternOrderedInvent
         /**
          * Constructs the {@link AbstractOrderedSlotsInventory}.
          *
-         * @param inventorySupplier The inventory supplier
+         * @param inventorySupplier The inventory typeSupplier
          * @param <T> The inventory type
          * @return The constructed inventory
          */

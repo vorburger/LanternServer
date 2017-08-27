@@ -6,11 +6,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.collect.ImmutableList;
 import org.lanternpowered.server.inventory.LanternItemStack;
 import org.spongepowered.api.item.ItemType;
+import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.EmptyInventory;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.Slot;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -58,6 +60,16 @@ public abstract class AbstractChildrenInventory<C extends AbstractMutableInvento
                 inventories.addAll(child.queryInventories(predicate));
             }
         }
+    }
+
+    @Override
+    protected void setCarrier(Carrier carrier) {
+        getChildren().forEach(child -> child.setCarrier(carrier));
+    }
+
+    @Override
+    public void addChangeListener(SlotChangeListener listener) {
+        getChildren().forEach(child -> child.addChangeListener(listener));
     }
 
     @Override
@@ -295,8 +307,41 @@ public abstract class AbstractChildrenInventory<C extends AbstractMutableInvento
     }
 
     @Override
-    protected <T extends Inventory> T query(Predicate<Inventory> matcher, boolean nested) {
-        return genericEmpty(); // TODO
+    public FastOfferResult offerFast(ItemStack stack) {
+        checkNotNull(stack, "stack");
+        final Set<Inventory> processed = new HashSet<>();
+        final Inventory inventory = queryAny(stack);
+        if (inventory instanceof AbstractChildrenInventory) {
+            final FastOfferResult offerResult = ((AbstractChildrenInventory) inventory).offerFast(stack, processed, true);
+            final Optional<ItemStack> rejectedItem = offerResult.getRejectedItem();
+            if (!rejectedItem.isPresent()) {
+                return offerResult;
+            }
+            stack = rejectedItem.get();
+        }
+        return offerFast(stack, processed, false);
+    }
+
+    private FastOfferResult offerFast(ItemStack stack, Set<Inventory> processed, boolean add) {
+        FastOfferResult offerResult = null;
+        for (AbstractMutableInventory inventory : getChildren()) {
+            if (!add && processed.contains(inventory)) {
+                continue;
+            }
+            offerResult = inventory.offerFast(stack);
+            final Optional<ItemStack> rejectedItem = offerResult.getRejectedItem();
+            if (!rejectedItem.isPresent()) {
+                return offerResult;
+            }
+            stack = rejectedItem.get();
+            if (add) {
+                processed.add(inventory);
+            }
+        }
+        if (offerResult == null) {
+            return new FastOfferResult(stack, false);
+        }
+        return offerResult;
     }
 
     /**

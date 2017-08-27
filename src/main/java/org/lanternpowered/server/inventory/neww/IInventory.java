@@ -27,7 +27,6 @@ package org.lanternpowered.server.inventory.neww;
 
 import org.lanternpowered.server.inventory.ContainerViewListener;
 import org.lanternpowered.server.inventory.InventoryCloseListener;
-import org.lanternpowered.server.inventory.slot.SlotChangeListener;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
@@ -39,6 +38,13 @@ public interface IInventory extends Inventory {
 
     @Override
     IInventory parent();
+
+    /**
+     * Gets the root {@link IInventory}.
+     *
+     * @return The root inventory
+     */
+    IInventory root();
 
     /**
      * Adds a {@link SlotChangeListener} to
@@ -62,8 +68,22 @@ public interface IInventory extends Inventory {
      */
     void addCloseListener(InventoryCloseListener listener);
 
+    /**
+     * Polls the first available stack with the specific {@link ItemType}.
+     *
+     * @param itemType The item type
+     * @return The polled item stack, if found
+     * @see #poll()
+     */
     Optional<ItemStack> poll(ItemType itemType);
 
+    /**
+     * Polls the first available stack that is matched by the {@link Predicate}.
+     *
+     * @param matcher The matcher
+     * @return The polled item stack, if found
+     * @see #poll()
+     */
     Optional<ItemStack> poll(Predicate<ItemStack> matcher);
 
     Optional<ItemStack> poll(int limit, ItemType itemType);

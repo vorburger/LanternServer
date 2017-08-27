@@ -74,10 +74,6 @@ public class LanternHotbarInventory extends AbstractInventoryRow implements Hotb
     }
 
     // TODO
-    @Override public void addChangeListener(SlotChangeListener listener) {
-
-    }
-
     @Override public void addViewListener(ContainerViewListener listener) {
 
     }

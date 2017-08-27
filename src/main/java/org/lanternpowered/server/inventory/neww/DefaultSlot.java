@@ -4,6 +4,7 @@ import org.lanternpowered.server.inventory.ContainerViewListener;
 import org.lanternpowered.server.inventory.InventoryCloseListener;
 import org.lanternpowered.server.inventory.slot.SlotChangeListener;
 import org.spongepowered.api.item.ItemType;
+import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
@@ -27,10 +28,6 @@ public class DefaultSlot extends AbstractSlot {
 
     @Override public int getStackSize() {
         return 0;
-    }
-
-    @Override public void addChangeListener(SlotChangeListener listener) {
-
     }
 
     @Override public void addViewListener(ContainerViewListener listener) {

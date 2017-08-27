@@ -12,10 +12,6 @@ import org.spongepowered.api.text.translation.Translation;
 
 final class DefaultUnorderedSlotsInventory extends AbstractUnorderedSlotsInventory {
 
-    @Override public void addChangeListener(SlotChangeListener listener) {
-
-    }
-
     @Override public void addViewListener(ContainerViewListener listener) {
 
     }

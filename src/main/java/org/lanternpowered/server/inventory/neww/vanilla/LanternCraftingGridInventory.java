@@ -29,28 +29,12 @@ public class LanternCraftingGridInventory extends AbstractGridInventory implemen
 
     // TODO: Move/remove
 
-    @Override public void addChangeListener(SlotChangeListener listener) {
-
-    }
-
     @Override public void addViewListener(ContainerViewListener listener) {
 
     }
 
     @Override public void addCloseListener(InventoryCloseListener listener) {
 
-    }
-
-    @Override public IInventory intersect(Inventory inventory) {
-        return null;
-    }
-
-    @Override public IInventory union(Inventory inventory) {
-        return null;
-    }
-
-    @Override public <T extends Inventory> Iterable<T> slots() {
-        return null;
     }
 
     @Override public <T extends Inventory> T first() {
@@ -66,46 +50,6 @@ public class LanternCraftingGridInventory extends AbstractGridInventory implemen
     }
 
     @Override public InventoryTransactionResult set(ItemStack stack) {
-        return null;
-    }
-
-    @Override public <T extends Inventory> T query(Class<?>... types) {
-        return null;
-    }
-
-    @Override public <T extends Inventory> T query(ItemType... types) {
-        return null;
-    }
-
-    @Override public <T extends Inventory> T query(ItemStack... types) {
-        return null;
-    }
-
-    @Override public <T extends Inventory> T query(InventoryProperty<?, ?>... props) {
-        return null;
-    }
-
-    @Override public <T extends Inventory> T query(Translation... names) {
-        return null;
-    }
-
-    @Override public <T extends Inventory> T query(String... names) {
-        return null;
-    }
-
-    @Override public <T extends Inventory> T query(Object... args) {
-        return null;
-    }
-
-    @Override public <T extends Inventory> T queryAny(ItemStack... types) {
-        return null;
-    }
-
-    @Override public PluginContainer getPlugin() {
-        return null;
-    }
-
-    @Override public InventoryArchetype getArchetype() {
         return null;
     }
 }

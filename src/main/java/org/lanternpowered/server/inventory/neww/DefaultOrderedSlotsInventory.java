@@ -9,10 +9,6 @@ import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResu
 
 public class DefaultOrderedSlotsInventory extends AbstractOrderedSlotsInventory {
 
-    @Override public void addChangeListener(SlotChangeListener listener) {
-
-    }
-
     @Override public void addViewListener(ContainerViewListener listener) {
 
     }

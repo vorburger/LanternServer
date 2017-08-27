@@ -16,10 +16,6 @@ import java.util.function.Predicate;
 
 class DefaultInventoryColumn extends AbstractInventoryColumn {
 
-    @Override public void addChangeListener(SlotChangeListener listener) {
-
-    }
-
     @Override public void addViewListener(ContainerViewListener listener) {
 
     }

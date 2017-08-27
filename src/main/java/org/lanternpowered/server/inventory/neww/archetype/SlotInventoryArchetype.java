@@ -1,36 +1,20 @@
 package org.lanternpowered.server.inventory.neww.archetype;
 
-import org.lanternpowered.server.inventory.InventoryPropertyHolder;
-import org.lanternpowered.server.inventory.neww.AbstractInventory;
-import org.lanternpowered.server.inventory.neww.AbstractSlot;
-import org.lanternpowered.server.inventory.neww.DefaultSlot;
-import org.lanternpowered.server.inventory.neww.LanternEquipmentSlot;
-import org.lanternpowered.server.inventory.neww.LanternFilteringSlot;
-import org.lanternpowered.server.inventory.neww.filter.EquipmentItemFilter;
-import org.lanternpowered.server.inventory.neww.filter.ItemFilter;
-import org.lanternpowered.server.inventory.neww.filter.PropertyItemFilters;
+import org.lanternpowered.server.inventory.neww.AbstractBuilder;
+import org.lanternpowered.server.inventory.neww.LanternInventoryArchetype;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
-import org.spongepowered.api.item.inventory.property.AcceptsItems;
-import org.spongepowered.api.item.inventory.property.ArmorSlotType;
-import org.spongepowered.api.item.inventory.property.EquipmentSlotType;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
-import java.util.function.Supplier;
 
-import javax.annotation.Nullable;
+public class SlotInventoryArchetype extends LanternInventoryArchetype {
 
-public class SlotInventoryArchetype extends AbstractInventoryArchetype {
-
-    @Nullable private ItemFilter itemFilter;
-
-    public SlotInventoryArchetype(String pluginId, String name) {
-        super(pluginId, name);
+    public SlotInventoryArchetype(String pluginId, String name, AbstractBuilder builder) {
+        super(pluginId, name, builder);
     }
 
-    public SlotInventoryArchetype(String pluginId, String id, String name) {
-        super(pluginId, id, name);
+    public SlotInventoryArchetype(String pluginId, String id, String name, AbstractBuilder builder) {
+        super(pluginId, id, name, builder);
     }
 
     @Override
@@ -38,6 +22,7 @@ public class SlotInventoryArchetype extends AbstractInventoryArchetype {
         return Collections.emptyList();
     }
 
+    /*
     @Override
     protected void preConstruct(ConstructionContext context) {
         this.itemFilter = constructFilter(this);
@@ -76,18 +61,18 @@ public class SlotInventoryArchetype extends AbstractInventoryArchetype {
         if (context instanceof PostConstructionContext) {
             itemFilter = constructFilter((InventoryPropertyHolder) context);
         }
-        Supplier<AbstractSlot> supplier;
+        Supplier<AbstractSlot> typeSupplier;
         final AbstractSlot.Builder builder = AbstractSlot.builder();
         if (itemFilter != null) {
             if (itemFilter instanceof EquipmentItemFilter) {
-                supplier = LanternEquipmentSlot::new;
+                typeSupplier = LanternEquipmentSlot::new;
             } else {
-                supplier = LanternFilteringSlot::new;
+                typeSupplier = LanternFilteringSlot::new;
             }
             builder.filter(itemFilter);
         } else {
-            supplier = DefaultSlot::new;
+            typeSupplier = DefaultSlot::new;
         }
-        return builder.build(supplier);
-    }
+        return builder.build(typeSupplier);
+    }*/
 }

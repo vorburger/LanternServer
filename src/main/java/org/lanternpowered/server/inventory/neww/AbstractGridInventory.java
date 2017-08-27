@@ -90,6 +90,20 @@ public abstract class AbstractGridInventory extends AbstractInventory2D implemen
         private Builder() {
         }
 
+        public Builder dimensions(int columns, int rows) {
+            checkArgument(this.fixedColumns == -1 || columns == this.fixedColumns,
+                    "The width is already fixed at %s and cannot be set to %s", this.fixedColumns, columns);
+            checkArgument(columns >= this.columns,
+                    "The width is already at %s and cannot be set to a smaller value %s", this.fixedColumns, columns);
+            checkArgument(this.fixedRows == -1 || rows == this.fixedRows,
+                    "The height is already fixed at %s and cannot be set to %s", this.fixedRows, rows);
+            checkArgument(rows >= this.rows,
+                    "The height is already at %s and cannot be set to a smaller value %s", this.fixedRows, rows);
+            this.columns = columns;
+            this.rows = rows;
+            return this;
+        }
+
         /**
          * Adds the provided {@link AbstractSlot} to
          * the x and y coordinates.

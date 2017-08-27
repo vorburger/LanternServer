@@ -2,6 +2,7 @@ package org.lanternpowered.server.inventory.neww;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.EmptyInventory;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
@@ -42,6 +43,13 @@ public abstract class AbstractMutableInventory extends AbstractInventory {
     void setArchetype(InventoryArchetype archetype) {
         this.archetype = archetype;
     }
+
+    /**
+     * Sets the {@link Carrier} of this {@link Inventory}.
+     *
+     * @param carrier The carrier
+     */
+    protected abstract void setCarrier(Carrier carrier);
 
     /**
      * Gets all the {@link AbstractSlot}s that could be found in the

@@ -20,6 +20,7 @@ import org.spongepowered.api.item.inventory.property.ArmorSlotType;
 import org.spongepowered.api.item.inventory.property.EquipmentSlotType;
 import org.spongepowered.api.item.inventory.property.InventoryCapacity;
 import org.spongepowered.api.item.inventory.property.InventoryTitle;
+import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.translation.Translation;
 
@@ -103,6 +104,14 @@ public abstract class AbstractInventory implements IInventory {
      */
     protected abstract List<AbstractSlot> getSlotInventories();
 
+    /**
+     * Attempts to offer the specified {@link ItemStack} to this inventory.
+     *
+     * @param stack The item stack
+     * @return The result
+     */
+    protected abstract FastOfferResult offerFast(ItemStack stack);
+
     @Override
     public <T extends Inventory> Iterable<T> slots() {
         return (Iterable<T>) getSlotInventories();
@@ -124,6 +133,11 @@ public abstract class AbstractInventory implements IInventory {
     @Override
     public AbstractInventory parent() {
         return this.parent == null ? this : this.parent;
+    }
+
+    @Override
+    public AbstractInventory root() {
+        return null;
     }
 
     // Queries
@@ -353,6 +367,11 @@ public abstract class AbstractInventory implements IInventory {
     public Optional<ItemStack> peek(int limit, ItemType itemType) {
         checkNotNull(itemType, "itemType");
         return peek(limit, stack -> stack.getType().equals(itemType));
+    }
+
+    @Override
+    public InventoryTransactionResult offer(ItemStack stack) {
+        return offerFast(stack).asTransactionResult();
     }
 
     // Properties

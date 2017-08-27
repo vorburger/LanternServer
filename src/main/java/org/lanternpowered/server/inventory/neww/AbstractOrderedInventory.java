@@ -17,7 +17,7 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 
 @SuppressWarnings("unchecked")
-public abstract class LanternOrderedInventory<C extends AbstractMutableInventory>
+public abstract class AbstractOrderedInventory<C extends AbstractMutableInventory>
         extends AbstractChildrenInventory<C> implements IOrderedInventory {
 
     /**

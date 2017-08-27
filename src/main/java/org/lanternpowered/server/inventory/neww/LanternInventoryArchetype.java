@@ -23,55 +23,57 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory.neww.archetype;
+package org.lanternpowered.server.inventory.neww;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.lanternpowered.server.catalog.PluginCatalogType;
 import org.lanternpowered.server.inventory.InventoryPropertyHolder;
-import org.lanternpowered.server.inventory.neww.AbstractInventory;
-import org.lanternpowered.server.inventory.neww.LanternInventoryBuilder;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
 import org.spongepowered.api.item.inventory.InventoryProperty;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public abstract class AbstractInventoryArchetype extends PluginCatalogType.Base implements InventoryArchetype, InventoryPropertyHolder {
+@SuppressWarnings("unchecked")
+public class LanternInventoryArchetype<T extends AbstractInventory> extends PluginCatalogType.Base
+        implements InventoryArchetype, InventoryPropertyHolder {
 
-    public AbstractInventoryArchetype(String pluginId, String name) {
+    protected final AbstractBuilder<T, ? super T, ?> builder;
+    private final Map<String, InventoryProperty<String, ?>> propertiesByName;
+
+    LanternInventoryArchetype(String pluginId, String name,
+            AbstractBuilder<T, ? super T, ?> builder) {
         super(pluginId, name);
+        this.propertiesByName = Collections.unmodifiableMap(builder.propertiesByName);
+        this.builder = builder;
     }
 
-    public AbstractInventoryArchetype(String pluginId, String id, String name) {
-        super(pluginId, id, name);
+    @Override
+    public List<InventoryArchetype> getChildArchetypes() {
+        return null;
     }
 
     @Override
     public Map<String, InventoryProperty<String, ?>> getProperties() {
-        return null;
+        return this.propertiesByName;
     }
 
     @Override
     public Optional<InventoryProperty<String, ?>> getProperty(String key) {
-        return null;
+        return this.builder.asPropertyHolder().getProperty(key);
     }
 
     @Override
-    public <T extends InventoryProperty<String, ?>> Optional<T> getProperty(Class<T> property) {
-        return Optional.empty();
+    public <P extends InventoryProperty<String, ?>> Optional<P> getProperty(Class<P> property) {
+        checkNotNull(property, "property");
+        return Optional.ofNullable((P) this.builder.properties.get(property));
     }
 
     @Override
-    public <T extends InventoryProperty<String, ?>> Optional<T> getProperty(Class<T> type, String key) {
-        return null;
+    public <P extends InventoryProperty<String, ?>> Optional<P> getProperty(Class<P> type, String key) {
+        return this.builder.asPropertyHolder().getProperty(type, key);
     }
-
-    protected abstract void preConstruct(ConstructionContext context);
-
-    /**
-     * Constructs a inventory for the given context.
-     *
-     * @param context The context
-     * @return The inventory
-     */
-    protected abstract AbstractInventory construct(ConstructionContext context);
 }

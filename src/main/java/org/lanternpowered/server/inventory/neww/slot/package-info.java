@@ -23,8 +23,5 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory.neww;
-
-class DefaultInventoryRow extends AbstractInventoryRow {
-
-}
+@org.spongepowered.api.util.annotation.NonnullByDefault
+package org.lanternpowered.server.inventory.neww.slot;

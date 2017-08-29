@@ -1,3 +1,28 @@
+/*
+ * This file is part of LanternServer, licensed under the MIT License (MIT).
+ *
+ * Copyright (c) LanternPowered <https://www.lanternpowered.org>
+ * Copyright (c) SpongePowered <https://www.spongepowered.org>
+ * Copyright (c) contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the Software), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED AS IS, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 package org.lanternpowered.server.inventory.neww;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -7,6 +32,7 @@ import org.lanternpowered.server.inventory.*;
 import org.lanternpowered.server.inventory.neww.filter.EquipmentItemFilter;
 import org.lanternpowered.server.inventory.neww.filter.ItemFilter;
 import org.lanternpowered.server.inventory.neww.filter.PropertyItemFilters;
+import org.lanternpowered.server.inventory.neww.slot.LanternSlot;
 import org.lanternpowered.server.util.collect.Lists2;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.Carrier;
@@ -14,6 +40,7 @@ import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
 import org.spongepowered.api.item.inventory.InventoryProperty;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.equipment.EquipmentType;
 import org.spongepowered.api.item.inventory.property.AcceptsItems;
 import org.spongepowered.api.item.inventory.property.ArmorSlotType;
 import org.spongepowered.api.item.inventory.property.EquipmentSlotType;
@@ -43,7 +70,7 @@ public abstract class AbstractSlot extends AbstractMutableInventory implements I
      *
      * @return The builder
      */
-    public static Builder<?> builder() {
+    public static Builder<AbstractSlot> builder() {
         return new Builder();
     }
 
@@ -166,6 +193,19 @@ public abstract class AbstractSlot extends AbstractMutableInventory implements I
     public boolean isValidItem(ItemStack stack) {
         checkNotNull(stack, "stack");
         return this.itemFilter == null || this.itemFilter.isValid(stack);
+    }
+
+    @Override
+    public boolean isValidItem(ItemType type) {
+        checkNotNull(type, "type");
+        return this.itemFilter == null || this.itemFilter.isValid(type);
+    }
+
+    @Override
+    public boolean isValidItem(EquipmentType type) {
+        checkNotNull(type, "type");
+        return this.itemFilter == null || !(this.itemFilter instanceof EquipmentItemFilter) ||
+                ((EquipmentItemFilter) this.itemFilter).isValid(type);
     }
 
     @Override
@@ -377,7 +417,7 @@ public abstract class AbstractSlot extends AbstractMutableInventory implements I
 
     public static final class Builder<T extends AbstractSlot> extends AbstractBuilder<T, AbstractSlot, Builder<T>> {
 
-        private static final Supplier<AbstractSlot> DEFAULT_SUPPLIER = DefaultSlot::new;
+        private static final Supplier<AbstractSlot> DEFAULT_SUPPLIER = LanternSlot::new;
         @Nullable private ItemFilter itemFilter;
 
         @Nullable private ItemFilter cachedResultItemFilter;

@@ -25,6 +25,8 @@
  */
 package org.lanternpowered.server.inventory.neww;
 
-class DefaultInventoryRow extends AbstractInventoryRow {
+@FunctionalInterface
+public interface InventoryCloseListener {
 
+    void onClose(IInventory inventory);
 }

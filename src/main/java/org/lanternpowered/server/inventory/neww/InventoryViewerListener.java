@@ -25,6 +25,35 @@
  */
 package org.lanternpowered.server.inventory.neww;
 
-class DefaultInventoryRow extends AbstractInventoryRow {
+import org.lanternpowered.server.inventory.LanternContainer;
+import org.spongepowered.api.effect.Viewer;
 
+public interface InventoryViewerListener {
+
+    /**
+     * Is called when the specified {@link Viewer} starts watching the {@link LanternContainer}.
+     *
+     * @param viewer The viewer
+     * @param container The container
+     * @param callback The callback
+     */
+    void onViewerAdded(Viewer viewer, LanternContainer container, Callback callback);
+
+    /**
+     * Is called when the specified {@link Viewer} stops watching the {@link LanternContainer}.
+     *
+     * @param viewer The viewer
+     * @param container The container
+     * @param callback The callback
+     */
+    void onViewerRemoved(Viewer viewer, LanternContainer container, Callback callback);
+
+    interface Callback {
+
+        /**
+         * Removes the {@link InventoryViewerListener}, the
+         * listener won't be run again.
+         */
+        void remove();
+    }
 }

@@ -1,21 +1,39 @@
+/*
+ * This file is part of LanternServer, licensed under the MIT License (MIT).
+ *
+ * Copyright (c) LanternPowered <https://www.lanternpowered.org>
+ * Copyright (c) SpongePowered <https://www.spongepowered.org>
+ * Copyright (c) contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the Software), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED AS IS, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 package org.lanternpowered.server.inventory.neww.vanilla;
 
-import org.lanternpowered.server.inventory.ContainerViewListener;
-import org.lanternpowered.server.inventory.InventoryCloseListener;
 import org.lanternpowered.server.inventory.behavior.HotbarBehavior;
 import org.lanternpowered.server.inventory.behavior.VanillaHotbarBehavior;
 import org.lanternpowered.server.inventory.neww.AbstractInventoryRow;
-import org.lanternpowered.server.inventory.neww.AbstractSlot;
 import org.lanternpowered.server.inventory.neww.ISlot;
-import org.lanternpowered.server.inventory.slot.LanternSlot;
-import org.lanternpowered.server.inventory.slot.SlotChangeListener;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.InventoryProperty;
-import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.entity.Hotbar;
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
 import org.spongepowered.api.item.inventory.property.EquipmentSlotType;
-import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
 
 import java.util.List;
 import java.util.Optional;
@@ -56,6 +74,9 @@ public class LanternHotbarInventory extends AbstractInventoryRow implements Hotb
         this.hotbarBehavior.setSelectedSlotIndex(index);
     }
 
+    // The EquipmentSlotType off the selected hotbar slot is dynamic,
+    // so you can't assign it directly to a slot instance
+
     @Override
     protected <T extends InventoryProperty<?, ?>> Optional<T> tryGetProperty(Inventory child, Class<T> property, @Nullable Object key) {
         if (EquipmentSlotType.class.isAssignableFrom(property) && child == getSelectedSlot()) {
@@ -71,14 +92,5 @@ public class LanternHotbarInventory extends AbstractInventoryRow implements Hotb
             properties.add((T) new EquipmentSlotType(EquipmentTypes.MAIN_HAND));
         }
         return properties;
-    }
-
-    // TODO
-    @Override public void addViewListener(ContainerViewListener listener) {
-
-    }
-
-    @Override public void addCloseListener(InventoryCloseListener listener) {
-
     }
 }

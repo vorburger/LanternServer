@@ -23,8 +23,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory.neww;
+package org.lanternpowered.server.inventory.neww.vanilla;
 
-class DefaultInventoryRow extends AbstractInventoryRow {
+import org.lanternpowered.server.inventory.neww.AbstractGridInventory;
+import org.spongepowered.api.item.inventory.entity.Hotbar;
+import org.spongepowered.api.item.inventory.entity.MainPlayerInventory;
+import org.spongepowered.api.item.inventory.type.GridInventory;
 
+public class LanternMainPlayerInventory extends AbstractGridInventory implements MainPlayerInventory {
+
+    private LanternHotbarInventory hotbar;
+    private AbstractGridInventory grid;
+
+    @Override
+    protected void init() {
+        super.init();
+
+        this.hotbar = query(LanternHotbarInventory.class).first();
+        this.grid = query(AbstractGridInventory.class).first();
+    }
+
+    @Override
+    public Hotbar getHotbar() {
+        return this.hotbar;
+    }
+
+    @Override
+    public GridInventory getGrid() {
+        return this.grid;
+    }
 }

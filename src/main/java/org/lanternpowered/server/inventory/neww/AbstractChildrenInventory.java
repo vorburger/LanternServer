@@ -1,3 +1,28 @@
+/*
+ * This file is part of LanternServer, licensed under the MIT License (MIT).
+ *
+ * Copyright (c) LanternPowered <https://www.lanternpowered.org>
+ * Copyright (c) SpongePowered <https://www.spongepowered.org>
+ * Copyright (c) contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the Software), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED AS IS, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 package org.lanternpowered.server.inventory.neww;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -6,7 +31,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.collect.ImmutableList;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import org.lanternpowered.server.inventory.LanternContainer;
 import org.lanternpowered.server.inventory.LanternItemStack;
+import org.spongepowered.api.effect.Viewer;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.EmptyInventory;
@@ -62,6 +89,24 @@ public abstract class AbstractChildrenInventory<C extends AbstractMutableInvento
             }
         }
         return this.inventoryToIndex.get(inventory);
+    }
+
+    @Override
+    void close() {
+        super.close();
+        getChildren().forEach(AbstractMutableInventory::close);
+    }
+
+    @Override
+    void addViewer(Viewer viewer, LanternContainer container) {
+        super.addViewer(viewer, container);
+        getChildren().forEach(child -> child.addViewer(viewer, container));
+    }
+
+    @Override
+    void removeViewer(Viewer viewer, LanternContainer container) {
+        super.removeViewer(viewer, container);
+        getChildren().forEach(child -> child.removeViewer(viewer, container));
     }
 
     @Override
@@ -215,12 +260,8 @@ public abstract class AbstractChildrenInventory<C extends AbstractMutableInvento
 
     @Override
     public Optional<ItemStack> poll(Predicate<ItemStack> matcher) {
-        return poll(getChildren(), matcher);
-    }
-
-    static Optional<ItemStack> poll(Iterable<? extends AbstractMutableInventory> iterable, Predicate<ItemStack> matcher) {
         checkNotNull(matcher, "matcher");
-        for (AbstractMutableInventory inventory : iterable) {
+        for (AbstractMutableInventory inventory : getChildren()) {
             final Optional<ItemStack> itemStack = inventory.poll(matcher);
             if (itemStack.isPresent()) {
                 return itemStack;
@@ -231,17 +272,13 @@ public abstract class AbstractChildrenInventory<C extends AbstractMutableInvento
 
     @Override
     public Optional<ItemStack> poll(int limit, Predicate<ItemStack> matcher) {
-        return poll(getChildren(), limit, matcher);
-    }
-
-    static Optional<ItemStack> poll(Iterable<? extends AbstractMutableInventory> iterable, int limit, Predicate<ItemStack> matcher) {
         checkNotNull(matcher, "matcher");
         checkArgument(limit >= 0, "Limit may not be negative");
         if (limit == 0) {
             return Optional.empty();
         }
         ItemStack stack = null;
-        for (AbstractInventory inventory : iterable) {
+        for (AbstractInventory inventory : getChildren()) {
             // Check whether the slot a item contains
             if (stack == null) {
                 stack = inventory.poll(limit, matcher).orElse(null);
@@ -272,12 +309,8 @@ public abstract class AbstractChildrenInventory<C extends AbstractMutableInvento
 
     @Override
     public Optional<ItemStack> peek(Predicate<ItemStack> matcher) {
-        return peek(getChildren(), matcher);
-    }
-
-    static Optional<ItemStack> peek(Iterable<? extends AbstractMutableInventory> iterable, Predicate<ItemStack> matcher) {
         checkNotNull(matcher, "matcher");
-        for (AbstractMutableInventory inventory : iterable) {
+        for (AbstractMutableInventory inventory : getChildren()) {
             final Optional<ItemStack> itemStack = inventory.peek(matcher);
             if (itemStack.isPresent()) {
                 return itemStack;
@@ -288,17 +321,13 @@ public abstract class AbstractChildrenInventory<C extends AbstractMutableInvento
 
     @Override
     public Optional<ItemStack> peek(int limit, Predicate<ItemStack> matcher) {
-        return peek(getChildren(), limit, matcher);
-    }
-
-    static Optional<ItemStack> peek(Iterable<? extends AbstractMutableInventory> iterable, int limit, Predicate<ItemStack> matcher) {
         checkNotNull(matcher, "matcher");
         checkArgument(limit >= 0, "Limit may not be negative");
         if (limit == 0) {
             return Optional.empty();
         }
         ItemStack stack = null;
-        for (AbstractMutableInventory inventory : iterable) {
+        for (AbstractMutableInventory inventory : getChildren()) {
             // Check whether the slot a item contains
             if (stack == null) {
                 stack = inventory.peek(limit, matcher).orElse(null);

@@ -23,8 +23,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory.neww;
+package org.lanternpowered.server.inventory.neww.slot;
 
-class DefaultInventoryRow extends AbstractInventoryRow {
+import org.spongepowered.api.item.inventory.crafting.CraftingOutput;
+
+public class LanternCraftingOutputSlot extends LanternOutputSlot implements CraftingOutput {
 
 }

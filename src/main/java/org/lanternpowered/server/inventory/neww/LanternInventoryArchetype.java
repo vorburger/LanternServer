@@ -45,8 +45,7 @@ public class LanternInventoryArchetype<T extends AbstractInventory> extends Plug
     private final Map<String, InventoryProperty<String, ?>> propertiesByName;
     private final List<InventoryArchetype> childArchetypes;
 
-    LanternInventoryArchetype(String pluginId, String name,
-            AbstractBuilder<T, ? super T, ?> builder) {
+    LanternInventoryArchetype(String pluginId, String name, AbstractBuilder<T, ? super T, ?> builder) {
         super(pluginId, name);
         this.propertiesByName = Collections.unmodifiableMap(builder.propertiesByName);
         this.childArchetypes = Collections.unmodifiableList(builder.getArchetypes());

@@ -25,27 +25,43 @@
  */
 package org.lanternpowered.server.inventory.neww;
 
-import org.spongepowered.api.item.inventory.Slot;
-import org.spongepowered.api.item.inventory.type.OrderedInventory;
+import org.spongepowered.api.item.inventory.Inventory;
+import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.util.Direction;
 
-import java.util.Optional;
-
-public interface IOrderedInventory extends IInventory, OrderedInventory {
-
-    /**
-     * Gets the {@link Slot} for the specified index.
-     *
-     * @param index The slot index
-     * @return The slot if found
-     */
-    Optional<ISlot> getSlot(int index);
+public interface ISidedInventory extends IInventory {
 
     /**
-     * Gets the index of the {@link Slot} in this ordered inventory,
-     * may return {@code -1} if the slot was not found.
+     * Gets whether this inventory can accept the specified item
+     * from the specified direction.
      *
-     * @param slot The slot
-     * @return The slot index
+     * @param stack Stack to check
+     * @param from Direction to check for insertion from
+     * @return True if this inventory can accept the supplied stack from
+     *         the specified direction
      */
-    int getSlotIndex(Slot slot);
+    boolean canAccept(ItemStack stack, Direction from);
+
+    /**
+     * Attempts to insert the supplied stack into this inventory from the
+     * specified direction.
+     *
+     * @see Inventory#offer(ItemStack)
+     * @param stack Stack to insert
+     * @param from Direction to check for insertion from
+     * @return True if this inventory can accept the supplied stack from the
+     *         specified direction
+     */
+    boolean offer(ItemStack stack, Direction from);
+
+    /**
+     * Gets whether automation can extract the specified item from the specified
+     * direction.
+     *
+     * @param stack Stack to check
+     * @param from Direction to check for retrieval from
+     * @return True if automation can retrieve the supplied stack from the
+     *         specified direction
+     */
+    boolean canGet(ItemStack stack, Direction from);
 }

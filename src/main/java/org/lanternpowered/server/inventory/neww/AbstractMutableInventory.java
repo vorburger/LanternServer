@@ -1,8 +1,34 @@
+/*
+ * This file is part of LanternServer, licensed under the MIT License (MIT).
+ *
+ * Copyright (c) LanternPowered <https://www.lanternpowered.org>
+ * Copyright (c) SpongePowered <https://www.spongepowered.org>
+ * Copyright (c) contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the Software), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED AS IS, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 package org.lanternpowered.server.inventory.neww;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.lanternpowered.server.inventory.ContainerViewListener;
+import org.lanternpowered.server.inventory.LanternContainer;
+import org.spongepowered.api.effect.Viewer;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.EmptyInventory;
 import org.spongepowered.api.item.inventory.Inventory;
@@ -28,6 +54,9 @@ public abstract class AbstractMutableInventory extends AbstractInventory {
     @Nullable private PluginContainer plugin;
     @Nullable private LanternEmptyInventory emptyInventory;
     @Nullable private InventoryArchetype archetype;
+
+    private final Set<InventoryViewerListener> viewerListeners = new HashSet<>();
+    private final Set<InventoryCloseListener> closeListeners = new HashSet<>();
 
     /**
      * Sets the {@link PluginContainer} of this inventory.
@@ -63,6 +92,62 @@ public abstract class AbstractMutableInventory extends AbstractInventory {
      * @return The slots
      */
     protected abstract List<AbstractSlot> getSlotInventories();
+
+    @Override
+    void close() {
+        super.close();
+        for (InventoryCloseListener listener : this.closeListeners) {
+            listener.onClose(this);
+        }
+    }
+
+    @Override
+    public void addCloseListener(InventoryCloseListener listener) {
+        checkNotNull(listener, "listener");
+        this.closeListeners.add(listener);
+    }
+
+    @Override
+    public void addViewListener(InventoryViewerListener listener) {
+        checkNotNull(listener, "listener");
+        this.viewerListeners.add(listener);
+    }
+
+    private static final class ViewerListenerCallback implements InventoryViewerListener.Callback {
+
+        private boolean remove;
+
+        @Override
+        public void remove() {
+            this.remove = true;
+        }
+    }
+
+    @Override
+    void addViewer(Viewer viewer, LanternContainer container) {
+        if (this.viewerListeners.isEmpty()) {
+            return;
+        }
+        final ViewerListenerCallback callback = new ViewerListenerCallback();
+        this.viewerListeners.removeIf(listener -> {
+            callback.remove = false;
+            listener.onViewerAdded(viewer, container, callback);
+            return callback.remove;
+        });
+    }
+
+    @Override
+    void removeViewer(Viewer viewer, LanternContainer container) {
+        if (this.viewerListeners.isEmpty()) {
+            return;
+        }
+        final ViewerListenerCallback callback = new ViewerListenerCallback();
+        this.viewerListeners.removeIf(listener -> {
+            callback.remove = false;
+            listener.onViewerRemoved(viewer, container, callback);
+            return callback.remove;
+        });
+    }
 
     @Override
     public <T extends Inventory> Iterable<T> slots() {

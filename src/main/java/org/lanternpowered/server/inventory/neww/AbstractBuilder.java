@@ -1,3 +1,28 @@
+/*
+ * This file is part of LanternServer, licensed under the MIT License (MIT).
+ *
+ * Copyright (c) LanternPowered <https://www.lanternpowered.org>
+ * Copyright (c) SpongePowered <https://www.spongepowered.org>
+ * Copyright (c) contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the Software), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED AS IS, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 package org.lanternpowered.server.inventory.neww;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -11,6 +36,7 @@ import org.spongepowered.api.plugin.PluginContainer;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Supplier;
@@ -40,11 +66,11 @@ public abstract class AbstractBuilder<R extends T, T extends AbstractInventory, 
      * @param <N> The supplied slot type
      * @return This builder, for chaining
      */
-    public <N extends T> B typeSupplier(Supplier<N> supplier) {
+    public <N extends T> AbstractBuilder<N, T, ?> typeSupplier(Supplier<N> supplier) {
         checkNotNull(supplier, "supplier");
         this.supplier = (Supplier<R>) supplier;
         invalidateCachedArchetype();
-        return (B) this;
+        return (AbstractBuilder<N, T, ?>) this;
     }
 
     /**
@@ -79,25 +105,11 @@ public abstract class AbstractBuilder<R extends T, T extends AbstractInventory, 
      * @return The inventory
      */
     public R build() {
-        return build(this.pluginContainer);
-    }
-
-    /**
-     * Constructs a {@link AbstractInventory}.
-     *
-     * @param plugin The plugin that constructs the inventory
-     * @return The inventory
-     */
-    public R build(Object plugin) {
-        return build(checkPlugin(plugin, "plugin"));
-    }
-
-    private R build(@Nullable PluginContainer pluginContainer) {
         checkState(this.supplier != null);
         final R inventory = this.supplier.get();
         if (inventory instanceof AbstractMutableInventory) {
             final AbstractMutableInventory mutableInventory = (AbstractMutableInventory) inventory;
-            final String pluginId = (pluginContainer == null ? Lantern.getImplementationPlugin() : pluginContainer).getId();
+            final String pluginId = (this.pluginContainer == null ? Lantern.getImplementationPlugin() : this.pluginContainer).getId();
             mutableInventory.setArchetype(buildArchetype(pluginId, UUID.randomUUID().toString()));
         }
         build(inventory);
@@ -114,12 +126,24 @@ public abstract class AbstractBuilder<R extends T, T extends AbstractInventory, 
     /**
      * Constructs a {@link LanternInventoryArchetype} from this builder.
      *
+     * @return The inventory archetype
+     */
+    public LanternInventoryArchetype<R> buildArchetype() {
+        checkState(this.supplier != null);
+        final String pluginId = (this.pluginContainer == null ? Lantern.getImplementationPlugin() : this.pluginContainer).getId();
+        return buildArchetype(pluginId, UUID.randomUUID().toString());
+    }
+
+    /**
+     * Constructs a {@link LanternInventoryArchetype} from this builder.
+     *
      * @param pluginId The plugin id
      * @param id The id
      * @return The inventory archetype
      */
     public LanternInventoryArchetype<R> buildArchetype(String pluginId, String id) {
-        if (this.cachedArchetype != null) {
+        if (this.cachedArchetype != null &&this.cachedArchetype.getId()
+                .equals(pluginId + ':' + id.toLowerCase(Locale.ENGLISH))) {
             return this.cachedArchetype;
         }
         return this.cachedArchetype = new LanternInventoryArchetype<>(pluginId, id, copy());

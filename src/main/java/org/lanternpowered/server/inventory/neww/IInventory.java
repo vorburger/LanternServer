@@ -25,8 +25,6 @@
  */
 package org.lanternpowered.server.inventory.neww;
 
-import org.lanternpowered.server.inventory.ContainerViewListener;
-import org.lanternpowered.server.inventory.InventoryCloseListener;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
@@ -55,11 +53,11 @@ public interface IInventory extends Inventory {
     void addChangeListener(SlotChangeListener listener);
 
     /**
-     * Adds a {@link ContainerViewListener} to this {@link Inventory}.
+     * Adds a {@link InventoryViewerListener} to this {@link Inventory}.
      *
      * @param listener The listener
      */
-    void addViewListener(ContainerViewListener listener);
+    void addViewListener(InventoryViewerListener listener);
 
     /**
      * Adds a {@link InventoryCloseListener} to this {@link Inventory}.

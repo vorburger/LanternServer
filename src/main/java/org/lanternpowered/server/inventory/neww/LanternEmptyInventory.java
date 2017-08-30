@@ -44,6 +44,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+import javax.annotation.Nullable;
+
 final class LanternEmptyInventory extends AbstractInventory implements EmptyInventory {
 
     static class Name {
@@ -104,6 +106,21 @@ final class LanternEmptyInventory extends AbstractInventory implements EmptyInve
 
     @Override
     public Optional<ItemStack> peek(int limit, Predicate<ItemStack> matcher) {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<PeekedPollTransactionResult> peekPoll(Predicate<ItemStack> matcher) {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<PeekedPollTransactionResult> peekPoll(int limit, Predicate<ItemStack> matcher) {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<PeekedSetTransactionResult> peekSet(@Nullable ItemStack itemStack) {
         return Optional.empty();
     }
 

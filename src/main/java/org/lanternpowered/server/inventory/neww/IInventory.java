@@ -25,12 +25,17 @@
  */
 package org.lanternpowered.server.inventory.neww;
 
+import org.lanternpowered.server.inventory.PeekSetTransactionsResult;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
+import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
 
 import java.util.Optional;
 import java.util.function.Predicate;
+
+import javax.annotation.Nullable;
 
 public interface IInventory extends Inventory {
 
@@ -95,6 +100,19 @@ public interface IInventory extends Inventory {
     Optional<ItemStack> peek(int limit, ItemType itemType);
 
     Optional<ItemStack> peek(int limit, Predicate<ItemStack> matcher);
+
+    Optional<PeekedPollTransactionResult> peekPoll(Predicate<ItemStack> matcher);
+
+    Optional<PeekedPollTransactionResult> peekPoll(int limit, Predicate<ItemStack> matcher);
+
+    /**
+     * Peeks for the result {@link SlotTransaction}s and {@link InventoryTransactionResult}
+     * that would occur if you try to set a item through {@link Inventory#set(ItemStack)}.
+     *
+     * @param itemStack The item stack to set
+     * @return The peeked transaction result
+     */
+    Optional<PeekedSetTransactionResult> peekSet(@Nullable ItemStack itemStack);
 
     /**
      * Check whether the supplied item can be inserted into this one of the children of the

@@ -23,8 +23,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory.neww;
+package org.lanternpowered.server.inventory.neww.type;
 
-public class DefaultGridInventory extends AbstractGridInventory {
+import org.lanternpowered.server.inventory.neww.AbstractUnorderedSlotsInventory;
+
+public class LanternUnorderedSlotsInventory extends AbstractUnorderedSlotsInventory {
 
 }

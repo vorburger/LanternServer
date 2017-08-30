@@ -28,7 +28,8 @@ package org.lanternpowered.server.inventory.neww.vanilla;
 import org.lanternpowered.server.inventory.neww.AbstractGridInventory;
 import org.lanternpowered.server.inventory.neww.AbstractOrderedSlotsInventory;
 import org.lanternpowered.server.inventory.neww.AbstractSlot;
-import org.lanternpowered.server.inventory.neww.DefaultGridInventory;
+import org.lanternpowered.server.inventory.neww.type.LanternCarriedEquipmentInventory;
+import org.lanternpowered.server.inventory.neww.type.LanternGridInventory;
 import org.lanternpowered.server.inventory.neww.LanternInventoryArchetype;
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
 import org.spongepowered.api.item.inventory.property.EquipmentSlotType;
@@ -52,20 +53,20 @@ public class BuildPlayerInv {
                 mainWithoutHotbarBuilder.slot(x, y, slotArchetype);
             }
         }
-        final LanternInventoryArchetype<DefaultGridInventory> mainWithoutHotbarArchetype = mainWithoutHotbarBuilder
-                .typeSupplier(DefaultGridInventory::new).buildArchetype();
+        final LanternInventoryArchetype<LanternGridInventory> mainWithoutHotbarArchetype = mainWithoutHotbarBuilder
+                .typeSupplier(LanternGridInventory::new).buildArchetype();
         // Step 3: Construct a grid of the main with hotbar
         final LanternInventoryArchetype<LanternMainPlayerInventory> mainArchetype = AbstractGridInventory.rowsBuilder()
                 .grid(0, mainWithoutHotbarArchetype) // The first 3 rows are used by the main grid
                 .row(3, hotbarArchetype) // The fourth is the hotbar
                 .typeSupplier(LanternMainPlayerInventory::new).buildArchetype();
         // Step 4: Construct the equipment inventory
-        final LanternInventoryArchetype<LanternEquipmentInventory> equipmentArchetype = AbstractOrderedSlotsInventory.builder()
+        final LanternInventoryArchetype<LanternCarriedEquipmentInventory> equipmentArchetype = AbstractOrderedSlotsInventory.builder()
                 .slot(AbstractSlot.builder().property(EquipmentSlotType.of(EquipmentTypes.HEADWEAR)).buildArchetype())
                 .slot(AbstractSlot.builder().property(EquipmentSlotType.of(EquipmentTypes.CHESTPLATE)).buildArchetype())
                 .slot(AbstractSlot.builder().property(EquipmentSlotType.of(EquipmentTypes.LEGGINGS)).buildArchetype())
                 .slot(AbstractSlot.builder().property(EquipmentSlotType.of(EquipmentTypes.BOOTS)).buildArchetype())
-                .typeSupplier(LanternEquipmentInventory::new)
+                .typeSupplier(LanternCarriedEquipmentInventory::new)
                 .buildArchetype();
         // Step 5: Construct the off hand slot
         final LanternInventoryArchetype<AbstractSlot> offhandSlot = AbstractSlot.builder()

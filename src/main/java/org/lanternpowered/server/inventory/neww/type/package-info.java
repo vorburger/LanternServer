@@ -23,13 +23,5 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory.property;
-
-import org.spongepowered.api.item.inventory.property.IntProperty;
-
-public final class ChestRowsProperty extends IntProperty {
-
-    public ChestRowsProperty(int value) {
-        super(value);
-    }
-}
+@org.spongepowered.api.util.annotation.NonnullByDefault
+package org.lanternpowered.server.inventory.neww.type;

@@ -27,7 +27,6 @@ package org.lanternpowered.server.inventory.neww;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
-import static org.lanternpowered.server.util.Conditions.checkPlugin;
 
 import org.lanternpowered.server.data.property.PropertyKeySetter;
 import org.spongepowered.api.event.item.inventory.InteractInventoryEvent;
@@ -35,7 +34,6 @@ import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
 import org.spongepowered.api.item.inventory.InventoryProperty;
-import org.spongepowered.api.plugin.PluginContainer;
 
 import java.util.function.Consumer;
 
@@ -97,18 +95,16 @@ public class LanternInventoryBuilder implements Inventory.Builder {
 
     @Override
     public Inventory build(Object plugin) {
-        final PluginContainer pluginContainer = checkPlugin(plugin, "plugin");
         checkState(this.inventoryArchetype != null, "The inventory archetype must be set");
         final AbstractInventory inventory;
         if (this.builder != null) {
-            inventory = this.builder.build();
+            inventory = this.builder.build(plugin);
         } else {
-            inventory = this.inventoryArchetype.builder.build();
+            inventory = this.inventoryArchetype.builder.build(plugin);
         }
         if (inventory instanceof AbstractMutableInventory && this.carrier != null) {
             final AbstractMutableInventory mutableInventory = (AbstractMutableInventory) inventory;
             mutableInventory.setCarrier(this.carrier);
-            mutableInventory.setPlugin(pluginContainer);
         }
         return inventory;
     }

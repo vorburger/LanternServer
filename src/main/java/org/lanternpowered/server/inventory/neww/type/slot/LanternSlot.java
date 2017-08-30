@@ -23,37 +23,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory.neww;
+package org.lanternpowered.server.inventory.neww.type.slot;
 
-import org.lanternpowered.server.inventory.LanternContainer;
-import org.spongepowered.api.effect.Viewer;
+import org.lanternpowered.server.inventory.neww.AbstractSlot;
 
-public interface InventoryViewerListener {
+public class LanternSlot extends AbstractSlot {
 
-    /**
-     * Is called when the specified {@link Viewer} starts watching the {@link LanternContainer}.
-     *
-     * @param viewer The viewer
-     * @param container The container
-     * @param callback The callback
-     */
-    void onViewerAdded(Viewer viewer, LanternContainer container, Callback callback);
-
-    /**
-     * Is called when the specified {@link Viewer} stops watching the {@link LanternContainer}.
-     *
-     * @param viewer The viewer
-     * @param container The container
-     * @param callback The callback
-     */
-    void onViewerRemoved(Viewer viewer, LanternContainer container, Callback callback);
-
-    interface Callback { // TODO: Better name?
-
-        /**
-         * Removes the {@link InventoryViewerListener}, the
-         * listener won't be run again.
-         */
-        void remove();
-    }
 }

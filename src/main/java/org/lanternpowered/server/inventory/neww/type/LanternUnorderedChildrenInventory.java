@@ -23,5 +23,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-@org.spongepowered.api.util.annotation.NonnullByDefault
-package org.lanternpowered.server.inventory.neww.slot;
+package org.lanternpowered.server.inventory.neww.type;
+
+import org.lanternpowered.server.inventory.neww.AbstractUnorderedChildrenInventory;
+
+public class LanternUnorderedChildrenInventory extends AbstractUnorderedChildrenInventory {
+
+}

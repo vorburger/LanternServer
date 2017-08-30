@@ -25,13 +25,43 @@
  */
 package org.lanternpowered.server.inventory.neww;
 
-import org.lanternpowered.server.inventory.ContainerViewListener;
-import org.lanternpowered.server.inventory.InventoryCloseListener;
-import org.lanternpowered.server.inventory.slot.SlotChangeListener;
-import org.spongepowered.api.item.inventory.Inventory;
+import com.google.common.base.MoreObjects;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
+import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
 
-public class DefaultOrderedSlotsInventory extends AbstractOrderedSlotsInventory {
+import java.util.List;
 
+import javax.annotation.Nullable;
+
+public class PeekedSetTransactionResult extends PeekedOfferTransactionResult {
+
+    @Nullable private final ItemStack replacedItem;
+
+    /**
+     * Constructs a new {@link PeekedSetTransactionResult}.
+     *
+     * @param transactions The slot transactions that will occur
+     * @param rejectedItem The rejected item stack, this can occur if the stack doesn't fit the inventory
+     * @param replacedItem The replaced item stack
+     */
+    public PeekedSetTransactionResult(List<SlotTransaction> transactions, @Nullable ItemStack rejectedItem, @Nullable ItemStack replacedItem) {
+        super(transactions, rejectedItem);
+        this.replacedItem = replacedItem;
+    }
+
+    @Override
+    protected InventoryTransactionResult.Builder asInventoryTransactionBuilder() {
+        final InventoryTransactionResult.Builder builder = super.asInventoryTransactionBuilder();
+        if (this.replacedItem != null) {
+            builder.replace(this.replacedItem);
+        }
+        return builder;
+    }
+
+    @Override
+    protected MoreObjects.ToStringHelper toStringHelper() {
+        return super.toStringHelper()
+                .add("replacedItem", this.replacedItem);
+    }
 }

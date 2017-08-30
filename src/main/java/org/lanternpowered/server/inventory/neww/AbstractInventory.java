@@ -34,6 +34,7 @@ import com.google.common.collect.Iterables;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.inventory.LanternContainer;
 import org.lanternpowered.server.inventory.equipment.LanternEquipmentType;
+import org.lanternpowered.server.inventory.neww.type.LanternUnorderedSlotsInventory;
 import org.lanternpowered.server.text.translation.TextTranslation;
 import org.spongepowered.api.effect.Viewer;
 import org.spongepowered.api.item.ItemType;
@@ -256,7 +257,7 @@ public abstract class AbstractInventory implements IInventory {
             return genericEmpty();
         }
         // Construct the result inventory
-        final DefaultUnorderedSlotsInventory result = new DefaultUnorderedSlotsInventory();
+        final LanternUnorderedSlotsInventory result = new LanternUnorderedSlotsInventory();
         result.init(slots);
         return (T) result;
     }

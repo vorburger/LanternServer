@@ -23,8 +23,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory.neww;
+package org.lanternpowered.server.inventory.neww.type;
 
-class DefaultInventoryColumn extends AbstractInventoryColumn {
+import org.lanternpowered.server.inventory.neww.AbstractInventoryColumn;
+
+public class LanternInventoryColumn extends AbstractInventoryColumn {
 
 }

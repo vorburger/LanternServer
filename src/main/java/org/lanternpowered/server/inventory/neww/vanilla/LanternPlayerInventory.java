@@ -27,10 +27,9 @@ package org.lanternpowered.server.inventory.neww.vanilla;
 
 import org.lanternpowered.server.inventory.neww.AbstractOrderedChildrenInventory;
 import org.lanternpowered.server.inventory.neww.AbstractSlot;
-import org.lanternpowered.server.inventory.neww.InventoryCloseListener;
+import org.lanternpowered.server.inventory.neww.type.LanternCarriedEquipmentInventory;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.Carrier;
-import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.entity.PlayerInventory;
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
 import org.spongepowered.api.item.inventory.property.EquipmentSlotType;
@@ -45,7 +44,7 @@ public class LanternPlayerInventory extends AbstractOrderedChildrenInventory imp
     @Nullable private WeakReference<Player> carrier;
 
     private LanternMainPlayerInventory mainInventory;
-    private LanternEquipmentInventory equipmentInventory;
+    private LanternCarriedEquipmentInventory equipmentInventory;
     private AbstractSlot offhandSlot;
 
     @Override
@@ -66,7 +65,7 @@ public class LanternPlayerInventory extends AbstractOrderedChildrenInventory imp
 
         // Search the the inventories for the helper methods
         this.mainInventory = query(LanternMainPlayerInventory.class).first();
-        this.equipmentInventory = query(LanternEquipmentInventory.class).first();
+        this.equipmentInventory = query(LanternCarriedEquipmentInventory.class).first();
         this.equipmentInventory = query(new EquipmentSlotType(EquipmentTypes.OFF_HAND)).first();
     }
 
@@ -76,7 +75,7 @@ public class LanternPlayerInventory extends AbstractOrderedChildrenInventory imp
     }
 
     @Override
-    public LanternEquipmentInventory getEquipment() {
+    public LanternCarriedEquipmentInventory getEquipment() {
         return this.equipmentInventory;
     }
 

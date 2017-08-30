@@ -31,6 +31,8 @@ import static com.google.common.base.Preconditions.checkState;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import org.lanternpowered.server.inventory.neww.type.LanternInventoryColumn;
+import org.lanternpowered.server.inventory.neww.type.LanternInventoryRow;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
 import org.spongepowered.api.item.inventory.type.GridInventory;
 import org.spongepowered.api.item.inventory.type.InventoryColumn;
@@ -72,6 +74,20 @@ public abstract class AbstractGridInventory extends AbstractInventory2D implemen
      */
     public static RowsBuilder<?> rowsBuilder() {
         return new RowsBuilder<>();
+    }
+
+    /**
+     * Constructs a new {@link ColumnsBuilder} to create {@link AbstractGridInventory}s. This builder
+     * only accepts {@link LanternInventoryArchetype}s that construct {@link AbstractInventoryColumn}s
+     * or {@link AbstractGridInventory}s.
+     * <p>
+     * The first specified column/grid will define the height/rows of all the columns, any mismatching
+     * value after specifying the first inventory will result in a exception.
+     *
+     * @return The builder
+     */
+    public static ColumnsBuilder<?> columnsBuilder() {
+        return new ColumnsBuilder<>();
     }
 
     @Nullable private List<AbstractInventoryRow> rows;
@@ -247,13 +263,13 @@ public abstract class AbstractGridInventory extends AbstractInventory2D implemen
                     rowSlots.add(slot);
                     columnSlots[x].add(slot);
                 }
-                final AbstractInventoryRow row = this.rowTypes[y] == null ? new DefaultInventoryRow() : this.rowTypes[y].get();
+                final AbstractInventoryRow row = this.rowTypes[y] == null ? new LanternInventoryRow() : this.rowTypes[y].get();
                 row.init(rowSlots.build());
                 row.setParentSafely(inventory); // Only set the parent if not done before
                 rows.add(row);
             }
             for (int x = 0; x < this.columns; x++) {
-                final AbstractInventoryColumn column = this.columnTypes[x] == null ? new DefaultInventoryColumn() : this.columnTypes[x].get();
+                final AbstractInventoryColumn column = this.columnTypes[x] == null ? new LanternInventoryColumn() : this.columnTypes[x].get();
                 column.init(columnSlots[x].build());
                 column.setParentSafely(inventory); // Only set the parent if not done before
                 columns.add(column);
@@ -377,7 +393,7 @@ public abstract class AbstractGridInventory extends AbstractInventory2D implemen
                         final Builder<?,?> builder = (Builder<?, ?>) entry.archetype.builder;
                         final int y = entry.y + i;
                         final AbstractInventoryRow newRow = this.rowTypes[y] != null ? this.rowTypes[y].get() :
-                                        builder.rowTypes[i] != null ? builder.rowTypes[y].get() : new DefaultInventoryRow();
+                                        builder.rowTypes[i] != null ? builder.rowTypes[y].get() : new LanternInventoryRow();
                         newRow.init(row.getSlotInventories());
                         newRow.setParentSafely(inventory);
                         for (int x = 0; x < this.columns; x++) {
@@ -388,7 +404,7 @@ public abstract class AbstractGridInventory extends AbstractInventory2D implemen
             }
             final ImmutableList.Builder<AbstractInventoryColumn> columns = ImmutableList.builder();
             for (int x = 0; x < this.columns; x++) {
-                final AbstractInventoryColumn column = this.columnTypes[x] == null ? new DefaultInventoryColumn() : this.columnTypes[x].get();
+                final AbstractInventoryColumn column = this.columnTypes[x] == null ? new LanternInventoryColumn() : this.columnTypes[x].get();
                 column.init(columnSlots[x].build());
                 column.setParentSafely(inventory); // Only set the parent if not done before
                 columns.add(column);
@@ -504,7 +520,7 @@ public abstract class AbstractGridInventory extends AbstractInventory2D implemen
                         final Builder<?,?> builder = (Builder<?, ?>) entry.archetype.builder;
                         final int y = entry.x + i;
                         final AbstractInventoryColumn newRow = this.columnTypes[y] != null ? this.columnTypes[y].get() :
-                                builder.columnTypes[i] != null ? builder.columnTypes[y].get() : new DefaultInventoryColumn();
+                                builder.columnTypes[i] != null ? builder.columnTypes[y].get() : new LanternInventoryColumn();
                         newRow.init(column.getSlotInventories());
                         newRow.setParentSafely(inventory);
                         for (int x = 0; x < this.columns; x++) {
@@ -516,7 +532,7 @@ public abstract class AbstractGridInventory extends AbstractInventory2D implemen
             final ImmutableList.Builder<AbstractSlot> slots = ImmutableList.builder();
             final ImmutableList.Builder<AbstractInventoryRow> rows = ImmutableList.builder();
             for (int x = 0; x < this.rows; x++) {
-                final AbstractInventoryRow row = this.rowTypes[x] == null ? new DefaultInventoryRow() : this.rowTypes[x].get();
+                final AbstractInventoryRow row = this.rowTypes[x] == null ? new LanternInventoryRow() : this.rowTypes[x].get();
                 row.init(rowSlots[x].build());
                 row.setParentSafely(inventory); // Only set the parent if not done before
                 slots.addAll(row.getSlotInventories());

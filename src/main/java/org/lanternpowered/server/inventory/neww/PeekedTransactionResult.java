@@ -25,6 +25,50 @@
  */
 package org.lanternpowered.server.inventory.neww;
 
-final class DefaultUnorderedChildrenInventory extends AbstractUnorderedChildrenInventory {
+import com.google.common.base.MoreObjects;
+import com.google.common.collect.ImmutableList;
+import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
 
+import java.util.List;
+
+public abstract class PeekedTransactionResult {
+
+    private final List<SlotTransaction> transactions;
+
+    protected PeekedTransactionResult(List<SlotTransaction> transactions) {
+        this.transactions = ImmutableList.copyOf(transactions);
+    }
+
+    /**
+     * Gets all the {@link SlotTransaction}s that occur
+     * when the transaction result is applied.
+     *
+     * @return The slot transactions
+     */
+    public List<SlotTransaction> getTransactions() {
+        return this.transactions;
+    }
+
+    /**
+     * Accepts all the changes that are applied by this result,
+     * only {@link SlotTransaction}s that aren't valid will be
+     * ignored.
+     */
+    public void accept() {
+        this.transactions.forEach(transaction -> {
+            if (transaction.isValid()) {
+                transaction.getSlot().set(transaction.getFinal().createStack());
+            }
+        });
+    }
+
+    protected MoreObjects.ToStringHelper toStringHelper() {
+        return MoreObjects.toStringHelper(this)
+                .add("transactions", this.transactions);
+    }
+
+    @Override
+    public String toString() {
+        return toStringHelper().toString();
+    }
 }

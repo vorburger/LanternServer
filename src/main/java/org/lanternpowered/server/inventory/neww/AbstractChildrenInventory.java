@@ -33,6 +33,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import org.lanternpowered.server.inventory.LanternContainer;
 import org.lanternpowered.server.inventory.LanternItemStack;
+import org.lanternpowered.server.inventory.neww.type.LanternUnorderedChildrenInventory;
 import org.spongepowered.api.effect.Viewer;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.Carrier;
@@ -117,7 +118,7 @@ public abstract class AbstractChildrenInventory<C extends AbstractMutableInvento
             return genericEmpty();
         }
         // Construct the result inventory
-        final DefaultUnorderedChildrenInventory result = new DefaultUnorderedChildrenInventory();
+        final LanternUnorderedChildrenInventory result = new LanternUnorderedChildrenInventory();
         result.init(ImmutableList.copyOf(inventories));
         return (T) result;
     }
@@ -153,6 +154,11 @@ public abstract class AbstractChildrenInventory<C extends AbstractMutableInvento
     @Override
     public InventoryTransactionResult set(ItemStack stack) {
         return InventoryTransactionResult.builder().type(InventoryTransactionResult.Type.FAILURE).reject(stack).build();
+    }
+
+    @Override
+    public Optional<PeekedSetTransactionResult> peekSet(@Nullable ItemStack itemStack) {
+        return Optional.empty();
     }
 
     @Override
@@ -305,6 +311,58 @@ public abstract class AbstractChildrenInventory<C extends AbstractMutableInvento
             }
         }
         return Optional.ofNullable(stack);
+    }
+
+    @Override
+    public Optional<PeekedPollTransactionResult> peekPoll(Predicate<ItemStack> matcher) {
+        checkNotNull(matcher, "matcher");
+        for (AbstractMutableInventory inventory : getChildren()) {
+            final Optional<PeekedPollTransactionResult> peekResult = inventory.peekPoll(matcher);
+            if (peekResult.isPresent()) {
+                return peekResult;
+            }
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<PeekedPollTransactionResult> peekPoll(int limit, Predicate<ItemStack> matcher) {
+        checkNotNull(matcher, "matcher");
+        checkArgument(limit >= 0, "Limit may not be negative");
+        if (limit == 0) {
+            return Optional.empty();
+        }
+        PeekedPollTransactionResult peekResult = null;
+        // Loop through the children inventories
+        for (AbstractMutableInventory inventory : getChildren()) {
+            // Check whether the slot a item contains
+            if (peekResult == null) {
+                peekResult = inventory.peekPoll(limit, matcher).orElse(null);
+                if (peekResult != null) {
+                    if (peekResult.getPolledItem().getQuantity() >= limit) {
+                        return Optional.of(peekResult);
+                    } else {
+                        limit -= peekResult.getPolledItem().getQuantity();
+                        if (!(matcher instanceof SimilarItemMatcher)) {
+                            matcher = new SimilarItemMatcher(peekResult.getPolledItem());
+                        }
+                    }
+                }
+            } else {
+                final PeekedPollTransactionResult peekResult1 = inventory.peekPoll(limit, matcher).orElse(null);
+                if (peekResult1 != null) {
+                    final int peekedStackSize = peekResult1.getPolledItem().getQuantity();
+                    final ItemStack peekedItem = peekResult.getPolledItem();
+                    limit -= peekedStackSize;
+                    peekedItem.setQuantity(peekedItem.getQuantity() + peekedStackSize);
+                    peekResult.getTransactions().addAll(peekResult1.getTransactions());
+                    if (limit <= 0) {
+                        return Optional.of(peekResult);
+                    }
+                }
+            }
+        }
+        return Optional.ofNullable(peekResult);
     }
 
     @Override

@@ -32,7 +32,7 @@ import org.lanternpowered.server.inventory.*;
 import org.lanternpowered.server.inventory.neww.filter.EquipmentItemFilter;
 import org.lanternpowered.server.inventory.neww.filter.ItemFilter;
 import org.lanternpowered.server.inventory.neww.filter.PropertyItemFilters;
-import org.lanternpowered.server.inventory.neww.slot.LanternSlot;
+import org.lanternpowered.server.inventory.neww.type.slot.LanternSlot;
 import org.lanternpowered.server.util.collect.Lists2;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.Carrier;
@@ -40,6 +40,7 @@ import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
 import org.spongepowered.api.item.inventory.InventoryProperty;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
 import org.spongepowered.api.item.inventory.property.AcceptsItems;
 import org.spongepowered.api.item.inventory.property.ArmorSlotType;
@@ -47,7 +48,9 @@ import org.spongepowered.api.item.inventory.property.EquipmentSlotType;
 import org.spongepowered.api.item.inventory.property.InventoryCapacity;
 import org.spongepowered.api.item.inventory.property.SlotIndex;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
+import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -245,6 +248,42 @@ public abstract class AbstractSlot extends AbstractMutableInventory implements I
     }
 
     @Override
+    public Optional<PeekedPollTransactionResult> peekPoll(Predicate<ItemStack> matcher) {
+        checkNotNull(matcher, "matcher");
+        if (this.itemStack == null || !matcher.test(this.itemStack)) {
+            return Optional.empty();
+        }
+        final List<SlotTransaction> transactions = new ArrayList<>();
+        transactions.add(new SlotTransaction(this, this.itemStack.createSnapshot(), ItemStackSnapshot.NONE));
+        return Optional.of(new PeekedPollTransactionResult(transactions, this.itemStack.copy()));
+    }
+
+    @Override
+    public Optional<PeekedPollTransactionResult> peekPoll(int limit, Predicate<ItemStack> matcher) {
+        checkNotNull(matcher, "matcher");
+        checkArgument(limit >= 0, "Limit may not be negative");
+        ItemStack itemStack = this.itemStack;
+        // There is no item available
+        if (limit == 0 || itemStack == null || !matcher.test(itemStack)) {
+            return Optional.empty();
+        }
+        final ItemStackSnapshot oldItem = itemStack.createSnapshot();
+        itemStack = itemStack.copy();
+        final int quantity = itemStack.getQuantity();
+        final ItemStackSnapshot newItem;
+        if (limit >= quantity) {
+            newItem = ItemStackSnapshot.NONE;
+        } else {
+            itemStack.setQuantity(quantity - limit);
+            newItem = LanternItemStack.toSnapshot(itemStack);
+            itemStack.setQuantity(limit);
+        }
+        final List<SlotTransaction> transactions = new ArrayList<>();
+        transactions.add(new SlotTransaction(this, oldItem, newItem));
+        return Optional.of(new PeekedPollTransactionResult(transactions, itemStack));
+    }
+
+    @Override
     public Optional<ItemStack> peek(Predicate<ItemStack> matcher) {
         checkNotNull(matcher, "matcher");
         return Optional.ofNullable(this.itemStack == null || !matcher.test(this.itemStack) ? null : this.itemStack.copy());
@@ -300,6 +339,36 @@ public abstract class AbstractSlot extends AbstractMutableInventory implements I
             queueUpdate();
             return FastOfferResult.SUCCESS_NO_REJECTED_ITEM;
         }
+    }
+
+    @Override
+    public Optional<PeekedSetTransactionResult> peekSet(@Nullable ItemStack stack) {
+        if (!LanternItemStack.isEmpty(stack) && !isValidItem(stack)) {
+            return Optional.empty();
+        }
+        stack = LanternItemStack.toNullable(stack);
+        final List<SlotTransaction> transactions = new ArrayList<>();
+        final ItemStackSnapshot oldItem = LanternItemStack.toSnapshot(this.itemStack);
+        ItemStack rejectedItem = null;
+        ItemStack replacedItem = oldItem.isEmpty() ? null : this.itemStack.copy();
+        ItemStackSnapshot newItem = ItemStackSnapshot.NONE;
+        if (stack != null) {
+            final int maxStackSize = Math.min(stack.getMaxStackQuantity(), this.maxStackSize);
+            final int quantity = stack.getQuantity();
+            if (quantity > maxStackSize) {
+                stack = stack.copy();
+                stack.setQuantity(maxStackSize);
+                newItem = LanternItemStack.toSnapshot(stack);
+                // Create the rest stack that was rejected,
+                // because the inventory doesn't allow so many items
+                rejectedItem = stack.copy();
+                rejectedItem.setQuantity(quantity - maxStackSize);
+            } else {
+                newItem = LanternItemStack.toSnapshot(stack);
+            }
+        }
+        transactions.add(new SlotTransaction(this, oldItem, newItem));
+        return Optional.of(new PeekedSetTransactionResult(transactions, rejectedItem, replacedItem));
     }
 
     @Override

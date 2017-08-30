@@ -23,37 +23,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory.neww;
+package org.lanternpowered.server.inventory.neww.type;
 
-import org.lanternpowered.server.inventory.LanternContainer;
-import org.spongepowered.api.effect.Viewer;
+import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.inventory.neww.AbstractGridInventory;
+import org.spongepowered.api.item.inventory.crafting.CraftingGridInventory;
+import org.spongepowered.api.item.recipe.crafting.CraftingRecipe;
+import org.spongepowered.api.world.World;
 
-public interface InventoryViewerListener {
+import java.util.Optional;
 
-    /**
-     * Is called when the specified {@link Viewer} starts watching the {@link LanternContainer}.
-     *
-     * @param viewer The viewer
-     * @param container The container
-     * @param callback The callback
-     */
-    void onViewerAdded(Viewer viewer, LanternContainer container, Callback callback);
+public class LanternCraftingGridInventory extends AbstractGridInventory implements CraftingGridInventory {
 
-    /**
-     * Is called when the specified {@link Viewer} stops watching the {@link LanternContainer}.
-     *
-     * @param viewer The viewer
-     * @param container The container
-     * @param callback The callback
-     */
-    void onViewerRemoved(Viewer viewer, LanternContainer container, Callback callback);
-
-    interface Callback { // TODO: Better name?
-
-        /**
-         * Removes the {@link InventoryViewerListener}, the
-         * listener won't be run again.
-         */
-        void remove();
+    @Override
+    public Optional<CraftingRecipe> getRecipe(World world) {
+        return Lantern.getRegistry().getCraftingRecipeRegistry().findMatchingRecipe(this, world);
     }
 }

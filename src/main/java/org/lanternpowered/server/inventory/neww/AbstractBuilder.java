@@ -88,8 +88,7 @@ public abstract class AbstractBuilder<R extends T, T extends AbstractInventory, 
     }
 
     /**
-     * Sets the plugin that provides the {@link AbstractInventory}
-     * or archetype.
+     * Sets the plugin that provides the {@link LanternInventoryArchetype}.
      *
      * @param plugin The plugin instance
      * @return This builder, for chaining
@@ -105,12 +104,28 @@ public abstract class AbstractBuilder<R extends T, T extends AbstractInventory, 
      * @return The inventory
      */
     public R build() {
+        return build0(this.pluginContainer == null ? Lantern.getImplementationPlugin() : this.pluginContainer);
+    }
+
+    /**
+     * Constructs a {@link AbstractInventory} and sets the plugin
+     * instance that constructed the inventory.
+     *
+     * @param plugin The plugin
+     * @return The inventory
+     */
+    public R build(Object plugin) {
+        return build0(checkPlugin(plugin, "plugin"));
+    }
+
+    private R build0(PluginContainer plugin) {
         checkState(this.supplier != null);
         final R inventory = this.supplier.get();
         if (inventory instanceof AbstractMutableInventory) {
             final AbstractMutableInventory mutableInventory = (AbstractMutableInventory) inventory;
             final String pluginId = (this.pluginContainer == null ? Lantern.getImplementationPlugin() : this.pluginContainer).getId();
             mutableInventory.setArchetype(buildArchetype(pluginId, UUID.randomUUID().toString()));
+            mutableInventory.setPlugin(plugin);
         }
         build(inventory);
         return inventory;

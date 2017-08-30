@@ -23,10 +23,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory.neww.vanilla;
+package org.lanternpowered.server.inventory.neww.type.slot;
 
-import org.lanternpowered.server.inventory.neww.AbstractCarriedEquipmentInventory;
+import org.spongepowered.api.item.inventory.slot.InputSlot;
 
-public class LanternEquipmentInventory extends AbstractCarriedEquipmentInventory {
+public class LanternInputSlot extends LanternFilteringSlot implements InputSlot {
 
 }

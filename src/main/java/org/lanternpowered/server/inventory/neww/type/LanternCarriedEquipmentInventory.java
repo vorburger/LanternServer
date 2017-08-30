@@ -23,20 +23,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory.neww.vanilla;
+package org.lanternpowered.server.inventory.neww.type;
 
-import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.inventory.neww.AbstractGridInventory;
-import org.spongepowered.api.item.inventory.crafting.CraftingGridInventory;
-import org.spongepowered.api.item.recipe.crafting.CraftingRecipe;
-import org.spongepowered.api.world.World;
+import org.lanternpowered.server.inventory.neww.AbstractCarriedEquipmentInventory;
 
-import java.util.Optional;
+public class LanternCarriedEquipmentInventory extends AbstractCarriedEquipmentInventory {
 
-public class LanternCraftingGridInventory extends AbstractGridInventory implements CraftingGridInventory {
-
-    @Override
-    public Optional<CraftingRecipe> getRecipe(World world) {
-        return Lantern.getRegistry().getCraftingRecipeRegistry().findMatchingRecipe(this, world);
-    }
 }

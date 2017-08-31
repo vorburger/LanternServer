@@ -28,7 +28,6 @@ package org.lanternpowered.server.inventory.neww;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.lanternpowered.server.inventory.LanternContainer;
-import org.lanternpowered.server.inventory.neww.type.LanternUnorderedChildrenInventory;
 import org.spongepowered.api.effect.Viewer;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.EmptyInventory;
@@ -172,7 +171,7 @@ public abstract class AbstractMutableInventory extends AbstractInventory {
             return genericEmpty();
         } else {
             // Construct the result inventory
-            final LanternUnorderedChildrenInventory result = new LanternUnorderedChildrenInventory();
+            final UnorderedSlotsInventoryQuery result = new UnorderedSlotsInventoryQuery();
             result.init(Collections.unmodifiableList(slots));
             return result;
         }
@@ -196,7 +195,7 @@ public abstract class AbstractMutableInventory extends AbstractInventory {
             return genericEmpty();
         } else {
             // Construct the result inventory
-            final LanternUnorderedChildrenInventory result = new LanternUnorderedChildrenInventory();
+            final UnorderedSlotsInventoryQuery result = new UnorderedSlotsInventoryQuery();
             result.init(Collections.unmodifiableList(slotsB));
             return result;
         }

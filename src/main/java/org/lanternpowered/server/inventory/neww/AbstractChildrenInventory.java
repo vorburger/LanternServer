@@ -33,7 +33,6 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import org.lanternpowered.server.inventory.LanternContainer;
 import org.lanternpowered.server.inventory.LanternItemStack;
-import org.lanternpowered.server.inventory.neww.type.LanternUnorderedChildrenInventory;
 import org.spongepowered.api.effect.Viewer;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.Carrier;
@@ -118,8 +117,8 @@ public abstract class AbstractChildrenInventory<C extends AbstractMutableInvento
             return genericEmpty();
         }
         // Construct the result inventory
-        final LanternUnorderedChildrenInventory result = new LanternUnorderedChildrenInventory();
-        result.init(ImmutableList.copyOf(inventories));
+        final UnorderedSlotsInventoryQuery result = new UnorderedSlotsInventoryQuery();
+        result.init((List) ImmutableList.copyOf(inventories));
         return (T) result;
     }
 

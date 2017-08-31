@@ -25,7 +25,6 @@
  */
 package org.lanternpowered.server.inventory.neww;
 
-import org.lanternpowered.server.inventory.PeekSetTransactionsResult;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;

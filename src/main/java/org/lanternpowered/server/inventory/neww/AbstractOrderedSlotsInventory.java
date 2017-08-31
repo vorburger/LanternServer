@@ -53,6 +53,7 @@ public abstract class AbstractOrderedSlotsInventory extends AbstractOrderedInven
 
     @Nullable private List<AbstractSlot> slots;
     @Nullable private Object2IntMap<AbstractSlot> slotsToIndex;
+    @Nullable private List<AbstractSlot> slotsWithPriority;
 
     void init(List<? extends AbstractSlot> slots) {
         final Object2IntMap<AbstractSlot> slotsToIndex = new Object2IntOpenHashMap<>();
@@ -68,7 +69,8 @@ public abstract class AbstractOrderedSlotsInventory extends AbstractOrderedInven
 
     @Override
     protected List<AbstractSlot> getChildren() {
-        return this.slots == null ? Collections.emptyList() : this.slots;
+        return this.slotsWithPriority != null ? this.slotsWithPriority :
+                this.slots != null ? this.slots : Collections.emptyList();
     }
 
     @Override
@@ -81,7 +83,8 @@ public abstract class AbstractOrderedSlotsInventory extends AbstractOrderedInven
         return this.slotsToIndex == null ? Object2IntMaps.emptyMap() : this.slotsToIndex;
     }
 
-    public static final class Builder<T extends AbstractOrderedSlotsInventory> extends AbstractBuilder<T, AbstractOrderedSlotsInventory, Builder<T>> {
+    public static final class Builder<T extends AbstractOrderedSlotsInventory>
+            extends AbstractArchetypeBuilder<T, AbstractOrderedSlotsInventory, Builder<T>> {
 
         private final List<LanternInventoryArchetype<? extends AbstractSlot>> slots = new ArrayList<>();
         private int freeSlotStart;

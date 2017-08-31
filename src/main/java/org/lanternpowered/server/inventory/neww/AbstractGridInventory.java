@@ -128,7 +128,7 @@ public abstract class AbstractGridInventory extends AbstractInventory2D implemen
     }
 
     public static abstract class Builder<T extends AbstractGridInventory, B extends Builder<T, B>>
-            extends AbstractBuilder<T, AbstractGridInventory, B> {
+            extends AbstractArchetypeBuilder<T, AbstractGridInventory, B> {
 
         Supplier<? extends AbstractInventoryColumn>[] columnTypes = new Supplier[0];
         Supplier<? extends AbstractInventoryRow>[] rowTypes = new Supplier[0];

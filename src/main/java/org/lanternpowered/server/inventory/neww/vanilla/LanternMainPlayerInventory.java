@@ -44,12 +44,12 @@ public class LanternMainPlayerInventory extends AbstractGridInventory implements
     }
 
     @Override
-    public Hotbar getHotbar() {
+    public LanternHotbarInventory getHotbar() {
         return this.hotbar;
     }
 
     @Override
-    public GridInventory getGrid() {
+    public AbstractGridInventory getGrid() {
         return this.grid;
     }
 }

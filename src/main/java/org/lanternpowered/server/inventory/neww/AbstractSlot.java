@@ -484,7 +484,7 @@ public abstract class AbstractSlot extends AbstractMutableInventory implements I
         return genericEmpty();
     }
 
-    public static final class Builder<T extends AbstractSlot> extends AbstractBuilder<T, AbstractSlot, Builder<T>> {
+    public static final class Builder<T extends AbstractSlot> extends AbstractArchetypeBuilder<T, AbstractSlot, Builder<T>> {
 
         private static final Supplier<AbstractSlot> DEFAULT_SUPPLIER = LanternSlot::new;
         @Nullable private ItemFilter itemFilter;

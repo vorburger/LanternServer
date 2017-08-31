@@ -29,7 +29,9 @@ import com.google.common.collect.ImmutableList;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMaps;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
+import org.spongepowered.api.item.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,6 +42,14 @@ import javax.annotation.Nullable;
 @SuppressWarnings("unchecked")
 public abstract class AbstractOrderedChildrenInventory extends AbstractOrderedInventory<AbstractMutableInventory> {
 
+    public static Builder<AbstractOrderedChildrenInventory> builder() {
+        return new Builder();
+    }
+
+    public static ViewBuilder<AbstractOrderedChildrenInventory> viewBuilder() {
+        return new ViewBuilder();
+    }
+
     @Nullable private List<AbstractMutableInventory> children;
     @Nullable private List<AbstractSlot> slots;
     @Nullable private Object2IntMap<AbstractSlot> slotsToIndex;
@@ -49,8 +59,8 @@ public abstract class AbstractOrderedChildrenInventory extends AbstractOrderedIn
      *
      * @param children The children
      */
-    void init(List<AbstractMutableInventory> children) {
-        this.children = children;
+    void init(List<AbstractMutableInventory> children, @Nullable List<AbstractMutableInventory> prioritizedChildren) {
+        this.children = prioritizedChildren == null ? children : prioritizedChildren;
         final ImmutableList.Builder<AbstractSlot> slotsBuilder = ImmutableList.builder();
         final Object2IntMap<AbstractSlot> slotsToIndex = new Object2IntOpenHashMap<>();
         slotsToIndex.defaultReturnValue(INVALID_INDEX);
@@ -91,30 +101,47 @@ public abstract class AbstractOrderedChildrenInventory extends AbstractOrderedIn
     }
 
     public static final class Builder<T extends AbstractOrderedChildrenInventory>
-            extends AbstractBuilder<T, AbstractOrderedChildrenInventory, Builder<T>>  {
+            extends AbstractArchetypeBuilder<T, AbstractOrderedChildrenInventory, Builder<T>>  {
 
-        private final List<LanternInventoryArchetype<? extends AbstractMutableInventory>> inventories = new ArrayList<>();
+        private final List<PrioritizedObject<LanternInventoryArchetype<? extends AbstractMutableInventory>>> inventories = new ArrayList<>();
 
         private Builder() {
         }
 
         /**
-         * Adds the {@link InventoryArchetype}.
+         * Adds the {@link InventoryArchetype} with the specified priority. All the
+         * {@link AbstractSlot} indexes will be generated on the insertion order. The
+         * priority will only affect the iteration order, this will affect
+         * {@link IInventory#offer(ItemStack)}, ... operations.
          *
          * @param inventoryArchetype The inventory archetype
          * @return This builder, for chaining
          */
-        public Builder inventory(LanternInventoryArchetype<? extends AbstractMutableInventory> inventoryArchetype) {
-            this.inventories.add(inventoryArchetype);
+        public Builder<T> inventory(LanternInventoryArchetype<? extends AbstractMutableInventory> inventoryArchetype, int priority) {
+            this.inventories.add(new PrioritizedObject<>(inventoryArchetype, priority));
             return this;
+        }
+
+        /**
+         * Adds the {@link InventoryArchetype} with the default priority.
+         *
+         * @param inventoryArchetype The inventory archetype
+         * @return This builder, for chaining
+         */
+        public Builder<T> inventory(LanternInventoryArchetype<? extends AbstractMutableInventory> inventoryArchetype) {
+            return inventory(inventoryArchetype, DEFAULT_PRIORITY);
         }
 
         @Override
         protected void build(AbstractOrderedChildrenInventory inventory) {
-            final List<AbstractMutableInventory> inventories = this.inventories.stream()
-                    .map(LanternInventoryArchetype::build)
+            final ImmutableList<PrioritizedObject<? extends AbstractMutableInventory>> prioritizedChildrenObjects = this.inventories.stream()
+                    .map(e -> new PrioritizedObject<>(e.object.build(), e.priority))
                     .collect(ImmutableList.toImmutableList());
-            inventory.init(inventories);
+            final ImmutableList<AbstractMutableInventory> children = prioritizedChildrenObjects.stream()
+                    .map(e -> e.object).collect(ImmutableList.toImmutableList());
+            final ImmutableList<AbstractMutableInventory> prioritizedChildren = prioritizedChildrenObjects.stream().sorted()
+                    .map(e -> e.object).collect(ImmutableList.toImmutableList());
+            inventory.init(children, prioritizedChildren);
         }
 
         @Override
@@ -127,6 +154,75 @@ public abstract class AbstractOrderedChildrenInventory extends AbstractOrderedIn
         @Override
         protected List<InventoryArchetype> getArchetypes() {
             return (List) this.inventories;
+        }
+    }
+
+    public static final class ViewBuilder<T extends AbstractOrderedChildrenInventory>
+            extends AbstractBuilder<T, AbstractOrderedChildrenInventory, ViewBuilder<T>>  {
+
+        private final List<PrioritizedObject<AbstractMutableInventory>> inventories = new ArrayList<>();
+
+        private ViewBuilder() {
+        }
+
+        /**
+         * Adds the {@link AbstractMutableInventory} with the specified priority. All the
+         * {@link AbstractSlot} indexes will be generated on the insertion order. The
+         * priority will only affect the iteration order, this will affect
+         * {@link IInventory#offer(ItemStack)}, ... operations.
+         *
+         * @param inventory The inventory
+         * @param priority The priority
+         * @return This builder, for chaining
+         */
+        public ViewBuilder<T> inventory(Inventory inventory, int priority) {
+            this.inventories.add(new PrioritizedObject<>((AbstractMutableInventory) inventory, priority));
+            return this;
+        }
+
+        /**
+         * Adds the {@link AbstractMutableInventory} with the default priority.
+         *
+         * @param inventory The inventory
+         * @return This builder, for chaining
+         */
+        public ViewBuilder<T> inventory(Inventory inventory) {
+            return inventory(inventory, DEFAULT_PRIORITY);
+        }
+
+        /**
+         * Adds the {@link AbstractMutableInventory}s with the specified priority. All the
+         * {@link AbstractSlot} indexes will be generated on the insertion order. The
+         * priority will only affect the iteration order, this will affect
+         * {@link IInventory#offer(ItemStack)}, ... operations.
+         *
+         * @param inventories The inventories
+         * @param priority The priority
+         * @return This builder, for chaining
+         */
+        public ViewBuilder<T> inventories(Iterable<? extends Inventory> inventories, int priority) {
+            inventories.forEach(inventory -> inventory(inventory, priority));
+            return this;
+        }
+
+        /**
+         * Adds the {@link AbstractMutableInventory} with the default priority.
+         *
+         * @param inventories The inventories
+         * @return This builder, for chaining
+         */
+        public ViewBuilder<T> inventories(Iterable<? extends Inventory> inventories) {
+            inventories.forEach(this::inventory);
+            return this;
+        }
+
+        @Override
+        protected void build(AbstractOrderedChildrenInventory inventory) {
+            final ImmutableList<AbstractMutableInventory> children = this.inventories.stream()
+                    .map(e -> e.object).collect(ImmutableList.toImmutableList());
+            final ImmutableList<AbstractMutableInventory> prioritizedChildren = this.inventories.stream().sorted()
+                    .map(e -> e.object).collect(ImmutableList.toImmutableList());
+            inventory.init(children, prioritizedChildren);
         }
     }
 }

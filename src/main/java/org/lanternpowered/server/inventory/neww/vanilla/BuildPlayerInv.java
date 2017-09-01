@@ -35,6 +35,7 @@ import org.lanternpowered.server.inventory.neww.type.LanternCraftingInventory;
 import org.lanternpowered.server.inventory.neww.type.LanternGridInventory;
 import org.lanternpowered.server.inventory.neww.LanternInventoryArchetype;
 import org.lanternpowered.server.inventory.neww.type.slot.LanternCraftingOutputSlot;
+import org.lanternpowered.server.inventory.neww.type.slot.LanternEquipmentSlot;
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
 import org.spongepowered.api.item.inventory.property.EquipmentSlotType;
 
@@ -64,22 +65,26 @@ public class BuildPlayerInv {
         // Step 3: Construct a grid of the main with hotbar
         final LanternInventoryArchetype<LanternMainPlayerInventory> mainArchetype = AbstractGridInventory.rowsBuilder()
                 .grid(0, mainWithoutHotbarArchetype) // The first 3 rows are used by the main grid
-                .row(3, hotbarArchetype) // The fourth is the hotbar
+                .row(3, hotbarArchetype, 1050) // The fourth is the hotbar, also give the hotbar higher priority
                 .typeSupplier(LanternMainPlayerInventory::new)
                 .buildArchetype();
         // Step 4: Construct the equipment inventory
         final LanternInventoryArchetype<LanternCarriedEquipmentInventory> equipmentArchetype = AbstractOrderedSlotsInventory.builder()
                 .slot(AbstractSlot.builder()
                         .property(EquipmentSlotType.of(EquipmentTypes.HEADWEAR))
+                        .typeSupplier(LanternEquipmentSlot::new)
                         .buildArchetype())
                 .slot(AbstractSlot.builder()
                         .property(EquipmentSlotType.of(EquipmentTypes.CHESTPLATE))
+                        .typeSupplier(LanternEquipmentSlot::new)
                         .buildArchetype())
                 .slot(AbstractSlot.builder()
                         .property(EquipmentSlotType.of(EquipmentTypes.LEGGINGS))
+                        .typeSupplier(LanternEquipmentSlot::new)
                         .buildArchetype())
                 .slot(AbstractSlot.builder()
                         .property(EquipmentSlotType.of(EquipmentTypes.BOOTS))
+                        .typeSupplier(LanternEquipmentSlot::new)
                         .buildArchetype())
                 .typeSupplier(LanternCarriedEquipmentInventory::new)
                 .buildArchetype();

@@ -41,7 +41,9 @@ import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
 import org.spongepowered.api.item.inventory.property.EquipmentSlotType;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Optional;
 
 import javax.annotation.Nullable;
@@ -98,10 +100,20 @@ public class LanternPlayerInventory extends AbstractOrderedChildrenInventory imp
         this.offhandSlot = query(new EquipmentSlotType(EquipmentTypes.OFF_HAND)).first();
 
         // Construct the inventory views
-        this.views.put(View.PRIORITY_MAIN_AND_HOTBAR, AbstractOrderedChildrenInventory.viewBuilder()
+
+        final AbstractInventory priorityMainAndHotbar = AbstractOrderedChildrenInventory.viewBuilder()
                 .inventory(this.mainInventory.getGrid())
                 .inventory(this.mainInventory.getHotbar())
+                .build();
+        this.views.put(View.PRIORITY_MAIN_AND_HOTBAR, priorityMainAndHotbar);
+
+        final List<AbstractInventory> inventories = new ArrayList<>();
+        inventories.addAll(getChildren());
+        inventories.set(inventories.indexOf(this.mainInventory), priorityMainAndHotbar);
+        this.views.put(View.ALL_PRIORITY_MAIN, AbstractOrderedChildrenInventory.viewBuilder()
+                .inventories(inventories)
                 .build());
+
         this.views.put(View.REVERSE_MAIN_AND_HOTBAR, AbstractOrderedChildrenInventory.viewBuilder()
                 .inventories(Lists.reverse(Lists.newArrayList(this.mainInventory.iterator())))
                 .build());

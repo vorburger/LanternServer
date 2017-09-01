@@ -33,6 +33,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMaps;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
+import org.spongepowered.api.item.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -55,7 +56,7 @@ public abstract class AbstractOrderedSlotsInventory extends AbstractOrderedInven
     @Nullable private Object2IntMap<AbstractSlot> slotsToIndex;
     @Nullable private List<AbstractSlot> slotsWithPriority;
 
-    void init(List<? extends AbstractSlot> slots) {
+    void init(List<? extends AbstractSlot> slots, @Nullable List<? extends AbstractSlot> prioritizedSlots) {
         final Object2IntMap<AbstractSlot> slotsToIndex = new Object2IntOpenHashMap<>();
         slotsToIndex.defaultReturnValue(INVALID_INDEX);
         for (int i = 0; i < slots.size(); i++) {
@@ -64,6 +65,7 @@ public abstract class AbstractOrderedSlotsInventory extends AbstractOrderedInven
         this.slotsToIndex = Object2IntMaps.unmodifiable(slotsToIndex);
         this.inventoryToIndex = this.slotsToIndex; // Reuse the slot to index map
         this.slots = (List<AbstractSlot>) slots;
+        this.slotsWithPriority = (List<AbstractSlot>) prioritizedSlots;
         init();
     }
 
@@ -86,7 +88,7 @@ public abstract class AbstractOrderedSlotsInventory extends AbstractOrderedInven
     public static final class Builder<T extends AbstractOrderedSlotsInventory>
             extends AbstractArchetypeBuilder<T, AbstractOrderedSlotsInventory, Builder<T>> {
 
-        private final List<LanternInventoryArchetype<? extends AbstractSlot>> slots = new ArrayList<>();
+        private final List<PrioritizedObject<LanternInventoryArchetype<? extends AbstractSlot>>> slots = new ArrayList<>();
         private int freeSlotStart;
 
         private Builder() {
@@ -104,19 +106,51 @@ public abstract class AbstractOrderedSlotsInventory extends AbstractOrderedInven
          * @return This builder, for chaining
          */
         public Builder<T> slot(LanternInventoryArchetype<? extends AbstractSlot> slotArchetype) {
+            return slot(slotArchetype, DEFAULT_PRIORITY);
+        }
+
+        /**
+         * Adds the {@link LanternInventoryArchetype} to the first free slot.
+         *
+         * @param slotArchetype The slot archetype
+         * @return This builder, for chaining
+         */
+        public Builder<T> slot(LanternInventoryArchetype<? extends AbstractSlot> slotArchetype, int priority) {
             int index = -1;
             for (int i = this.freeSlotStart; i < this.slots.size(); i++) {
                 if (this.slots.get(i) == null) {
                     index = i;
                 }
             }
+            final PrioritizedObject<LanternInventoryArchetype<? extends AbstractSlot>> prioritizedObject =
+                    new PrioritizedObject<>(slotArchetype, priority);
             if (index == -1) {
-                this.slots.add(slotArchetype);
+                this.slots.add(prioritizedObject);
                 this.freeSlotStart = this.slots.size();
             } else {
-                this.slots.set(index, slotArchetype);
+                this.slots.set(index, prioritizedObject);
                 this.freeSlotStart = index + 1;
             }
+            return this;
+        }
+
+        /**
+         * Adds the {@link LanternInventoryArchetype} to the specific slot index
+         * and the specified priority. All the {@link AbstractSlot} indexes will be generated
+         * on the insertion order. The priority will only affect the iteration order, this
+         * will affect {@link IInventory#offer(ItemStack)}, ... operations.
+         *
+         * @param slotArchetype The slot archetype
+         * @param priority The priority
+         * @return This builder, for chaining
+         */
+        public Builder<T> slot(int index, LanternInventoryArchetype<? extends AbstractSlot> slotArchetype, int priority) {
+            checkArgument(index >= 0, "Index %s cannot be negative ", index);
+            while (this.slots.size() <= index) {
+                this.slots.add(null);
+            }
+            checkState(this.slots.get(index) == null, "There is already a slot bound at index %s", index);
+            this.slots.set(index, new PrioritizedObject<>(slotArchetype, priority));
             return this;
         }
 
@@ -127,12 +161,21 @@ public abstract class AbstractOrderedSlotsInventory extends AbstractOrderedInven
          * @return This builder, for chaining
          */
         public Builder<T> slot(int index, LanternInventoryArchetype<? extends AbstractSlot> slotArchetype) {
-            checkArgument(index >= 0, "Index %s cannot be negative ", index);
-            while (this.slots.size() <= index) {
-                this.slots.add(null);
-            }
-            checkState(this.slots.get(index) == null, "There is already a slot bound at index %s", index);
-            this.slots.set(index, slotArchetype);
+            return slot(index, slotArchetype, DEFAULT_PRIORITY);
+        }
+
+        /**
+         * Adds the {@link LanternInventoryArchetype}s to the first free slots and the
+         * specified priority. All the {@link AbstractSlot} indexes will be generated
+         * on the insertion order. The priority will only affect the iteration order, this
+         * will affect {@link IInventory#offer(ItemStack)}, ... operations.
+         *
+         * @param slotArchetypes The slot archetypes
+         * @param priority The priority
+         * @return This builder, for chaining
+         */
+        public Builder<T> slots(Iterable<LanternInventoryArchetype<? extends AbstractSlot>> slotArchetypes, int priority) {
+            slotArchetypes.forEach(slotArchetype -> slot(slotArchetype, priority));
             return this;
         }
 
@@ -154,10 +197,14 @@ public abstract class AbstractOrderedSlotsInventory extends AbstractOrderedInven
                 checkState(this.slots.get(i) != null,
                         "Slot isn't set at index %s, the size of the inventory is expanded up to %s", i, this.slots.size());
             }
-            final List<? extends AbstractSlot> slots = this.slots.stream()
-                    .map(LanternInventoryArchetype::build)
+            final ImmutableList<PrioritizedObject<? extends AbstractSlot>> prioritizedChildrenObjects = this.slots.stream()
+                    .map(e -> new PrioritizedObject<>(e.object.build(), e.priority))
                     .collect(ImmutableList.toImmutableList());
-            inventory.init(slots);
+            final ImmutableList<AbstractSlot> slots = prioritizedChildrenObjects.stream()
+                    .map(e -> e.object).collect(ImmutableList.toImmutableList());
+            final ImmutableList<AbstractSlot> prioritizedSlots = prioritizedChildrenObjects.stream().sorted()
+                    .map(e -> e.object).collect(ImmutableList.toImmutableList());
+            inventory.init(slots, prioritizedSlots);
         }
 
         @Override

@@ -44,7 +44,7 @@ public abstract class AbstractBuilder<R extends T, T extends AbstractInventory, 
 
     protected static final int DEFAULT_PRIORITY = 1000;
 
-    protected static final class PrioritizedObject<T> implements Comparable<PrioritizedObject<T>> {
+    protected static class PrioritizedObject<T> implements Comparable<PrioritizedObject<T>> {
 
         protected final T object;
         protected final int priority;

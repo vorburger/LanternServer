@@ -56,17 +56,17 @@ public abstract class AbstractInventory2D extends AbstractOrderedSlotsInventory 
     AbstractInventory2D() {
     }
 
-    void init(List<? extends AbstractSlot> slots, int columns, int rows) {
+    void init(List<? extends AbstractSlot> slots, int columns, int rows, @Nullable List<? extends AbstractSlot> prioritizedSlots) {
         checkState(columns * rows == slots.size());
 
         this.columns = columns;
         this.rows = rows;
 
-        super.init(slots);
+        super.init(slots, prioritizedSlots);
     }
 
     @Override
-    void init(List<? extends AbstractSlot> slots) {
+    void init(List<? extends AbstractSlot> slots, @Nullable List<? extends AbstractSlot> prioritizedSlots) {
         throw new UnsupportedOperationException();
     }
 

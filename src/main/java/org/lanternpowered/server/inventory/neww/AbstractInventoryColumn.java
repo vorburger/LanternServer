@@ -29,10 +29,12 @@ import org.spongepowered.api.item.inventory.type.InventoryColumn;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 public abstract class AbstractInventoryColumn extends AbstractInventory2D implements InventoryColumn {
 
     @Override
-    void init(List<? extends AbstractSlot> slots) {
-        super.init(slots, slots.size(), 1);
+    void init(List<? extends AbstractSlot> slots, @Nullable List<? extends AbstractSlot> prioritizedSlots) {
+        super.init(slots, slots.size(), 1, prioritizedSlots);
     }
 }

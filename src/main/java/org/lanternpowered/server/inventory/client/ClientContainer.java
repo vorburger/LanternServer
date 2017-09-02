@@ -42,7 +42,7 @@ import org.lanternpowered.server.inventory.IInventory;
 import org.lanternpowered.server.inventory.LanternItemStack;
 import org.lanternpowered.server.inventory.behavior.ContainerInteractionBehavior;
 import org.lanternpowered.server.inventory.behavior.MouseButton;
-import org.lanternpowered.server.inventory.slot.LanternSlot;
+import org.lanternpowered.server.inventory.AbstractSlot;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetWindowSlot;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWindowItems;
@@ -52,6 +52,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.item.inventory.InventoryProperty;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.text.Text;
 
 import java.util.ArrayList;
@@ -176,9 +177,9 @@ public abstract class ClientContainer implements ContainerBase {
 
     private final class SlotClientSlot extends BaseClientSlot implements ClientSlot.Slot {
 
-        private final LanternSlot slot;
+        private final AbstractSlot slot;
 
-        private SlotClientSlot(int index, LanternSlot slot) {
+        private SlotClientSlot(int index, AbstractSlot slot) {
             super(index);
             this.slot = slot;
         }
@@ -189,7 +190,7 @@ public abstract class ClientContainer implements ContainerBase {
         }
 
         @Override
-        public LanternSlot getSlot() {
+        public AbstractSlot getSlot() {
             return this.slot;
         }
 
@@ -240,7 +241,7 @@ public abstract class ClientContainer implements ContainerBase {
     }
 
     private final Text title;
-    private final Multimap<LanternSlot, SlotClientSlot> slotMap = HashMultimap.create();
+    private final Multimap<AbstractSlot, SlotClientSlot> slotMap = HashMultimap.create();
     private BaseClientSlot cursor = new EmptyClientSlot(CURSOR_SLOT_INDEX); // Not really a slot, but the implementation does the trick
     private final int containerId;
     @SuppressWarnings("NullableProblems") protected BaseClientSlot[] slots;
@@ -255,7 +256,7 @@ public abstract class ClientContainer implements ContainerBase {
         }
 
         @Override
-        public void queueSlotChange(LanternSlot slot) {
+        public void queueSlotChange(Slot slot) {
             getRoot().queueSlotChange(slot);
         }
 
@@ -270,7 +271,7 @@ public abstract class ClientContainer implements ContainerBase {
         }
 
         @Override
-        public void queueSilentSlotChange(LanternSlot slot) {
+        public void queueSilentSlotChange(Slot slot) {
             getRoot().queueSilentSlotChange(slot);
         }
 
@@ -285,7 +286,7 @@ public abstract class ClientContainer implements ContainerBase {
         }
 
         @Override
-        public ClientSlot.Slot bindSlot(int index, LanternSlot slot) {
+        public ClientSlot.Slot bindSlot(int index, AbstractSlot slot) {
             return getRoot().bindSlot(localToGlobalIndex(index), slot);
         }
 
@@ -295,7 +296,7 @@ public abstract class ClientContainer implements ContainerBase {
         }
 
         @Override
-        public Optional<LanternSlot> getSlot(int index) {
+        public Optional<AbstractSlot> getSlot(int index) {
             return getRoot().getSlot(localToGlobalIndex(index));
         }
 
@@ -428,7 +429,7 @@ public abstract class ClientContainer implements ContainerBase {
             removeSlot(index);
             BaseClientSlot clientSlot = clientContainer.slots[s2 + i];
             if (clientSlot instanceof SlotClientSlot) {
-                final LanternSlot slot = ((SlotClientSlot) clientSlot).slot;
+                final AbstractSlot slot = ((SlotClientSlot) clientSlot).slot;
                 clientSlot = new SlotClientSlot(index, slot);
                 this.slotMap.put(slot, (SlotClientSlot) clientSlot);
                 if (this.player != null) {
@@ -516,7 +517,7 @@ public abstract class ClientContainer implements ContainerBase {
         this.interactionBehavior = interactionBehavior;
     }
 
-    public void bindCursor(LanternSlot slot) {
+    public void bindCursor(AbstractSlot slot) {
         bindSlot(CURSOR_SLOT_INDEX, slot);
     }
 
@@ -536,7 +537,7 @@ public abstract class ClientContainer implements ContainerBase {
         queueSilentSlotChangeSafely(clientSlot);
     }
 
-    protected ClientSlot.Slot bindSlot(int index, LanternSlot slot) {
+    protected ClientSlot.Slot bindSlot(int index, AbstractSlot slot) {
         populate();
         final SlotClientSlot clientSlot = new SlotClientSlot(index, slot);
         removeSlot(index);
@@ -565,7 +566,7 @@ public abstract class ClientContainer implements ContainerBase {
         // Cleanup the old client slot
         final BaseClientSlot oldClientSlot = index == CURSOR_SLOT_INDEX ? this.cursor : this.slots[index];
         if (oldClientSlot instanceof SlotClientSlot) {
-            final LanternSlot slot = ((SlotClientSlot) oldClientSlot).slot;
+            final AbstractSlot slot = ((SlotClientSlot) oldClientSlot).slot;
             // Remove the tracker from this slot
             if (this.slotMap.remove(slot, oldClientSlot) &&
                     this.player != null && this.slotMap.get(slot).isEmpty()) {
@@ -609,8 +610,8 @@ public abstract class ClientContainer implements ContainerBase {
     }
 
     @Override
-    public void queueSlotChange(LanternSlot slot) {
-        this.slotMap.get(checkNotNull(slot, "slot")).forEach(this::queueSlotChange);
+    public void queueSlotChange(Slot slot) {
+        this.slotMap.get((AbstractSlot) checkNotNull(slot, "slot")).forEach(this::queueSlotChange);
     }
 
     @Override
@@ -642,8 +643,8 @@ public abstract class ClientContainer implements ContainerBase {
     }
 
     @Override
-    public void queueSilentSlotChange(LanternSlot slot) {
-        this.slotMap.get(checkNotNull(slot, "slot")).forEach(this::queueSilentSlotChange);
+    public void queueSilentSlotChange(Slot slot) {
+        this.slotMap.get((AbstractSlot) checkNotNull(slot, "slot")).forEach(this::queueSilentSlotChange);
     }
 
     @Override
@@ -691,7 +692,7 @@ public abstract class ClientContainer implements ContainerBase {
         populate();
         this.player = (LanternPlayer) player;
         // Add the tracker to each slot
-        for (LanternSlot slot : this.slotMap.keySet()) {
+        for (AbstractSlot slot : this.slotMap.keySet()) {
             slot.addTracker(this);
         }
     }
@@ -785,7 +786,7 @@ public abstract class ClientContainer implements ContainerBase {
     }
 
     /**
-     * Releases all the {@link LanternSlot} and
+     * Releases all the {@link AbstractSlot} and
      * removes the {@link LanternPlayer}.
      */
     public void release() {
@@ -795,7 +796,7 @@ public abstract class ClientContainer implements ContainerBase {
         }
         this.player = null;
         // Remove the tracker from each slot
-        for (LanternSlot slot : this.slotMap.keySet()) {
+        for (AbstractSlot slot : this.slotMap.keySet()) {
             slot.removeTracker(this);
         }
     }
@@ -818,7 +819,7 @@ public abstract class ClientContainer implements ContainerBase {
     }
 
     @Override
-    public Optional<LanternSlot> getSlot(int index) {
+    public Optional<AbstractSlot> getSlot(int index) {
         populate();
         if (index != CURSOR_SLOT_INDEX && (index < 0 || index >= this.slots.length)) {
             return Optional.empty();

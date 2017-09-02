@@ -190,7 +190,6 @@ import org.lanternpowered.server.game.registry.type.world.WeatherTypeRegistryMod
 import org.lanternpowered.server.game.registry.type.world.WorldArchetypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.world.biome.BiomeRegistryModule;
 import org.lanternpowered.server.game.registry.util.RegistryHelper;
-import org.lanternpowered.server.inventory.LanternInventoryArchetypeBuilder;
 import org.lanternpowered.server.inventory.LanternItemStackBuilder;
 import org.lanternpowered.server.item.firework.LanternFireworkEffectBuilder;
 import org.lanternpowered.server.item.recipe.IIngredient;

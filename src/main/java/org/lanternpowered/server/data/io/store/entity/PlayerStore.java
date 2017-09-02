@@ -38,7 +38,6 @@ import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.entity.player.GameModeRegistryModule;
-import org.lanternpowered.server.inventory.LanternEquipmentInventory;
 import org.lanternpowered.server.inventory.LanternItemStack;
 import org.lanternpowered.server.inventory.entity.LanternHumanMainInventory;
 import org.lanternpowered.server.inventory.entity.LanternPlayerInventory;

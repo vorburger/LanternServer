@@ -27,13 +27,14 @@ package org.lanternpowered.server.block.tile.vanilla;
 
 import org.lanternpowered.server.block.tile.LanternTileEntity;
 import org.lanternpowered.server.block.vanilla.container.action.ContainerAnimationAction;
-import org.lanternpowered.server.inventory.ContainerViewListener;
+import org.lanternpowered.server.inventory.InventoryViewerListener;
+import org.lanternpowered.server.inventory.LanternContainer;
 import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.effect.Viewer;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-public abstract class LanternContainerTileBase extends LanternTileEntity implements ContainerViewListener {
+public abstract class LanternContainerTileBase extends LanternTileEntity implements InventoryViewerListener {
 
     private int playersCount = 0;
 
@@ -44,7 +45,7 @@ public abstract class LanternContainerTileBase extends LanternTileEntity impleme
     private int soundDelay;
 
     @Override
-    public Result onViewerAdded(Viewer viewer, org.lanternpowered.server.inventory.LanternContainer container) {
+    public void onViewerAdded(Viewer viewer, LanternContainer container, Callback callback) {
         if (this.playersCount++ == 0) {
             this.soundDelay = getOpenSoundDelay();
 
@@ -52,11 +53,10 @@ public abstract class LanternContainerTileBase extends LanternTileEntity impleme
             final LanternWorld world = (LanternWorld) location.getExtent();
             world.addBlockAction(location.getBlockPosition(), getBlock().getType(), ContainerAnimationAction.OPEN);
         }
-        return Result.IGNORE;
     }
 
     @Override
-    public Result onViewerRemoved(Viewer viewer, org.lanternpowered.server.inventory.LanternContainer container) {
+    public void onViewerRemoved(Viewer viewer, LanternContainer container, Callback callback) {
         if (--this.playersCount == 0) {
             this.soundDelay = this.getCloseSoundDelay();
 
@@ -64,7 +64,6 @@ public abstract class LanternContainerTileBase extends LanternTileEntity impleme
             final LanternWorld world = (LanternWorld) location.getExtent();
             world.addBlockAction(location.getBlockPosition(), getBlock().getType(), ContainerAnimationAction.CLOSE);
         }
-        return Result.IGNORE;
     }
 
     /**

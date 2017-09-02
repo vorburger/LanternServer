@@ -32,8 +32,6 @@ import org.lanternpowered.server.behavior.Parameters;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.block.behavior.types.InteractWithBlockBehavior;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
-import org.lanternpowered.server.inventory.AbstractInventory;
-import org.lanternpowered.server.inventory.ContainerViewListener;
 import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;

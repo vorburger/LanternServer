@@ -27,48 +27,28 @@ package org.lanternpowered.server.inventory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import org.lanternpowered.server.catalog.PluginCatalogType;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
 import org.spongepowered.api.item.inventory.InventoryProperty;
 
-import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import javax.annotation.Nullable;
+@SuppressWarnings("unchecked")
+public class LanternInventoryArchetype<T extends AbstractInventory> extends PluginCatalogType.Base
+        implements InventoryArchetype, InventoryPropertyHolder {
 
-public class LanternInventoryArchetype extends PluginCatalogType.Base implements InventoryArchetype {
-
-    private final Map<String, InventoryProperty<?,?>> inventoryPropertiesByName;
-    private final Map<InventoryPropertyKey, InventoryProperty<?,?>> inventoryPropertiesByKey;
-
+    protected final AbstractArchetypeBuilder<T, ? super T, ?> builder;
+    private final Map<String, InventoryProperty<String, ?>> propertiesByName;
     private final List<InventoryArchetype> childArchetypes;
 
-    public LanternInventoryArchetype(String pluginId, String name, List<InventoryArchetype> childArchetypes,
-            Map<String, InventoryProperty<?, ?>> inventoryPropertiesByName,
-            Map<InventoryPropertyKey, InventoryProperty<?, ?>> inventoryPropertiesByKey) {
+    LanternInventoryArchetype(String pluginId, String name, AbstractArchetypeBuilder<T, ? super T, ?> builder) {
         super(pluginId, name);
-        this.childArchetypes = ImmutableList.copyOf(childArchetypes);
-        this.inventoryPropertiesByName = ImmutableMap.copyOf(inventoryPropertiesByName);
-        this.inventoryPropertiesByKey = ImmutableMap.copyOf(inventoryPropertiesByKey);
-    }
-
-    public LanternInventoryArchetype(String pluginId, String id, String name, List<InventoryArchetype> childArchetypes,
-            Map<String, InventoryProperty<?, ?>> inventoryPropertiesByName,
-            Map<InventoryPropertyKey, InventoryProperty<?, ?>> inventoryPropertiesByKey) {
-        super(pluginId, id, name);
-        this.childArchetypes = ImmutableList.copyOf(childArchetypes);
-        this.inventoryPropertiesByName = ImmutableMap.copyOf(inventoryPropertiesByName);
-        this.inventoryPropertiesByKey = ImmutableMap.copyOf(inventoryPropertiesByKey);
-    }
-
-    public Map<Class<?>, InventoryProperty<?,?>> getPropertiesByClass() {
-        final ImmutableMap.Builder<Class<?>, InventoryProperty<?,?>> builder = ImmutableMap.builder();
-        this.inventoryPropertiesByKey.forEach((key, value) -> builder.put(value.getClass(), value));
-        return builder.build();
+        this.propertiesByName = Collections.unmodifiableMap(builder.propertiesByName);
+        this.childArchetypes = Collections.unmodifiableList(builder.getArchetypes());
+        this.builder = builder;
     }
 
     @Override
@@ -78,25 +58,43 @@ public class LanternInventoryArchetype extends PluginCatalogType.Base implements
 
     @Override
     public Map<String, InventoryProperty<String, ?>> getProperties() {
-        //noinspection unchecked
-        return (Map) this.inventoryPropertiesByName;
+        return this.propertiesByName;
     }
 
     @Override
     public Optional<InventoryProperty<String, ?>> getProperty(String key) {
         checkNotNull(key, "key");
-        //noinspection unchecked
-        return Optional.ofNullable((InventoryProperty<String, ?>) this.inventoryPropertiesByName.get(key));
+        return Optional.ofNullable(this.propertiesByName.get(key));
     }
 
     @Override
-    public <T extends InventoryProperty<String, ?>> Optional<T> getProperty(Class<T> property, @Nullable String key) {
+    public <P extends InventoryProperty<String, ?>> Optional<P> getProperty(Class<P> property) {
         checkNotNull(property, "property");
-        final InventoryPropertyKey propertyKey = new InventoryPropertyKey(property, key);
-        final InventoryProperty<?, ?> property1 = this.inventoryPropertiesByKey.get(propertyKey);
-        if (property1 != null && property.isInstance(property1)) {
-            return Optional.of(property.cast(property1));
-        }
+        return Optional.ofNullable((P) this.builder.properties.get(property));
+    }
+
+    @Override
+    public <P extends InventoryProperty<String, ?>> Optional<P> getProperty(Class<P> type, String key) {
+        // return this.builder.asPropertyHolder().getProperty(type, key);
         return Optional.empty();
+    }
+
+    /**
+     * Constructs a {@link AbstractInventory}.
+     *
+     * @return The inventory
+     */
+    public T build() {
+        return this.builder.build();
+    }
+
+    /**
+     * Constructs a {@link LanternInventoryBuilder}
+     * with this archetype.
+     *
+     * @return The inventory builder
+     */
+    public LanternInventoryBuilder<T> builder() {
+        return LanternInventoryBuilder.create().of(this);
     }
 }

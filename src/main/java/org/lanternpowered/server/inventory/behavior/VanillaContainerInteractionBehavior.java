@@ -30,25 +30,19 @@ import static com.google.common.base.Preconditions.checkState;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.event.LanternEventHelper;
 import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.inventory.AbstractChildrenInventory;
 import org.lanternpowered.server.inventory.AbstractInventory;
 import org.lanternpowered.server.inventory.AbstractMutableInventory;
-import org.lanternpowered.server.inventory.IInventory;
+import org.lanternpowered.server.inventory.AbstractSlot;
 import org.lanternpowered.server.inventory.LanternContainer;
 import org.lanternpowered.server.inventory.LanternItemStack;
 import org.lanternpowered.server.inventory.LanternItemStackSnapshot;
 import org.lanternpowered.server.inventory.OpenableInventory;
-import org.lanternpowered.server.inventory.PeekOfferTransactionsResult;
-import org.lanternpowered.server.inventory.PeekPollTransactionsResult;
-import org.lanternpowered.server.inventory.PeekSetTransactionsResult;
+import org.lanternpowered.server.inventory.PeekedOfferTransactionResult;
 import org.lanternpowered.server.inventory.PlayerInventoryContainer;
 import org.lanternpowered.server.inventory.client.ClientContainer;
 import org.lanternpowered.server.inventory.client.ClientSlot;
 import org.lanternpowered.server.inventory.client.PlayerClientContainer;
-import org.lanternpowered.server.inventory.entity.HumanInventoryView;
-import org.lanternpowered.server.inventory.entity.LanternHotbar;
-import org.lanternpowered.server.inventory.entity.LanternPlayerInventory;
-import org.lanternpowered.server.inventory.slot.LanternSlot;
+import org.lanternpowered.server.inventory.vanilla.LanternPlayerInventory;
 import org.lanternpowered.server.item.recipe.crafting.CraftingMatrix;
 import org.lanternpowered.server.item.recipe.crafting.ExtendedCraftingResult;
 import org.lanternpowered.server.item.recipe.crafting.MatrixResult;
@@ -123,7 +117,7 @@ public class VanillaContainerInteractionBehavior extends AbstractContainerIntera
                 !(clientSlot instanceof ClientSlot.Slot) || mouseButton == MouseButton.MIDDLE) {
             return;
         }
-        final LanternSlot slot = ((ClientSlot.Slot) clientSlot).getSlot();
+        final AbstractSlot slot = ((ClientSlot.Slot) clientSlot).getSlot();
         final ItemStack itemStack = slot.peek().orElse(null);
 
         final Cause cause = Cause.builder().named(NamedCause.SOURCE, player).build();
@@ -147,14 +141,14 @@ public class VanillaContainerInteractionBehavior extends AbstractContainerIntera
                     final ItemStack itemStack1 = resultItem.createStack();
                     itemStack1.setQuantity(times * itemStack1.getQuantity());
 
-                    final AbstractMutableInventory targetInventory = this.container.getPlayerInventory()
-                            .getInventoryView(HumanInventoryView.REVERSE_MAIN_AND_HOTBAR);
-                    PeekOfferTransactionsResult peekResult = targetInventory.peekOfferFastTransactions(itemStack1);
+                    final AbstractInventory targetInventory = this.container.getPlayerInventory()
+                            .getView(LanternPlayerInventory.View.REVERSE_MAIN_AND_HOTBAR);
+                    PeekedOfferTransactionResult peekResult = targetInventory.peekOfferFastTransactions(itemStack1);
 
-                    if (peekResult.getOfferResult().isSuccess()) {
+                    if (peekResult != null) {
                         transactions.add(new SlotTransaction(slot, resultItem, ItemStackSnapshot.NONE));
 
-                        final ItemStack restItem = peekResult.getOfferResult().getRest();
+                        final ItemStack restItem = peekResult.getRejectedItem().orElse(null);
                         if (restItem != null) {
                             final int added = itemStack1.getQuantity() - restItem.getQuantity();
                             times = added / resultItem.getQuantity();
@@ -162,7 +156,7 @@ public class VanillaContainerInteractionBehavior extends AbstractContainerIntera
                             if (diff != 0) {
                                 itemStack1.setQuantity(resultItem.getQuantity() * times);
                                 peekResult = targetInventory.peekOfferFastTransactions(itemStack1);
-                                checkState(peekResult.getOfferResult().isSuccess());
+                                checkState(peekResult != null);
                             }
                         }
 
@@ -182,8 +176,8 @@ public class VanillaContainerInteractionBehavior extends AbstractContainerIntera
             cursorTransaction = new Transaction<>(cursorItem, cursorItem);
 
             if (itemStack != null) {
-                final PeekOfferTransactionsResult result = getShiftPeekOfferResult(slot, itemStack.copy());
-                if (result.getOfferResult().isSuccess()) {
+                final PeekedOfferTransactionResult result = getShiftPeekOfferResult(slot, itemStack.copy());
+                if (result != null) {
                     transactions.addAll(result.getTransactions());
                     final ItemStack rest = result.getOfferResult().getRest();
                     if (rest != null) {
@@ -727,7 +721,7 @@ public class VanillaContainerInteractionBehavior extends AbstractContainerIntera
         LanternEventHelper.finishSpawnEntityEvent(event);
     }
 
-    private PeekOfferTransactionsResult getShiftPeekOfferResult(LanternSlot slot, ItemStack itemStack) {
+    private PeekedOfferTransactionResult getShiftPeekOfferResult(AbstractSlot slot, ItemStack itemStack) {
         final LanternPlayerInventory playerInventory = this.container.getPlayerInventory();
         final OpenableInventory openableInventory = (OpenableInventory) this.container.getOpenInventory();
         IInventory targetInventory = openableInventory.getShiftClickTarget(this.container, slot);

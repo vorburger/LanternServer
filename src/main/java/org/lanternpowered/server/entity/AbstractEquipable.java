@@ -27,7 +27,6 @@ package org.lanternpowered.server.entity;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.lanternpowered.server.inventory.SimpleEquipmentInventory;
 import org.lanternpowered.server.inventory.slot.LanternSlot;
 import org.spongepowered.api.entity.Equipable;
 import org.spongepowered.api.item.inventory.EmptyInventory;

@@ -31,15 +31,12 @@ import static com.google.common.base.Preconditions.checkState;
 import com.google.common.collect.ImmutableSet;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.inventory.client.ClientContainer;
-import org.lanternpowered.server.inventory.entity.LanternHumanMainInventory;
-import org.lanternpowered.server.inventory.entity.LanternPlayerInventory;
-import org.lanternpowered.server.inventory.slot.LanternSlot;
+import org.lanternpowered.server.inventory.type.slot.LanternSlot;
+import org.lanternpowered.server.inventory.vanilla.LanternPlayerInventory;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.item.inventory.Container;
 import org.spongepowered.api.item.inventory.Inventory;
-import org.spongepowered.api.item.inventory.entity.PlayerInventory;
-import org.spongepowered.api.text.translation.Translation;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -49,17 +46,23 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 
-public class LanternContainer extends LanternOrderedInventory implements Container {
+public class LanternContainer extends AbstractOrderedChildrenInventory implements Container {
 
     private final Map<Player, ClientContainer> viewers = new HashMap<>();
-    final LanternOrderedInventory openInventory;
+    final AbstractOrderedInventory<?> openInventory;
     final LanternPlayerInventory playerInventory;
 
     /**
      * The slot for the cursor item.
      */
-    private final LanternSlot cursor = new LanternSlot(this);
+    private final LanternSlot cursor = new LanternSlot();
 
+    public LanternContainer(AbstractOrderedInventory<?> openInventory, LanternPlayerInventory playerInventory) {
+        this.playerInventory = playerInventory;
+        this.openInventory = openInventory;
+    }
+
+    /*
     /**
      * Creates a new {@link LanternContainer}, the specified {@link PlayerInventory} is
      * used as the bottom inventory and also as top inventory if {@code null} is provided
@@ -67,7 +70,7 @@ public class LanternContainer extends LanternOrderedInventory implements Contain
      *
      * @param playerInventory The player inventory
      * @param openInventory The inventory to open
-     */
+     *//*
     public LanternContainer(LanternPlayerInventory playerInventory, OpenableInventory openInventory) {
         this(playerInventory, openInventory, openInventory.getName());
     }
@@ -80,7 +83,7 @@ public class LanternContainer extends LanternOrderedInventory implements Contain
      * @param playerInventory The player inventory
      * @param openInventory The inventory to open
      * @param name The name of the container
-     */
+     *//*
     public LanternContainer(LanternPlayerInventory playerInventory, OpenableInventory openInventory, @Nullable Translation name) {
         this(name, playerInventory, checkNotNull(openInventory, "openInventory"));
     }
@@ -97,7 +100,7 @@ public class LanternContainer extends LanternOrderedInventory implements Contain
             registerChild(playerInventory);
             this.openInventory = playerInventory;
         }
-    }
+    }*/
 
     /**
      * Gets the cursor {@link LanternSlot}.
@@ -115,7 +118,7 @@ public class LanternContainer extends LanternOrderedInventory implements Contain
      *
      * @return The inventory
      */
-    public LanternOrderedInventory getOpenInventory() {
+    public AbstractOrderedInventory<?> getOpenInventory() {
         return this.openInventory;
     }
 

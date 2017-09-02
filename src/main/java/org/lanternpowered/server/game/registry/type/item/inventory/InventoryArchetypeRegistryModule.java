@@ -30,8 +30,6 @@ import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 import com.google.common.collect.ImmutableList;
 import org.lanternpowered.server.game.registry.CatalogMappingData;
 import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
-import org.lanternpowered.server.inventory.LanternInventoryArchetypeBuilder;
-import org.lanternpowered.server.inventory.LanternInventoryArchetypes;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
 import org.spongepowered.api.item.inventory.InventoryArchetypes;
 import org.spongepowered.api.item.inventory.property.AcceptsItems;

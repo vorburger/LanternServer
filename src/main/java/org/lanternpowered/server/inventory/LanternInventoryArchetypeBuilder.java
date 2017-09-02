@@ -26,87 +26,65 @@
 package org.lanternpowered.server.inventory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.lanternpowered.server.util.Conditions.checkNotNullOrEmpty;
 
 import org.spongepowered.api.item.inventory.InventoryArchetype;
 import org.spongepowered.api.item.inventory.InventoryProperty;
+import org.spongepowered.api.item.inventory.property.InventoryCapacity;
+import org.spongepowered.api.item.inventory.property.InventoryDimension;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Nullable;
-
-@SuppressWarnings({"unchecked", "ConstantConditions"})
 public class LanternInventoryArchetypeBuilder implements InventoryArchetype.Builder {
 
-    private final List<InventoryArchetype> types = new ArrayList<>();
-    private final Map<String, InventoryProperty<String, ?>> inventoryPropertiesByName = new HashMap<>();
-    private final Map<Class<?>, InventoryProperty<String, ?>> inventoryProperties = new HashMap<>();
+    private final List<LanternInventoryArchetype<?>> archetypes = new ArrayList<>();
+    private final Map<Class<?>, InventoryProperty<?,?>> properties = new HashMap<>();
 
     @Override
-    public LanternInventoryArchetypeBuilder from(InventoryArchetype value) {
-        checkNotNull(value, "value");
-        this.types.addAll(value.getChildArchetypes());
-        this.inventoryPropertiesByName.putAll(value.getProperties());
-        this.inventoryProperties.putAll((Map) ((LanternInventoryArchetype) value).getPropertiesByClass());
-        return this;
+    public InventoryArchetype.Builder from(InventoryArchetype value) {
+        return null;
     }
 
     @Override
-    public LanternInventoryArchetypeBuilder reset() {
-        this.types.clear();
-        this.inventoryPropertiesByName.clear();
-        this.inventoryProperties.clear();
-        return this;
+    public InventoryArchetype.Builder reset() {
+        return null;
     }
 
-    public LanternInventoryArchetypeBuilder property(@Nullable String key, InventoryProperty<String, ?> property) {
+    @Override
+    public InventoryArchetype.Builder property(InventoryProperty<String, ?> property) {
         checkNotNull(property, "property");
-        if (key != null) {
-            this.inventoryPropertiesByName.put(key, property);
-        }
-        this.inventoryProperties.put(property.getClass(), property);
+        this.properties.put(property.getClass(), property);
         return this;
     }
 
     @Override
-    public LanternInventoryArchetypeBuilder property(InventoryProperty<String, ?> property) {
-        checkNotNull(property, "property");
-        return property(property.getKey(), property);
-    }
-
-    @Override
-    public LanternInventoryArchetypeBuilder with(InventoryArchetype archetype) {
+    public InventoryArchetype.Builder with(InventoryArchetype archetype) {
         checkNotNull(archetype, "archetype");
-        this.types.add(archetype);
+        this.archetypes.add((LanternInventoryArchetype<?>) archetype);
         return this;
     }
 
     @Override
-    public LanternInventoryArchetypeBuilder with(InventoryArchetype... archetypes) {
-        checkNotNull(archetypes, "archetypes");
-        Collections.addAll(this.types, archetypes);
+    public InventoryArchetype.Builder with(InventoryArchetype... archetypes) {
+        Arrays.stream(archetypes).forEach(this::with);
         return this;
     }
 
     @Override
-    public LanternInventoryArchetype build(String id, String name) {
-        checkNotNullOrEmpty(id, "id");
-        checkNotNullOrEmpty(name, "name");
-        final int index = id.indexOf(':');
-        final String pluginId;
-        if (index != -1) {
-            pluginId = id.substring(0, index);
-            id = id.substring(index + 1);
-        } else {
-            pluginId = "minecraft";
+    public InventoryArchetype build(String id, String name) {
+        final InventoryDimension inventoryDimension = (InventoryDimension) this.properties.remove(InventoryDimension.class);
+        final InventoryCapacity inventoryCapacity = (InventoryCapacity) this.properties.remove(InventoryCapacity.class);
+        // Dimension doesn't matter, this means that we can just create a ordered children archetype
+        if (inventoryDimension == null) {
+            for (LanternInventoryArchetype<?> archetype : this.archetypes) {
+                if (archetype.builder instanceof AbstractSlot.Builder) {
+
+                }
+            }
         }
-        final Map<InventoryPropertyKey, InventoryProperty<?,?>> inventoryProperties = new HashMap<>();
-        this.inventoryProperties.values().forEach(property ->
-                inventoryProperties.put(new InventoryPropertyKey(property.getClass(), property.getKey()), property));
-        return new LanternInventoryArchetype(pluginId, id, name, this.types, (Map) this.inventoryPropertiesByName, inventoryProperties);
+        return null;
     }
 }

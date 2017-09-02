@@ -25,6 +25,9 @@
  */
 package org.lanternpowered.server.block.tile.vanilla;
 
+import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.inventory.vanilla.VanillaInventoryArchetypes;
+import org.lanternpowered.server.inventory.vanilla.block.ChestInventory;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.block.tileentity.TileEntity;
@@ -40,7 +43,7 @@ import org.spongepowered.api.world.World;
 import java.util.Optional;
 import java.util.Random;
 
-public class LanternChest extends LanternContainerTile<TileChestInventory> implements Chest {
+public class LanternChest extends LanternContainerTile<ChestInventory> implements Chest {
 
     private static final Direction[] HORIZONTAL_DIRECTIONS = { Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST };
 
@@ -53,8 +56,10 @@ public class LanternChest extends LanternContainerTile<TileChestInventory> imple
     }
 
     @Override
-    protected TileChestInventory createInventory() {
-        return new TileChestInventory(null, this);
+    protected ChestInventory createInventory() {
+        return VanillaInventoryArchetypes.CHEST.builder()
+                .withCarrier(this)
+                .build(Lantern.getMinecraftPlugin());
     }
 
     @Override

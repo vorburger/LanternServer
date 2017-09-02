@@ -31,8 +31,9 @@ import org.lanternpowered.server.behavior.BehaviorResult;
 import org.lanternpowered.server.behavior.Parameters;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.inventory.AbstractSlot;
 import org.lanternpowered.server.inventory.LanternItemStack;
-import org.lanternpowered.server.inventory.PeekOfferTransactionsResult;
+import org.lanternpowered.server.inventory.PeekedOfferTransactionResult;
 import org.lanternpowered.server.inventory.slot.LanternSlot;
 import org.lanternpowered.server.item.behavior.types.InteractWithItemBehavior;
 import org.spongepowered.api.data.Transaction;
@@ -51,10 +52,10 @@ public class ArmorQuickEquipInteractionBehavior implements InteractWithItemBehav
         final LanternPlayer player = (LanternPlayer) context.tryGet(Parameters.PLAYER);
         final ItemStack itemStack = context.tryGet(Parameters.USED_ITEM_STACK);
 
-        final PeekOfferTransactionsResult result = player.getInventory().getEquipment().peekOfferFastTransactions(itemStack.copy());
+        final PeekedOfferTransactionResult result = player.getInventory().getEquipment().peekOfferFastTransactions(itemStack.copy());
         if (result.getOfferResult().isSuccess()) {
             final List<SlotTransaction> transactions = result.getTransactions();
-            final LanternSlot slot = (LanternSlot) context.get(Parameters.USED_SLOT).orElse(null);
+            final AbstractSlot slot = (AbstractSlot) context.get(Parameters.USED_SLOT).orElse(null);
             if (slot != null) {
                 transactions.add(new SlotTransaction(
                         slot, itemStack.createSnapshot(), LanternItemStack.toSnapshot(result.getOfferResult().getRest())));

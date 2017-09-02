@@ -30,7 +30,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.lanternpowered.server.inventory.behavior.HotbarBehavior;
 import org.lanternpowered.server.inventory.behavior.SimpleHotbarBehavior;
-import org.lanternpowered.server.inventory.slot.LanternSlot;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutHeldItemChange;
 import org.spongepowered.api.text.Text;
@@ -116,11 +115,6 @@ public class PlayerClientContainer extends ClientContainer {
             this.previousSelectedHotbarSlot = selectedHotbarSlot;
             messages.add(new MessagePlayInOutHeldItemChange(selectedHotbarSlot));
         }
-    }
-
-    @Override
-    public ClientSlot.Slot bindSlot(int index, LanternSlot slot) {
-        return super.bindSlot(index, slot);
     }
 
     public void handleHeldItemChange(int hotbarSlotIndex) {

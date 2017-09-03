@@ -33,7 +33,11 @@ import org.lanternpowered.server.inventory.AbstractInventory;
 import org.lanternpowered.server.inventory.AbstractOrderedChildrenInventory;
 import org.lanternpowered.server.inventory.AbstractSlot;
 import org.lanternpowered.server.inventory.CarrierReference;
-import org.lanternpowered.server.inventory.type.LanternCarriedEquipmentInventory;
+import org.lanternpowered.server.inventory.LanternContainer;
+import org.lanternpowered.server.inventory.OpenableInventory;
+import org.lanternpowered.server.inventory.behavior.VanillaContainerInteractionBehavior;
+import org.lanternpowered.server.inventory.client.PlayerClientContainer;
+import org.lanternpowered.server.inventory.type.LanternArmorEquipableInventory;
 import org.lanternpowered.server.inventory.type.LanternCraftingInventory;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.Carrier;
@@ -41,19 +45,20 @@ import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.entity.PlayerInventory;
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
 import org.spongepowered.api.item.inventory.property.EquipmentSlotType;
+import org.spongepowered.api.text.Text;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Optional;
 
-public class LanternPlayerInventory extends AbstractOrderedChildrenInventory implements PlayerInventory {
+public class LanternPlayerInventory extends AbstractOrderedChildrenInventory implements PlayerInventory, OpenableInventory {
 
     private final CarrierReference<Player> carrierReference = CarrierReference.of(Player.class);
 
     private LanternCraftingInventory craftingInventory;
     private LanternMainPlayerInventory mainInventory;
-    private LanternCarriedEquipmentInventory equipmentInventory;
+    private LanternPlayerEquipmentInventory equipmentInventory;
     private AbstractSlot offhandSlot;
 
     private final EnumMap<View, AbstractInventory> views = new EnumMap<>(View.class);
@@ -94,7 +99,7 @@ public class LanternPlayerInventory extends AbstractOrderedChildrenInventory imp
         // Search the the inventories for the helper methods
         this.craftingInventory = query(LanternCraftingInventory.class).first();
         this.mainInventory = query(LanternMainPlayerInventory.class).first();
-        this.equipmentInventory = query(LanternCarriedEquipmentInventory.class).first();
+        this.equipmentInventory = query(LanternPlayerEquipmentInventory.class).first();
         this.offhandSlot = query(new EquipmentSlotType(EquipmentTypes.OFF_HAND)).first();
 
         // Construct the inventory views
@@ -123,7 +128,7 @@ public class LanternPlayerInventory extends AbstractOrderedChildrenInventory imp
     }
 
     @Override
-    public LanternCarriedEquipmentInventory getEquipment() {
+    public LanternPlayerEquipmentInventory getEquipment() {
         return this.equipmentInventory;
     }
 
@@ -140,6 +145,18 @@ public class LanternPlayerInventory extends AbstractOrderedChildrenInventory imp
     @Override
     public AbstractGridInventory getMainGrid() {
         return getMain().getGrid();
+    }
+
+    @Override
+    public PlayerClientContainer constructClientContainer(LanternContainer container) {
+        final PlayerClientContainer clientContainer = new PlayerClientContainer(Text.of(getName()));
+        clientContainer.bindCursor(container.getCursorSlot());
+        clientContainer.bindHotbarBehavior(getHotbar().getHotbarBehavior());
+        clientContainer.bindInteractionBehavior(new VanillaContainerInteractionBehavior(container));
+        clientContainer.bindBottom();
+        getSlotsToIndexMap().object2IntEntrySet().forEach(entry ->
+                clientContainer.bindSlot(entry.getIntValue(), entry.getKey()));
+        return clientContainer;
     }
 
     /**

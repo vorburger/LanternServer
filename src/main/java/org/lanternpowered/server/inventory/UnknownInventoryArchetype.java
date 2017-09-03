@@ -25,26 +25,47 @@
  */
 package org.lanternpowered.server.inventory;
 
-import org.spongepowered.api.item.inventory.Carrier;
+import org.spongepowered.api.item.inventory.InventoryArchetype;
+import org.spongepowered.api.item.inventory.InventoryProperty;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
-public abstract class AbstractEquipmentInventory<C extends Carrier> extends AbstractOrderedSlotsInventory implements IEquipmentInventory<C> {
+public class UnknownInventoryArchetype extends LanternInventoryArchetype<AbstractInventory> {
 
-    private final CarrierReference<C> carrierReference;
-
-    protected AbstractEquipmentInventory(Class<C> carrierType) {
-        this.carrierReference = CarrierReference.of(carrierType);
+    public UnknownInventoryArchetype(String pluginId, String name) {
+        super(pluginId, name);
     }
 
     @Override
-    public Optional<C> getCarrier() {
-        return this.carrierReference.get();
+    public AbstractArchetypeBuilder<AbstractInventory, ? super AbstractInventory, ?> getBuilder() {
+        throw new IllegalStateException("The unknown inventory archetype cannot be constructed.");
     }
 
     @Override
-    protected void setCarrier(Carrier carrier) {
-        super.setCarrier(carrier);
-        this.carrierReference.set(carrier);
+    public List<InventoryArchetype> getChildArchetypes() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public Map<String, InventoryProperty<String, ?>> getProperties() {
+        return Collections.emptyMap();
+    }
+
+    @Override
+    public Optional<InventoryProperty<String, ?>> getProperty(String key) {
+        return Optional.empty();
+    }
+
+    @Override
+    public <P extends InventoryProperty<String, ?>> Optional<P> getProperty(Class<P> property) {
+        return Optional.empty();
+    }
+
+    @Override
+    public <T extends InventoryProperty<String, ?>> Optional<T> getProperty(Class<T> type, String key) {
+        return Optional.empty();
     }
 }

@@ -30,18 +30,24 @@ import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.inventory.AbstractGridInventory;
+import org.lanternpowered.server.inventory.AbstractOrderedChildrenInventory;
 import org.lanternpowered.server.inventory.AbstractOrderedSlotsInventory;
 import org.lanternpowered.server.inventory.AbstractSlot;
 import org.lanternpowered.server.inventory.LanternInventoryArchetype;
 import org.lanternpowered.server.inventory.filter.ItemFilter;
-import org.lanternpowered.server.inventory.type.LanternCarriedEquipmentInventory;
+import org.lanternpowered.server.inventory.type.LanternArmorEquipableInventory;
+import org.lanternpowered.server.inventory.type.LanternCraftingGridInventory;
+import org.lanternpowered.server.inventory.type.LanternCraftingInventory;
+import org.lanternpowered.server.inventory.type.LanternGridInventory;
 import org.lanternpowered.server.inventory.type.LanternOrderedSlotsInventory;
+import org.lanternpowered.server.inventory.type.slot.LanternCraftingOutputSlot;
 import org.lanternpowered.server.inventory.type.slot.LanternEquipmentSlot;
 import org.lanternpowered.server.inventory.type.slot.LanternFuelSlot;
 import org.lanternpowered.server.inventory.type.slot.LanternInputSlot;
 import org.lanternpowered.server.inventory.type.slot.LanternOutputSlot;
 import org.lanternpowered.server.inventory.type.slot.LanternSlot;
 import org.lanternpowered.server.inventory.vanilla.block.ChestInventory;
+import org.lanternpowered.server.inventory.vanilla.block.CraftingTableInventory;
 import org.lanternpowered.server.inventory.vanilla.block.DispenserInventory;
 import org.lanternpowered.server.inventory.vanilla.block.FurnaceInventory;
 import org.lanternpowered.server.inventory.vanilla.block.JukeboxInventory;
@@ -85,6 +91,14 @@ public final class VanillaInventoryArchetypes {
             .typeSupplier(LanternFuelSlot::new)
             .buildArchetype(Minecraft.IDENTIFIER, "fuel_slot");
 
+    ////////////////////////////
+    /// Crafting Output Slot ///
+    ////////////////////////////
+
+    public static final LanternInventoryArchetype<LanternCraftingOutputSlot> CRAFTING_OUTPUT_SLOT = AbstractSlot.builder()
+            .typeSupplier(LanternCraftingOutputSlot::new)
+            .buildArchetype(Minecraft.IDENTIFIER, "crafting_output_slot");
+
     ///////////////////
     /// Helmet Slot ///
     ///////////////////
@@ -121,6 +135,24 @@ public final class VanillaInventoryArchetypes {
             .typeSupplier(LanternEquipmentSlot::new)
             .buildArchetype(Minecraft.IDENTIFIER, "boots_slot");
 
+    /////////////////////
+    /// Mainhand Slot ///
+    /////////////////////
+
+    public static final LanternInventoryArchetype<LanternEquipmentSlot> MAIN_HAND_SLOT = AbstractSlot.builder()
+            .property(EquipmentSlotType.of(EquipmentTypes.MAIN_HAND))
+            .typeSupplier(LanternEquipmentSlot::new)
+            .buildArchetype(Minecraft.IDENTIFIER, "main_hand_slot");
+
+    ////////////////////
+    /// Offhand Slot ///
+    ////////////////////
+
+    public static final LanternInventoryArchetype<LanternEquipmentSlot> OFF_HAND_SLOT = AbstractSlot.builder()
+            .property(EquipmentSlotType.of(EquipmentTypes.OFF_HAND))
+            .typeSupplier(LanternEquipmentSlot::new)
+            .buildArchetype(Minecraft.IDENTIFIER, "off_hand_slot");
+
     /////////////
     /// Chest ///
     /////////////
@@ -141,6 +173,7 @@ public final class VanillaInventoryArchetypes {
 
     static {
         final AbstractGridInventory.SlotsBuilder<ChestInventory> builder = AbstractGridInventory.slotsBuilder()
+                .expand(9, 3)
                 .typeSupplier(ChestInventory::new);
         for (int y = 0; y < 3; y++) {
             for (int x = 0; x < 9; x++) {
@@ -173,15 +206,16 @@ public final class VanillaInventoryArchetypes {
     public static final LanternInventoryArchetype<DispenserInventory> DISPENSER;
 
     static {
-        final AbstractGridInventory.SlotsBuilder<AbstractGridInventory> builder = AbstractGridInventory.slotsBuilder();
+        final AbstractGridInventory.SlotsBuilder<DispenserInventory> builder = AbstractGridInventory.slotsBuilder()
+                .property(new InventoryTitle(t("container.dispenser")))
+                .typeSupplier(DispenserInventory::new)
+                .expand(3, 3);
         for (int y = 0; y < 3; y++) {
             for (int x = 0; x < 3; x++) {
                 builder.slot(x, y, SLOT);
             }
         }
-        DISPENSER = builder.property(new InventoryTitle(t("container.dispenser")))
-                .typeSupplier(DispenserInventory::new)
-                .buildArchetype(Minecraft.IDENTIFIER, "dispenser");
+        DISPENSER = builder.buildArchetype(Minecraft.IDENTIFIER, "dispenser");
     }
 
     ///////////////
@@ -208,29 +242,31 @@ public final class VanillaInventoryArchetypes {
     /// Entity Equipment ///
     ////////////////////////
 
-    public static final LanternInventoryArchetype<LanternCarriedEquipmentInventory> ARMOR = AbstractOrderedSlotsInventory.builder()
+    public static final LanternInventoryArchetype<LanternArmorEquipableInventory> ENTITY_EQUIPMENT = AbstractOrderedSlotsInventory.builder()
+            .slot(MAIN_HAND_SLOT)
+            .slot(OFF_HAND_SLOT)
             .slot(HELMET_SLOT)
             .slot(CHESTPLATE_SLOT)
             .slot(LEGGINGS_SLOT)
             .slot(BOOTS_SLOT)
-            .typeSupplier(LanternCarriedEquipmentInventory::new)
-            .buildArchetype(Minecraft.IDENTIFIER, "armor");
+            .typeSupplier(LanternArmorEquipableInventory::new)
+            .buildArchetype(Minecraft.IDENTIFIER, "entity_equipment");
 
     ////////////////////////
     /// Player Main Grid ///
     ////////////////////////
 
-    public static final LanternInventoryArchetype<AbstractGridInventory> PLAYER_MAIN_GRID;
+    public static final LanternInventoryArchetype<LanternGridInventory> PLAYER_MAIN_GRID;
 
     static {
-        final AbstractGridInventory.SlotsBuilder<AbstractGridInventory> builder = AbstractGridInventory.slotsBuilder();
+        final AbstractGridInventory.SlotsBuilder<LanternGridInventory> builder = AbstractGridInventory.slotsBuilder()
+                .typeSupplier(LanternGridInventory::new);
         for (int y = 0; y < 3; y++) {
             for (int x = 0; x < 9; x++) {
                 builder.slot(x, y, SLOT);
             }
         }
-        PLAYER_MAIN_GRID = builder
-                .buildArchetype(Minecraft.IDENTIFIER, "player_main_grid");
+        PLAYER_MAIN_GRID = builder.buildArchetype(Minecraft.IDENTIFIER, "player_main_grid");
     }
 
     /////////////////////
@@ -240,13 +276,12 @@ public final class VanillaInventoryArchetypes {
     public static final LanternInventoryArchetype<LanternHotbarInventory> PLAYER_HOTBAR;
 
     static {
-        final AbstractOrderedSlotsInventory.Builder<?> builder = AbstractOrderedSlotsInventory.builder();
+        final AbstractOrderedSlotsInventory.Builder<LanternHotbarInventory> builder = AbstractOrderedSlotsInventory.builder()
+                .typeSupplier(LanternHotbarInventory::new);
         for (int x = 0; x < 9; x++) {
             builder.slot(SLOT);
         }
-        PLAYER_HOTBAR = builder
-                .typeSupplier(LanternHotbarInventory::new)
-                .buildArchetype(Minecraft.IDENTIFIER, "player_hotbar");
+        PLAYER_HOTBAR = builder.buildArchetype(Minecraft.IDENTIFIER, "player_hotbar");
     }
 
     ///////////////////
@@ -258,6 +293,85 @@ public final class VanillaInventoryArchetypes {
             .row(3, PLAYER_HOTBAR, 1050)
             .typeSupplier(LanternMainPlayerInventory::new)
             .buildArchetype(Minecraft.IDENTIFIER, "player_main");
+
+    /////////////////////
+    /// Crafting Grid ///
+    /////////////////////
+
+    public static final LanternInventoryArchetype<LanternCraftingGridInventory> CRAFTING_GRID;
+
+    static {
+        final AbstractGridInventory.SlotsBuilder<LanternCraftingGridInventory> builder = AbstractGridInventory.slotsBuilder()
+                .typeSupplier(LanternCraftingGridInventory::new);
+        for (int y = 0; y < 2; y++) {
+            for (int x = 0; x < 2; x++) {
+                builder.slot(x, y, SLOT);
+            }
+        }
+        CRAFTING_GRID = builder.buildArchetype(Minecraft.IDENTIFIER, "crafting_grid");
+    }
+
+    ////////////////
+    /// Crafting ///
+    ////////////////
+
+    public static final LanternInventoryArchetype<LanternCraftingInventory> CRAFTING = AbstractOrderedChildrenInventory.builder()
+            .inventory(CRAFTING_GRID)
+            .inventory(CRAFTING_OUTPUT_SLOT)
+            .typeSupplier(LanternCraftingInventory::new)
+            .buildArchetype(Minecraft.IDENTIFIER, "crafting");
+
+    //////////////////////
+    /// Workbench Grid ///
+    //////////////////////
+
+    public static final LanternInventoryArchetype<LanternCraftingGridInventory> WORKBENCH_GRID;
+
+    static {
+        final AbstractGridInventory.SlotsBuilder<LanternCraftingGridInventory> builder = AbstractGridInventory.slotsBuilder()
+                .typeSupplier(LanternCraftingGridInventory::new)
+                .expand(3, 3);
+        for (int y = 0; y < 3; y++) {
+            for (int x = 0; x < 3; x++) {
+                builder.slot(x, y, SLOT);
+            }
+        }
+        WORKBENCH_GRID = builder.buildArchetype(Minecraft.IDENTIFIER, "workbench_grid");
+    }
+
+    /////////////////
+    /// Workbench ///
+    /////////////////
+
+    public static final LanternInventoryArchetype<CraftingTableInventory> WORKBENCH = AbstractOrderedChildrenInventory.builder()
+            .inventory(WORKBENCH_GRID)
+            .inventory(CRAFTING_OUTPUT_SLOT)
+            .typeSupplier(CraftingTableInventory::new)
+            .buildArchetype(Minecraft.IDENTIFIER, "workbench");
+
+    ////////////////////
+    /// Player Armor ///
+    ////////////////////
+
+    public static final LanternInventoryArchetype<LanternPlayerEquipmentInventory> PLAYER_ARMOR = AbstractOrderedSlotsInventory.builder()
+            .slot(HELMET_SLOT)
+            .slot(CHESTPLATE_SLOT)
+            .slot(LEGGINGS_SLOT)
+            .slot(BOOTS_SLOT)
+            .typeSupplier(LanternPlayerEquipmentInventory::new)
+            .buildArchetype(Minecraft.IDENTIFIER, "player_armor");
+
+    //////////////
+    /// Player ///
+    //////////////
+
+    public static final LanternInventoryArchetype<LanternPlayerInventory> PLAYER = AbstractOrderedChildrenInventory.builder()
+            .inventory(CRAFTING)
+            .inventory(PLAYER_ARMOR)
+            .inventory(OFF_HAND_SLOT)
+            .inventory(PLAYER_MAIN)
+            .typeSupplier(LanternPlayerInventory::new)
+            .buildArchetype(Minecraft.IDENTIFIER, "player");
 
     private VanillaInventoryArchetypes() {
     }

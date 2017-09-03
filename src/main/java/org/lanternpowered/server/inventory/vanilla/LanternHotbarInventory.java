@@ -25,10 +25,11 @@
  */
 package org.lanternpowered.server.inventory.vanilla;
 
+import org.lanternpowered.server.inventory.AbstractInventoryRow;
+import org.lanternpowered.server.inventory.AbstractSlot;
+import org.lanternpowered.server.inventory.ISlot;
 import org.lanternpowered.server.inventory.behavior.HotbarBehavior;
 import org.lanternpowered.server.inventory.behavior.VanillaHotbarBehavior;
-import org.lanternpowered.server.inventory.AbstractInventoryRow;
-import org.lanternpowered.server.inventory.ISlot;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.InventoryProperty;
 import org.spongepowered.api.item.inventory.entity.Hotbar;
@@ -50,9 +51,9 @@ public class LanternHotbarInventory extends AbstractInventoryRow implements Hotb
      *
      * @return The selected slot
      */
-    public ISlot getSelectedSlot() {
+    public AbstractSlot getSelectedSlot() {
         final int slotIndex = this.hotbarBehavior.getSelectedSlotIndex();
-        return getSlot(slotIndex).orElseThrow(() -> new IllegalStateException("No slot at index: " + slotIndex));
+        return (AbstractSlot) getSlot(slotIndex).orElseThrow(() -> new IllegalStateException("No slot at index: " + slotIndex));
     }
 
     /**

@@ -25,59 +25,24 @@
  */
 package org.lanternpowered.server.inventory;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import org.lanternpowered.server.catalog.PluginCatalogType;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
 import org.spongepowered.api.item.inventory.InventoryProperty;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @SuppressWarnings("unchecked")
-public class LanternInventoryArchetype<T extends AbstractInventory> extends PluginCatalogType.Base
+public abstract class LanternInventoryArchetype<T extends AbstractInventory> extends PluginCatalogType.Base
         implements InventoryArchetype, InventoryPropertyHolder {
 
-    protected final AbstractArchetypeBuilder<T, ? super T, ?> builder;
-    private final Map<String, InventoryProperty<String, ?>> propertiesByName;
-    private final List<InventoryArchetype> childArchetypes;
-
-    LanternInventoryArchetype(String pluginId, String name, AbstractArchetypeBuilder<T, ? super T, ?> builder) {
+    LanternInventoryArchetype(String pluginId, String name) {
         super(pluginId, name);
-        this.propertiesByName = Collections.unmodifiableMap(builder.propertiesByName);
-        this.childArchetypes = Collections.unmodifiableList(builder.getArchetypes());
-        this.builder = builder;
     }
 
-    @Override
-    public List<InventoryArchetype> getChildArchetypes() {
-        return this.childArchetypes;
-    }
+    public abstract AbstractArchetypeBuilder<T, ? super T, ?> getBuilder();
 
     @Override
-    public Map<String, InventoryProperty<String, ?>> getProperties() {
-        return this.propertiesByName;
-    }
-
-    @Override
-    public Optional<InventoryProperty<String, ?>> getProperty(String key) {
-        checkNotNull(key, "key");
-        return Optional.ofNullable(this.propertiesByName.get(key));
-    }
-
-    @Override
-    public <P extends InventoryProperty<String, ?>> Optional<P> getProperty(Class<P> property) {
-        checkNotNull(property, "property");
-        return Optional.ofNullable((P) this.builder.properties.get(property));
-    }
-
-    @Override
-    public <P extends InventoryProperty<String, ?>> Optional<P> getProperty(Class<P> type, String key) {
-        // return this.builder.asPropertyHolder().getProperty(type, key);
-        return Optional.empty();
-    }
+    public abstract <P extends InventoryProperty<String, ?>> Optional<P> getProperty(Class<P> property);
 
     /**
      * Constructs a {@link AbstractInventory}.
@@ -85,7 +50,7 @@ public class LanternInventoryArchetype<T extends AbstractInventory> extends Plug
      * @return The inventory
      */
     public T build() {
-        return this.builder.build();
+        return getBuilder().build0(null, this);
     }
 
     /**

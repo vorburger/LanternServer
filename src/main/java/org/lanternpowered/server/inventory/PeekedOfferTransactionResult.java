@@ -25,6 +25,8 @@
  */
 package org.lanternpowered.server.inventory;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.google.common.base.MoreObjects;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
@@ -37,16 +39,21 @@ import javax.annotation.Nullable;
 
 public class PeekedOfferTransactionResult extends PeekedTransactionResult {
 
+    private final InventoryTransactionResult.Type type;
     @Nullable private final ItemStack rejectedItem;
 
     /**
      * Constructs a new {@link PeekedOfferTransactionResult}.
      *
+     * @param type The type of the transaction result
      * @param transactions The slot transactions that will occur
      * @param rejectedItem The rejected item stack, this can occur if the stack doesn't fit the inventory
      */
-    public PeekedOfferTransactionResult(List<SlotTransaction> transactions, @Nullable ItemStack rejectedItem) {
+    public PeekedOfferTransactionResult(InventoryTransactionResult.Type type, List<SlotTransaction> transactions,
+            @Nullable ItemStack rejectedItem) {
         super(transactions);
+        checkNotNull(type, "type");
+        this.type = type;
         this.rejectedItem = rejectedItem;
     }
 
@@ -62,6 +69,25 @@ public class PeekedOfferTransactionResult extends PeekedTransactionResult {
     }
 
     /**
+     * Gets the {@link InventoryTransactionResult.Type}.
+     *
+     * @return The result type
+     */
+    public InventoryTransactionResult.Type getType() {
+        return this.type;
+    }
+
+    /**
+     * Gets whether the {@link InventoryTransactionResult.Type}
+     * is successful.
+     *
+     * @return The successful
+     */
+    public boolean isSuccess() {
+        return this.type == InventoryTransactionResult.Type.SUCCESS;
+    }
+
+    /**
      * Converts this {@link PeekedOfferTransactionResult} into a
      * {@link InventoryTransactionResult}.
      *
@@ -73,7 +99,7 @@ public class PeekedOfferTransactionResult extends PeekedTransactionResult {
 
     protected InventoryTransactionResult.Builder asInventoryTransactionBuilder() {
         final InventoryTransactionResult.Builder builder = InventoryTransactionResult.builder();
-        builder.type(InventoryTransactionResult.Type.SUCCESS);
+        builder.type(this.type);
         if (this.rejectedItem != null) {
             builder.reject(this.rejectedItem);
         }

@@ -80,6 +80,15 @@ public abstract class AbstractMutableInventory extends AbstractInventory {
      *
      * @param carrier The carrier
      */
+    void setCarrier0(Carrier carrier) {
+        setCarrier(carrier);
+    }
+
+    /**
+     * Sets the {@link Carrier} of this {@link Inventory}.
+     *
+     * @param carrier The carrier
+     */
     protected abstract void setCarrier(Carrier carrier);
 
     /**

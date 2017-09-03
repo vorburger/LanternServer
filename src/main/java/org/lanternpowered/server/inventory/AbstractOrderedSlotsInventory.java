@@ -81,7 +81,7 @@ public abstract class AbstractOrderedSlotsInventory extends AbstractOrderedInven
     }
 
     @Override
-    Object2IntMap<AbstractSlot> getSlotsToIndexMap() {
+    protected Object2IntMap<AbstractSlot> getSlotsToIndexMap() {
         return this.slotsToIndex == null ? Object2IntMaps.emptyMap() : this.slotsToIndex;
     }
 
@@ -208,11 +208,15 @@ public abstract class AbstractOrderedSlotsInventory extends AbstractOrderedInven
         }
 
         @Override
-        protected Builder<T> copy() {
-            final Builder<T> copy = new Builder<>();
+        protected void copyTo(Builder<T> copy) {
+            super.copyTo(copy);
             copy.slots.addAll(this.slots);
             copy.freeSlotStart = this.freeSlotStart;
-            return copy;
+        }
+
+        @Override
+        protected Builder<T> newBuilder() {
+            return new Builder<>();
         }
 
         @Override

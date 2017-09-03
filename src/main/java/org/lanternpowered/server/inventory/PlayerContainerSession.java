@@ -35,7 +35,6 @@ import org.lanternpowered.server.inventory.client.ClientContainer;
 import org.lanternpowered.server.inventory.client.EnchantmentTableClientContainer;
 import org.lanternpowered.server.inventory.client.PlayerClientContainer;
 import org.lanternpowered.server.inventory.client.TradingClientContainer;
-import org.lanternpowered.server.inventory.slot.LanternSlot;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInAcceptBeaconEffects;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInChangeItemName;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInChangeOffer;
@@ -240,7 +239,7 @@ public class PlayerContainerSession {
     }
 
     public void handleItemDrop(MessagePlayInDropHeldItem message) {
-        final LanternSlot slot = this.player.getInventory().getHotbar().getSelectedSlot();
+        final AbstractSlot slot = this.player.getInventory().getHotbar().getSelectedSlot();
         final Optional<ItemStack> itemStack = message.isFullStack() ? slot.peek() : slot.peek(1);
 
         if (itemStack.isPresent()) {

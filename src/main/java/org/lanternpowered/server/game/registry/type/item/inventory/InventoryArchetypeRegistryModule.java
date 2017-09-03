@@ -25,20 +25,20 @@
  */
 package org.lanternpowered.server.game.registry.type.item.inventory;
 
-import static org.lanternpowered.server.text.translation.TranslationHelper.t;
-
 import com.google.common.collect.ImmutableList;
 import org.lanternpowered.server.game.registry.CatalogMappingData;
 import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
+import org.lanternpowered.server.inventory.LanternInventoryArchetype;
+import org.lanternpowered.server.inventory.LanternInventoryArchetypes;
+import org.lanternpowered.server.inventory.UnknownInventoryArchetype;
+import org.lanternpowered.server.inventory.sponge.SpongeInventoryArchetypes;
+import org.lanternpowered.server.inventory.vanilla.VanillaInventoryArchetypes;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
 import org.spongepowered.api.item.inventory.InventoryArchetypes;
-import org.spongepowered.api.item.inventory.property.AcceptsItems;
-import org.spongepowered.api.item.inventory.property.GuiIdProperty;
-import org.spongepowered.api.item.inventory.property.GuiIds;
-import org.spongepowered.api.item.inventory.property.InventoryDimension;
-import org.spongepowered.api.item.inventory.property.InventoryTitle;
 import org.spongepowered.api.registry.util.RegistrationDependency;
 
+import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.List;
 
 @RegistrationDependency(ClientContainerRegistryModule.class)
@@ -58,6 +58,20 @@ public class InventoryArchetypeRegistryModule extends PluginCatalogRegistryModul
 
     @Override
     public void registerDefaults() {
+        register(new UnknownInventoryArchetype("minecraft", "unknown"));
+
+        for (Class<?> target : Arrays.asList(VanillaInventoryArchetypes.class, SpongeInventoryArchetypes.class)) {
+            for (Field field : target.getFields()) {
+                if (LanternInventoryArchetype.class.isAssignableFrom(field.getType())) {
+                    try {
+                        register((InventoryArchetype) field.get(null));
+                    } catch (IllegalAccessException e) {
+                        throw new IllegalStateException(e);
+                    }
+                }
+            }
+        }
+        /*
         final LanternInventoryArchetypeBuilder builder = new LanternInventoryArchetypeBuilder();
 
         final InventoryArchetype slotArchetype = builder.build("minecraft:slot", "Slot");
@@ -114,7 +128,7 @@ public class InventoryArchetypeRegistryModule extends PluginCatalogRegistryModul
                         .build("minecraft:furnace_input", "Furnace Input"))
                 .with(new LanternInventoryArchetypeBuilder()
                         .from(slotArchetype)
-                        .property(AcceptsItems.of(/*fuelsPredicate?*/))
+                        .property(AcceptsItems.of(/*fuelsPredicate?*//*))
                         .build("minecraft:furnace_fuel", "Furnace Fuel"))
                 .with(new LanternInventoryArchetypeBuilder()
                         .from(slotArchetype)
@@ -246,6 +260,6 @@ public class InventoryArchetypeRegistryModule extends PluginCatalogRegistryModul
 
         final InventoryArchetype emptyArchetype = builder.reset()
                 .build("minecraft:empty", "Empty");
-        register(emptyArchetype);
+        register(emptyArchetype);*/
     }
 }

@@ -28,6 +28,7 @@ package org.lanternpowered.server.inventory;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.inventory.client.ClientContainer;
@@ -57,50 +58,32 @@ public class LanternContainer extends AbstractOrderedChildrenInventory implement
      */
     private final LanternSlot cursor = new LanternSlot();
 
-    public LanternContainer(AbstractOrderedInventory<?> openInventory, LanternPlayerInventory playerInventory) {
+    /**
+     * Creates a new {@link LanternContainer}, the specified {@link LanternPlayerInventory} is
+     * used as the bottom inventory and also as top inventory if {@code null} is provided
+     * for the inventory that should be opened.
+     *
+     * @param playerInventory The player inventory
+     * @param openInventory The inventory to open
+     */
+    public LanternContainer(LanternPlayerInventory playerInventory, AbstractOrderedInventory<?> openInventory) {
         this.playerInventory = playerInventory;
         this.openInventory = openInventory;
+        init(ImmutableList.of(openInventory, playerInventory), null);
     }
 
-    /*
     /**
-     * Creates a new {@link LanternContainer}, the specified {@link PlayerInventory} is
+     * Creates a new {@link LanternContainer}, the specified {@link LanternPlayerInventory} is
      * used as the bottom inventory and also as top inventory if {@code null} is provided
      * for the inventory that should be opened.
      *
      * @param playerInventory The player inventory
-     * @param openInventory The inventory to open
-     *//*
-    public LanternContainer(LanternPlayerInventory playerInventory, OpenableInventory openInventory) {
-        this(playerInventory, openInventory, openInventory.getName());
+     */
+    LanternContainer(LanternPlayerInventory playerInventory) {
+        this.playerInventory = playerInventory;
+        this.openInventory = playerInventory;
+        init(ImmutableList.of(playerInventory), null);
     }
-
-    /**
-     * Creates a new {@link LanternContainer}, the specified {@link PlayerInventory} is
-     * used as the bottom inventory and also as top inventory if {@code null} is provided
-     * for the inventory that should be opened.
-     *
-     * @param playerInventory The player inventory
-     * @param openInventory The inventory to open
-     * @param name The name of the container
-     *//*
-    public LanternContainer(LanternPlayerInventory playerInventory, OpenableInventory openInventory, @Nullable Translation name) {
-        this(name, playerInventory, checkNotNull(openInventory, "openInventory"));
-    }
-
-    LanternContainer(@Nullable Translation name, LanternPlayerInventory playerInventory, @Nullable OpenableInventory openInventory) {
-        super(null, name);
-        this.playerInventory = checkNotNull(playerInventory, "playerInventory");
-        final LanternHumanMainInventory mainInventory = playerInventory.getMain();
-        if (openInventory != null) {
-            registerChild(openInventory);
-            registerChild(mainInventory);
-            this.openInventory = (LanternOrderedInventory) openInventory;
-        } else {
-            registerChild(playerInventory);
-            this.openInventory = playerInventory;
-        }
-    }*/
 
     /**
      * Gets the cursor {@link LanternSlot}.

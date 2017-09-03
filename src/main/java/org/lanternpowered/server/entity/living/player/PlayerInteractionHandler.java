@@ -37,8 +37,7 @@ import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.entity.event.SwingHandEntityEvent;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternGame;
-import org.lanternpowered.server.inventory.entity.OffHandSlot;
-import org.lanternpowered.server.inventory.slot.LanternSlot;
+import org.lanternpowered.server.inventory.AbstractSlot;
 import org.lanternpowered.server.item.LanternItemType;
 import org.lanternpowered.server.item.behavior.types.FinishUsingItemBehavior;
 import org.lanternpowered.server.item.behavior.types.InteractWithItemBehavior;
@@ -129,7 +128,7 @@ public final class PlayerInteractionHandler {
             }
         }
         final HandType activeHand = this.player.get(LanternKeys.ACTIVE_HAND).orElse(Optional.empty()).orElse(null);
-        final LanternSlot slot = activeHand == null ? null : activeHand == HandTypes.MAIN_HAND ?
+        final AbstractSlot slot = activeHand == null ? null : activeHand == HandTypes.MAIN_HAND ?
                 this.player.getInventory().getHotbar().getSelectedSlot() : this.player.getInventory().getOffhand();
         // The interaction just started
         if (!Objects.equals(activeHand, this.lastActiveHand)) {
@@ -307,8 +306,8 @@ public final class PlayerInteractionHandler {
         }
 
         // Try the action of the hotbar item first
-        final LanternSlot hotbarSlot = this.player.getInventory().getHotbar().getSelectedSlot();
-        final OffHandSlot offHandSlot = this.player.getInventory().getOffhand();
+        final AbstractSlot hotbarSlot = this.player.getInventory().getHotbar().getSelectedSlot();
+        final AbstractSlot offHandSlot = this.player.getInventory().getOffhand();
 
         // The offset can round up to 1, causing
         // an incorrect clicked block location
@@ -388,7 +387,7 @@ public final class PlayerInteractionHandler {
         }
 
         // Try the action of the hotbar item first
-        final LanternSlot slot = activeHand.get() == HandTypes.MAIN_HAND ?
+        final AbstractSlot slot = activeHand.get() == HandTypes.MAIN_HAND ?
                 this.player.getInventory().getHotbar().getSelectedSlot() : this.player.getInventory().getOffhand();
 
         final ItemStack rawItemStack = slot.getRawItemStack();
@@ -410,7 +409,7 @@ public final class PlayerInteractionHandler {
         handleFinishItemInteraction0(slot, activeHand.get());
     }
 
-    private void handleFinishItemInteraction0(LanternSlot slot, HandType handType) {
+    private void handleFinishItemInteraction0(AbstractSlot slot, HandType handType) {
         final BehaviorContextImpl context = new BehaviorContextImpl(Cause.source(this.player).build());
         context.set(Parameters.PLAYER, this.player);
 
@@ -454,7 +453,7 @@ public final class PlayerInteractionHandler {
             if (!this.player.get(LanternKeys.CAN_DUAL_WIELD).orElse(false)) {
                 return;
             }
-            final OffHandSlot offHandSlot = this.player.getInventory().getOffhand();
+            final AbstractSlot offHandSlot = this.player.getInventory().getOffhand();
             final Optional<ItemStack> handItem = offHandSlot.peek();
 
             if (handItem.isPresent()) {
@@ -501,7 +500,7 @@ public final class PlayerInteractionHandler {
                 this.player.getInventory().getHotbar().getSelectedSlot(), snapshot);
     }
 
-    private boolean handleHandItemInteraction(BehaviorContextImpl context, HandType handType, LanternSlot slot,
+    private boolean handleHandItemInteraction(BehaviorContextImpl context, HandType handType, AbstractSlot slot,
             @Nullable BehaviorContextImpl.Snapshot snapshot) {
         final Optional<HandType> activeHand = this.player.get(LanternKeys.ACTIVE_HAND).orElse(Optional.empty());
         // The player is already interacting

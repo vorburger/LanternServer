@@ -55,7 +55,7 @@ import org.lanternpowered.server.block.behavior.simple.SimpleBreakBehavior;
 import org.lanternpowered.server.block.behavior.simple.SimplePlacementBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.ChestInteractionBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.ChestPlacementBehavior;
-import org.lanternpowered.server.block.behavior.vanilla.CraftingTableInteractionBehavior;
+import org.lanternpowered.server.block.behavior.vanilla.WorkbenchInteractionBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.EnderChestInteractionBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.HopperPlacementBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.HorizontalRotationPlacementBehavior;
@@ -102,7 +102,6 @@ import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.block.tileentity.TileEntityTypes;
 import org.spongepowered.api.block.trait.EnumTrait;
 import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.type.InstrumentTypes;
 import org.spongepowered.api.data.type.SlabType;
 import org.spongepowered.api.data.type.TreeType;
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
@@ -932,7 +931,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                                 .add(blastResistance(12.5)))
                         .translation("tile.workbench.name")
                         .behaviors(pipeline -> pipeline
-                                .add(new CraftingTableInteractionBehavior()))
+                                .add(new WorkbenchInteractionBehavior()))
                         .build("minecraft", "crafting_table"));
         // TODO: Wheat
         ////////////////////

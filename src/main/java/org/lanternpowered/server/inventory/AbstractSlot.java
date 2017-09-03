@@ -28,6 +28,7 @@ package org.lanternpowered.server.inventory;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.collect.ImmutableList;
 import org.lanternpowered.server.inventory.filter.EquipmentItemFilter;
 import org.lanternpowered.server.inventory.filter.ItemFilter;
 import org.lanternpowered.server.inventory.filter.PropertyItemFilters;
@@ -306,6 +307,48 @@ public abstract class AbstractSlot extends AbstractMutableInventory implements I
     }
 
     @Override
+    public PeekedOfferTransactionResult peekOffer(ItemStack itemStack) {
+        checkNotNull(itemStack, "itemStack");
+        if (itemStack.isEmpty()) {
+            return new PeekedOfferTransactionResult(InventoryTransactionResult.Type.FAILURE, ImmutableList.of(), itemStack);
+        }
+        final int maxStackSize = Math.min(itemStack.getMaxStackQuantity(), this.maxStackSize);
+        if (this.itemStack != null && (!this.itemStack.similarTo(itemStack)
+                || this.itemStack.getQuantity() >= maxStackSize) || !isValidItem(itemStack)) {
+            return new PeekedOfferTransactionResult(InventoryTransactionResult.Type.FAILURE, ImmutableList.of(), itemStack);
+        }
+        final List<SlotTransaction> transactions = new ArrayList<>();
+        // Get the amount of space we have left
+        final int availableSpace = this.itemStack == null ? maxStackSize :
+                maxStackSize - this.itemStack.getQuantity();
+        final int quantity = itemStack.getQuantity();
+        if (quantity > availableSpace) {
+            ItemStack newStack;
+            if (this.itemStack == null) {
+                newStack = itemStack.copy();
+            } else {
+                newStack = this.itemStack.copy();
+            }
+            newStack.setQuantity(maxStackSize);
+            itemStack = itemStack.copy();
+            itemStack.setQuantity(quantity - availableSpace);
+            transactions.add(new SlotTransaction(this, LanternItemStack.toSnapshot(this.itemStack), LanternItemStackSnapshot.wrap(newStack)));
+            return new PeekedOfferTransactionResult(InventoryTransactionResult.Type.SUCCESS, transactions, itemStack);
+        } else {
+            final ItemStack newStack;
+            if (this.itemStack == null) {
+                newStack = itemStack.copy();
+            } else {
+                newStack = this.itemStack.copy();
+                newStack.setQuantity(newStack.getQuantity() + quantity);
+            }
+            transactions.add(new SlotTransaction(this, LanternItemStack.toSnapshot(this.itemStack),
+                    LanternItemStackSnapshot.wrap(newStack)));
+            return new PeekedOfferTransactionResult(InventoryTransactionResult.Type.SUCCESS, transactions, null);
+        }
+    }
+
+    @Override
     public FastOfferResult offerFast(ItemStack stack) {
         checkNotNull(stack, "stack");
         if (LanternItemStack.toNullable(stack) == null) {
@@ -341,9 +384,9 @@ public abstract class AbstractSlot extends AbstractMutableInventory implements I
     }
 
     @Override
-    public Optional<PeekedSetTransactionResult> peekSet(@Nullable ItemStack stack) {
+    public PeekedSetTransactionResult peekSet(@Nullable ItemStack stack) {
         if (!LanternItemStack.isEmpty(stack) && !isValidItem(stack)) {
-            return Optional.empty();
+            return new PeekedSetTransactionResult(InventoryTransactionResult.Type.SUCCESS, ImmutableList.of(), stack, null);
         }
         stack = LanternItemStack.toNullable(stack);
         final List<SlotTransaction> transactions = new ArrayList<>();
@@ -367,7 +410,7 @@ public abstract class AbstractSlot extends AbstractMutableInventory implements I
             }
         }
         transactions.add(new SlotTransaction(this, oldItem, newItem));
-        return Optional.of(new PeekedSetTransactionResult(transactions, rejectedItem, replacedItem));
+        return new PeekedSetTransactionResult(InventoryTransactionResult.Type.SUCCESS, transactions, rejectedItem, replacedItem);
     }
 
     @Override
@@ -556,13 +599,16 @@ public abstract class AbstractSlot extends AbstractMutableInventory implements I
         }
 
         @Override
-        protected Builder<T> copy() {
-            final Builder<T> copy = new Builder<>();
-            copy.supplier = this.supplier;
+        protected void copyTo(Builder<T> copy) {
+            super.copyTo(copy);
             copy.itemFilter = this.itemFilter;
             copy.hasItemFilter = this.hasItemFilter;
             copy.cachedResultItemFilter = this.cachedResultItemFilter;
-            return copy;
+        }
+
+        @Override
+        protected Builder<T> newBuilder() {
+            return new Builder<>();
         }
 
         @Override

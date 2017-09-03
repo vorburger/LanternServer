@@ -27,24 +27,23 @@ package org.lanternpowered.server.inventory;
 
 import org.spongepowered.api.item.inventory.Carrier;
 
-import java.util.Optional;
+import javax.annotation.Nullable;
 
-public abstract class AbstractEquipmentInventory<C extends Carrier> extends AbstractOrderedSlotsInventory implements IEquipmentInventory<C> {
+@SuppressWarnings("unchecked")
+public class AbstractViewBuilder<R extends T, T extends AbstractInventory, B extends AbstractViewBuilder<R, T, B>>
+        extends AbstractBuilder<R, T, B> {
 
-    private final CarrierReference<C> carrierReference;
+    @Nullable private Carrier carrier;
 
-    protected AbstractEquipmentInventory(Class<C> carrierType) {
-        this.carrierReference = CarrierReference.of(carrierType);
+    public B withCarrier(Carrier carrier) {
+        this.carrier = carrier;
+        return (B) this;
     }
 
     @Override
-    public Optional<C> getCarrier() {
-        return this.carrierReference.get();
-    }
-
-    @Override
-    protected void setCarrier(Carrier carrier) {
-        super.setCarrier(carrier);
-        this.carrierReference.set(carrier);
+    protected void build(R inventory) {
+        if (this.carrier != null && inventory instanceof AbstractMutableInventory) {
+            ((AbstractMutableInventory) inventory).setCarrier(this.carrier);
+        }
     }
 }

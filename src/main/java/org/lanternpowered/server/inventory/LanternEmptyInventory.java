@@ -27,6 +27,7 @@ package org.lanternpowered.server.inventory;
 
 import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
 
+import com.google.common.collect.ImmutableList;
 import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.EmptyInventory;
@@ -45,7 +46,7 @@ import java.util.function.Predicate;
 
 import javax.annotation.Nullable;
 
-final class LanternEmptyInventory extends AbstractInventory implements EmptyInventory {
+class LanternEmptyInventory extends AbstractInventory implements EmptyInventory {
 
     static class Name {
         static final Translation INSTANCE = tr("inventory.empty.name");
@@ -109,6 +110,11 @@ final class LanternEmptyInventory extends AbstractInventory implements EmptyInve
     }
 
     @Override
+    public PeekedOfferTransactionResult peekOffer(ItemStack itemStack) {
+        return new PeekedOfferTransactionResult(InventoryTransactionResult.Type.FAILURE, ImmutableList.of(), itemStack);
+    }
+
+    @Override
     public Optional<PeekedPollTransactionResult> peekPoll(Predicate<ItemStack> matcher) {
         return Optional.empty();
     }
@@ -119,8 +125,8 @@ final class LanternEmptyInventory extends AbstractInventory implements EmptyInve
     }
 
     @Override
-    public Optional<PeekedSetTransactionResult> peekSet(@Nullable ItemStack itemStack) {
-        return Optional.empty();
+    public PeekedSetTransactionResult peekSet(@Nullable ItemStack itemStack) {
+        return new PeekedSetTransactionResult(InventoryTransactionResult.Type.FAILURE, ImmutableList.of(), itemStack, null);
     }
 
     @Override

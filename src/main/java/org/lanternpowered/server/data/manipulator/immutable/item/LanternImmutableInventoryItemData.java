@@ -28,6 +28,7 @@ package org.lanternpowered.server.data.manipulator.immutable.item;
 import org.lanternpowered.server.data.element.Element;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.data.manipulator.immutable.AbstractImmutableData;
+import org.lanternpowered.server.inventory.LanternEmptyCarriedInventory;
 import org.spongepowered.api.data.manipulator.immutable.item.ImmutableInventoryItemData;
 import org.spongepowered.api.data.manipulator.mutable.item.InventoryItemData;
 import org.spongepowered.api.item.inventory.Carrier;
@@ -44,13 +45,13 @@ public class LanternImmutableInventoryItemData extends AbstractImmutableData<Imm
         super(manipulator);
         final Element<CarriedInventory<?>> element = getValueCollection().getElement(LanternKeys.ITEM_INVENTORY).get();
         if (element.get() instanceof LanternEmptyCarriedInventory) {
-            element.set(new LanternEmptyCarriedInventory<>(null, this));
+            element.set(new LanternEmptyCarriedInventory(this));
         }
     }
 
     @Override
     public void registerKeys() {
-        getValueCollection().register(LanternKeys.ITEM_INVENTORY, new LanternEmptyCarriedInventory<>(null, this));
+        getValueCollection().register(LanternKeys.ITEM_INVENTORY, new LanternEmptyCarriedInventory(this));
     }
 
     @Override

@@ -64,7 +64,7 @@ public abstract class AbstractGridInventory extends AbstractInventory2D implemen
     }
 
     /**
-     * Constructs a new {@link SlotsBuilder} to create {@link AbstractGridInventory}s. This builder
+     * Constructs a new {@link RowsBuilder} to create {@link AbstractGridInventory}s. This builder
      * only accepts {@link LanternInventoryArchetype}s that construct {@link AbstractInventoryRow}s
      * or {@link AbstractGridInventory}s.
      * <p>
@@ -75,6 +75,20 @@ public abstract class AbstractGridInventory extends AbstractInventory2D implemen
      */
     public static RowsBuilder<AbstractGridInventory> rowsBuilder() {
         return new RowsBuilder<>();
+    }
+
+    /**
+     * Constructs a new {@link RowsViewBuilder} to create {@link AbstractGridInventory}s. This builder
+     * only accepts {@link LanternInventoryArchetype}s that construct {@link AbstractInventoryRow}s
+     * or {@link AbstractGridInventory}s.
+     * <p>
+     * The first specified row/grid will define the width/columns of all the rows, any mismatching
+     * value after specifying the first inventory will result in a exception.
+     *
+     * @return The builder
+     */
+    public static RowsViewBuilder<AbstractGridInventory> rowsViewBuilder() {
+        return new RowsViewBuilder<>();
     }
 
     /**
@@ -102,10 +116,10 @@ public abstract class AbstractGridInventory extends AbstractInventory2D implemen
 
     void init(List<? extends AbstractSlot> slots, List<AbstractInventoryRow> rows, List<AbstractInventoryColumn> columns,
             @Nullable List<? extends AbstractSlot> prioritizedSlots) {
-        super.init(slots, rows.size(), columns.size(), prioritizedSlots);
-
         this.columns = columns;
         this.rows = rows;
+
+        super.init(slots, rows.size(), columns.size(), prioritizedSlots);
     }
 
     @Override
@@ -118,6 +132,14 @@ public abstract class AbstractGridInventory extends AbstractInventory2D implemen
         // columns since they are already matched
         this.rows.stream().filter(predicate::test).forEach(inventories::add);
         this.columns.stream().filter(predicate::test).forEach(inventories::add);
+        // Check the slots their parents, in case they are nested into another grid
+        for (AbstractSlot slot : getSlotInventories()) {
+            final AbstractInventory parent = slot.parent();
+            if ((parent != this || parent != slot) && parent instanceof AbstractMutableInventory &&
+                    predicate.test((AbstractMutableInventory) parent)) {
+                inventories.add((AbstractMutableInventory) parent);
+            }
+        }
     }
 
     @Override
@@ -130,8 +152,8 @@ public abstract class AbstractGridInventory extends AbstractInventory2D implemen
         return x < 0 || this.columns == null || x >= this.columns.size() ? Optional.empty() : Optional.of(this.columns.get(x));
     }
 
-    public static abstract class Builder<T extends AbstractGridInventory, B extends Builder<T, B>>
-            extends AbstractArchetypeBuilder<T, AbstractGridInventory, B> {
+    public static abstract class ViewBuilder<T extends AbstractGridInventory, B extends ViewBuilder<T, B>>
+            extends AbstractViewBuilder<T, AbstractGridInventory, B> {
 
         Supplier<? extends AbstractInventoryColumn>[] columnTypes = new Supplier[0];
         Supplier<? extends AbstractInventoryRow>[] rowTypes = new Supplier[0];
@@ -139,7 +161,7 @@ public abstract class AbstractGridInventory extends AbstractInventory2D implemen
         int rows = 0;
         int columns = 0;
 
-        Builder() {
+        ViewBuilder() {
         }
 
         /**
@@ -178,7 +200,7 @@ public abstract class AbstractGridInventory extends AbstractInventory2D implemen
          * @param columns The columns
          * @param rows The rows
          */
-        void expand(int columns, int rows) {
+        public B expand(int columns, int rows) {
             // Expand the amount of rows
             if (rows > this.rows) {
                 final Supplier<? extends AbstractInventoryRow>[] rowTypes = new Supplier[rows];
@@ -193,9 +215,87 @@ public abstract class AbstractGridInventory extends AbstractInventory2D implemen
                 this.columnTypes = columnTypes;
                 this.columns = columns;
             }
+            return (B) this;
         }
 
         void copyTo(Builder<?,?> builder) {
+            builder.columns = this.columns;
+            builder.columnTypes = Arrays.copyOf(this.columnTypes, this.columnTypes.length);
+            builder.rows = this.rows;
+            builder.rowTypes = Arrays.copyOf(this.rowTypes, this.rowTypes.length);
+        }
+    }
+
+
+    public static abstract class Builder<T extends AbstractGridInventory, B extends Builder<T, B>>
+            extends AbstractArchetypeBuilder<T, AbstractGridInventory, B> {
+
+        Supplier<? extends AbstractInventoryColumn>[] columnTypes = new Supplier[0];
+        Supplier<? extends AbstractInventoryRow>[] rowTypes = new Supplier[0];
+
+        int rows = 0;
+        int columns = 0;
+
+        Builder() {
+        }
+
+        /**
+         * Sets the {@link AbstractInventoryColumn} type for the given
+         * column index (x coordinate). The returned {@link AbstractInventoryColumn}
+         * of the {@link Supplier} may not be initialized.
+         *
+         * @param x The column index (x coordinate)
+         * @param column The column
+         * @return This builder, for chaining
+         */
+        public B columnType(int x, Supplier<? extends AbstractInventoryColumn> column) {
+            expand(x + 1, this.rows);
+            this.columnTypes[x] = column;
+            return (B) this;
+        }
+
+        /**
+         * Sets the {@link AbstractInventoryRow} type for the given
+         * row index (y coordinate). The returned {@link AbstractInventoryRow}
+         * of the {@link Supplier} may not be initialized.
+         *
+         * @param y The row index (y coordinate)
+         * @param rowSupplier The row type supplier
+         * @return This builder, for chaining
+         */
+        public B rowType(int y, Supplier<? extends AbstractInventoryRow> rowSupplier) {
+            expand(this.columns, y + 1);
+            this.rowTypes[y] = rowSupplier;
+            return (B) this;
+        }
+
+        /**
+         * Expands the slots matrix to the given maximum.
+         *
+         * @param columns The columns
+         * @param rows The rows
+         */
+        public B expand(int columns, int rows) {
+            // Expand the amount of rows
+            if (rows > this.rows) {
+                final Supplier<? extends AbstractInventoryRow>[] rowTypes = new Supplier[rows];
+                System.arraycopy(this.rowTypes, 0, rowTypes, 0, this.rowTypes.length);
+                this.rowTypes = rowTypes;
+                this.rows = rows;
+            }
+            // Expand the amount of columns
+            if (columns > this.columns) {
+                final Supplier<? extends AbstractInventoryColumn>[] columnTypes = new Supplier[columns];
+                System.arraycopy(this.columnTypes, 0, columnTypes, 0, this.columnTypes.length);
+                this.columnTypes = columnTypes;
+                this.columns = columns;
+            }
+            return (B) this;
+        }
+
+        @Override
+        protected void copyTo(B builder) {
+            super.copyTo(builder);
             builder.columns = this.columns;
             builder.columnTypes = Arrays.copyOf(this.columnTypes, this.columnTypes.length);
             builder.rows = this.rows;
@@ -212,10 +312,14 @@ public abstract class AbstractGridInventory extends AbstractInventory2D implemen
         }
 
         @Override
-        void expand(int columns, int rows) {
+        public SlotsBuilder<T> expand(int columns, int rows) {
             // Expand the amount of rows
             if (rows > this.rows) {
                 this.slots = Arrays.copyOf(this.slots, rows);
+                final int columns1 = Math.max(columns, this.columns);
+                for (int i = this.rows; i < rows; i++) {
+                    this.slots[i] = new PrioritizedObject[columns1];
+                }
             }
             // Expand the amount of columns
             if (columns > this.columns) {
@@ -223,7 +327,7 @@ public abstract class AbstractGridInventory extends AbstractInventory2D implemen
                     this.slots[i] = Arrays.copyOf(this.slots[i], columns);
                 }
             }
-            super.expand(columns, rows);
+            return super.expand(columns, rows);
         }
 
         @Override
@@ -257,7 +361,7 @@ public abstract class AbstractGridInventory extends AbstractInventory2D implemen
          */
         public SlotsBuilder<T> slot(int x, int y, LanternInventoryArchetype<? extends AbstractSlot> slotArchetype, int priority) {
             checkNotNull(slotArchetype, "slotArchetype");
-            expand(x, y);
+            expand(x + 1, y + 1);
             checkState(this.slots[y][x] == null, "There is already a slot bound at %s;%s", x, y);
             this.slots[y][x] = new PrioritizedObject<>(slotArchetype, priority);
             this.cachedArchetypesList = null;
@@ -315,14 +419,17 @@ public abstract class AbstractGridInventory extends AbstractInventory2D implemen
         }
 
         @Override
-        protected SlotsBuilder<T> copy() {
-            final SlotsBuilder<T> copy = new SlotsBuilder<>();
-            copyTo(copy);
+        protected void copyTo(SlotsBuilder<T> copy) {
+            super.copyTo(copy);
             copy.slots = new PrioritizedObject[this.rows][];
             for (int i = 0; i < this.rows; i++) {
                 copy.slots[i] = Arrays.copyOf(this.slots[i], this.slots[i].length);
             }
-            return copy;
+        }
+
+        @Override
+        protected SlotsBuilder<T> newBuilder() {
+            return new SlotsBuilder<>();
         }
 
         @Override
@@ -331,7 +438,7 @@ public abstract class AbstractGridInventory extends AbstractInventory2D implemen
                 final List<PrioritizedObject<InventoryArchetype>> list = new ArrayList<>();
                 for (int y = 0; y < this.slots.length; y++) {
                     for (int x = 0; x < this.slots[y].length; x++) {
-                        checkState(this.slots[y][x] == null, "There is no slot bound at %s;%s", x, y);
+                        checkState(this.slots[y][x] != null, "There is no slot bound at %s;%s", x, y);
                         list.add((PrioritizedObject) this.slots[y][x]);
                     }
                 }
@@ -341,6 +448,133 @@ public abstract class AbstractGridInventory extends AbstractInventory2D implemen
                         .collect(ImmutableList.toImmutableList());
             }
             return this.cachedArchetypesList;
+        }
+    }
+
+    public static final class RowsViewBuilder<T extends AbstractGridInventory> extends ViewBuilder<T, RowsViewBuilder<T>> {
+
+        static final class InventoryEntry extends PrioritizedObject<AbstractInventory2D> {
+
+            private final int rows;
+            private final int y;
+
+            private InventoryEntry(AbstractInventory2D object, int y, int rows, int priority) {
+                super(object, priority);
+                this.rows = rows;
+                this.y = y;
+            }
+        }
+
+        private InventoryEntry[] entries = new InventoryEntry[0];
+
+        public RowsViewBuilder<T> grid(int y, AbstractGridInventory gridInventory, int priority) {
+            return inventory(y, gridInventory, priority);
+        }
+
+        public RowsViewBuilder<T> grid(int y, AbstractGridInventory gridInventory) {
+            return grid(y, gridInventory, DEFAULT_PRIORITY);
+        }
+
+        public RowsViewBuilder<T> row(int y, AbstractInventoryRow rowInventory, int priority) {
+            return inventory(y, rowInventory, priority);
+        }
+
+        public RowsViewBuilder<T> row(int y, AbstractInventoryRow rowInventory) {
+            return row(y, rowInventory, DEFAULT_PRIORITY);
+        }
+
+        private RowsViewBuilder<T> inventory(int y, AbstractInventory2D inventory, int priority) {
+            checkNotNull(inventory, "inventory");
+            final int columns = inventory.getColumns();
+            final int rows = inventory.getRows();
+            checkState(this.columns == 0 || this.columns == columns,
+                    "Inventory columns mismatch, this must be %s but was %s", this.columns, columns);
+            expand(columns, rows + y);
+            final InventoryEntry entry = new InventoryEntry(inventory, y, rows, priority);
+            for (int i = 0; i < rows; i++) {
+                final int index = y + i;
+                checkState(this.entries[index] == null, "The row %s is already occupied", index);
+                this.entries[index] = entry;
+            }
+            return this;
+        }
+
+        @Override
+        public <N extends AbstractGridInventory> RowsViewBuilder<N> typeSupplier(Supplier<N> supplier) {
+            return (RowsViewBuilder<N>) super.typeSupplier(supplier);
+        }
+
+        @Override
+        public RowsViewBuilder<T> expand(int columns, int rows) {
+            checkState(this.columns == 0 || this.columns <= columns,
+                    "Cannot expand the amount of columns to %s, it is already fixed at %s", columns, this.columns);
+            if (rows > this.rows) {
+                this.entries = Arrays.copyOf(this.entries, rows);
+            }
+            return super.expand(columns, rows);
+        }
+
+        @Override
+        protected void build(T inventory) {
+            final List<PrioritizedObject<AbstractSlot>>[] columnSlots = new List[this.columns];
+            for (int x = 0; x < this.columns; x++) {
+                columnSlots[x] = new ArrayList<>();
+            }
+            for (int y = 0; y < this.rows; y++) {
+                checkState(this.entries[y] != null, "Missing row at %s within the rows grid with dimensions %s;%s", y, this.columns, this.rows);
+            }
+            final ImmutableList.Builder<AbstractInventoryRow> rows = ImmutableList.builder();
+            final List<PrioritizedObject<AbstractSlot>> prioritizedSlotObjects = new ArrayList<>();
+            for (InventoryEntry entry : Sets.newLinkedHashSet(Lists.newArrayList(this.entries))) {
+                final AbstractInventory2D inventory2D = entry.object;
+                // We can use the row as the row instance as well
+                if (entry.object instanceof AbstractInventoryRow) {
+                    rows.add((AbstractInventoryRow) inventory2D);
+                    for (int x = 0; x < this.columns; x++) {
+                        final PrioritizedObject<AbstractSlot> prioritizedSlotObject =
+                                new PrioritizedObject<>(inventory2D.getSlotInventories().get(x), entry.priority);
+                        columnSlots[x].add(prioritizedSlotObject);
+                        prioritizedSlotObjects.add(prioritizedSlotObject);
+                    }
+                } else {
+                    for (int i = 0; i < entry.rows; i++) {
+                        // Construct the row that will use this grid as parent, also try to generate
+                        // a row with the supplier provided in the other grid inventory.
+                        final int y = entry.y + i;
+                        final AbstractInventoryRow newRow = this.rowTypes[y] != null ? this.rowTypes[y].get() : new LanternInventoryRow();
+                        final List<PrioritizedObject<AbstractSlot>> prioritizedRowSlotObjects = new ArrayList<>();
+                        for (int x = 0; x < this.columns; x++) {
+                            final PrioritizedObject<AbstractSlot> prioritizedSlotObject =
+                                    new PrioritizedObject<>(inventory2D.getSlotInventories().get(x), entry.priority);
+                            prioritizedRowSlotObjects.add(prioritizedSlotObject);
+                            prioritizedSlotObjects.add(prioritizedSlotObject);
+                            columnSlots[x].add(prioritizedSlotObject);
+                        }
+                        final ImmutableList<AbstractSlot> slots = prioritizedRowSlotObjects.stream()
+                                .map(e -> e.object).collect(ImmutableList.toImmutableList());
+                        final ImmutableList<AbstractSlot> prioritizedSlots = prioritizedRowSlotObjects.stream().sorted()
+                                .map(e -> e.object).collect(ImmutableList.toImmutableList());
+                        newRow.init(slots, prioritizedSlots);
+                        newRow.setParentSafely(inventory);
+                    }
+                }
+            }
+            final ImmutableList.Builder<AbstractInventoryColumn> columns = ImmutableList.builder();
+            for (int x = 0; x < this.columns; x++) {
+                final AbstractInventoryColumn column = this.columnTypes[x] == null ? new LanternInventoryColumn() : this.columnTypes[x].get();
+                final ImmutableList<AbstractSlot> slots = columnSlots[x].stream()
+                        .map(e -> e.object).collect(ImmutableList.toImmutableList());
+                final ImmutableList<AbstractSlot> prioritizedSlots = columnSlots[x].stream().sorted()
+                        .map(e -> e.object).collect(ImmutableList.toImmutableList());
+                column.init(slots, prioritizedSlots);
+                column.setParentSafely(inventory); // Only set the parent if not done before
+                columns.add(column);
+            }
+            final ImmutableList<AbstractSlot> slots = prioritizedSlotObjects.stream()
+                    .map(e -> e.object).collect(ImmutableList.toImmutableList());
+            final ImmutableList<AbstractSlot> prioritizedSlots = prioritizedSlotObjects.stream().sorted()
+                    .map(e -> e.object).collect(ImmutableList.toImmutableList());
+            inventory.init(slots, rows.build(), columns.build(), prioritizedSlots);
         }
     }
 
@@ -381,16 +615,16 @@ public abstract class AbstractGridInventory extends AbstractInventory2D implemen
             checkNotNull(archetype, "archetype");
             final int columns;
             final int rows;
-            if (archetype.builder instanceof SlotsBuilder) {
-                columns = ((SlotsBuilder) archetype.builder).columns;
-                rows = ((SlotsBuilder) archetype.builder).rows;
+            if (archetype.getBuilder() instanceof SlotsBuilder) {
+                columns = ((SlotsBuilder) archetype.getBuilder()).columns;
+                rows = ((SlotsBuilder) archetype.getBuilder()).rows;
             } else {
                 columns = archetype.getChildArchetypes().size();
                 rows = 1;
             }
             checkState(this.columns == 0 || this.columns == columns,
                     "Inventory columns mismatch, this must be %s but was %s", this.columns, columns);
-            expand(rows + y, columns);
+            expand(columns, rows + y);
             final ArchetypeEntry entry = new ArchetypeEntry(archetype, y, rows, priority);
             for (int i = 0; i < rows; i++) {
                 final int index = y + i;
@@ -407,18 +641,20 @@ public abstract class AbstractGridInventory extends AbstractInventory2D implemen
         }
 
         @Override
-        void expand(int columns, int rows) {
+        public RowsBuilder<T> expand(int columns, int rows) {
             checkState(this.columns == 0 || this.columns <= columns,
                     "Cannot expand the amount of columns to %s, it is already fixed at %s", columns, this.columns);
             if (rows > this.rows) {
                 this.entries = Arrays.copyOf(this.entries, rows);
             }
-            super.expand(columns, rows);
+            return super.expand(columns, rows);
         }
 
         @Override
         protected void build(T inventory) {
             final List<PrioritizedObject<AbstractSlot>>[] columnSlots = new List[this.columns];
+            System.out.println(this.rows);
+            System.out.println(this.columns);
             for (int x = 0; x < this.columns; x++) {
                 columnSlots[x] = new ArrayList<>();
             }
@@ -443,10 +679,10 @@ public abstract class AbstractGridInventory extends AbstractInventory2D implemen
                     for (int i = 0; i < entry.rows; i++) {
                         // Construct the row that will use this grid as parent, also try to generate
                         // a row with the supplier provided in the other grid inventory.
-                        final Builder<?,?> builder = (Builder<?, ?>) entry.object.builder;
+                        final Builder<?,?> builder = (Builder<?, ?>) entry.object.getBuilder();
                         final int y = entry.y + i;
                         final AbstractInventoryRow newRow = this.rowTypes[y] != null ? this.rowTypes[y].get() :
-                                        builder.rowTypes[i] != null ? builder.rowTypes[y].get() : new LanternInventoryRow();
+                                builder.rowTypes[i] != null ? builder.rowTypes[y].get() : new LanternInventoryRow();
                         final List<PrioritizedObject<AbstractSlot>> prioritizedRowSlotObjects = new ArrayList<>();
                         for (int x = 0; x < this.columns; x++) {
                             final PrioritizedObject<AbstractSlot> prioritizedSlotObject =
@@ -461,6 +697,7 @@ public abstract class AbstractGridInventory extends AbstractInventory2D implemen
                                 .map(e -> e.object).collect(ImmutableList.toImmutableList());
                         newRow.init(slots, prioritizedSlots);
                         newRow.setParentSafely(inventory);
+                        rows.add(newRow);
                     }
                 }
             }
@@ -479,15 +716,21 @@ public abstract class AbstractGridInventory extends AbstractInventory2D implemen
                     .map(e -> e.object).collect(ImmutableList.toImmutableList());
             final ImmutableList<AbstractSlot> prioritizedSlots = prioritizedSlotObjects.stream().sorted()
                     .map(e -> e.object).collect(ImmutableList.toImmutableList());
+            System.out.println(slots.size());
+            System.out.println(rows.build().size());
+            System.out.println(columns.build().size());
             inventory.init(slots, rows.build(), columns.build(), prioritizedSlots);
         }
 
         @Override
-        protected RowsBuilder<T> copy() {
-            final RowsBuilder<T> copy = new RowsBuilder<>();
-            copyTo(copy);
+        protected void copyTo(RowsBuilder<T> copy) {
+            super.copyTo(copy);
             copy.entries = Arrays.copyOf(this.entries, this.entries.length);
-            return copy;
+        }
+
+        @Override
+        protected RowsBuilder<T> newBuilder() {
+            return new RowsBuilder<>();
         }
 
         @Override
@@ -499,7 +742,6 @@ public abstract class AbstractGridInventory extends AbstractInventory2D implemen
             return this.cachedArchetypesList;
         }
     }
-
 
     public static final class ColumnsBuilder<T extends AbstractGridInventory> extends Builder<T, ColumnsBuilder<T>> {
 
@@ -538,16 +780,16 @@ public abstract class AbstractGridInventory extends AbstractInventory2D implemen
             checkNotNull(archetype, "archetype");
             final int columns;
             final int rows;
-            if (archetype.builder instanceof SlotsBuilder) {
-                columns = ((SlotsBuilder) archetype.builder).columns;
-                rows = ((SlotsBuilder) archetype.builder).rows;
+            if (archetype.getBuilder() instanceof SlotsBuilder) {
+                columns = ((SlotsBuilder) archetype.getBuilder()).columns;
+                rows = ((SlotsBuilder) archetype.getBuilder()).rows;
             } else {
                 columns = 1;
                 rows = archetype.getChildArchetypes().size();
             }
             checkState(this.rows == 0 || this.rows == rows,
                     "Inventory rows mismatch, this must be %s but was %s", this.rows, rows);
-            expand(rows, x + columns);
+            expand(x + columns, rows);
             final ArchetypeEntry entry = new ArchetypeEntry(archetype, x, rows, priority);
             for (int i = 0; i < columns; i++) {
                 final int index = x + i;
@@ -564,13 +806,13 @@ public abstract class AbstractGridInventory extends AbstractInventory2D implemen
         }
 
         @Override
-        void expand(int columns, int rows) {
+        public ColumnsBuilder<T> expand(int columns, int rows) {
             checkState(this.rows == 0 || this.rows <= rows,
                     "Cannot expand the amount of rows to %s, it is already fixed at %s", rows, this.rows);
             if (columns > this.columns) {
                 this.entries = Arrays.copyOf(this.entries, columns);
             }
-            super.expand(columns, rows);
+            return super.expand(columns, rows);
         }
 
         @Override
@@ -598,7 +840,7 @@ public abstract class AbstractGridInventory extends AbstractInventory2D implemen
                         final AbstractInventoryColumn column = (AbstractInventoryColumn) gridInventory.getColumn(i).get();
                         // Construct the row that will use this grid as parent, also try to generate
                         // a row with the supplier provided in the other grid inventory.
-                        final Builder<?,?> builder = (Builder<?, ?>) entry.object.builder;
+                        final Builder<?,?> builder = (Builder<?, ?>) entry.object.getBuilder();
                         final int y = entry.x + i;
                         final AbstractInventoryColumn newRow = this.columnTypes[y] != null ? this.columnTypes[y].get() :
                                 builder.columnTypes[i] != null ? builder.columnTypes[y].get() : new LanternInventoryColumn();
@@ -639,11 +881,14 @@ public abstract class AbstractGridInventory extends AbstractInventory2D implemen
         }
 
         @Override
-        protected ColumnsBuilder<T> copy() {
-            final ColumnsBuilder<T> copy = new ColumnsBuilder<>();
-            copyTo(copy);
+        protected void copyTo(ColumnsBuilder<T> copy) {
+            super.copyTo(copy);
             copy.entries = Arrays.copyOf(this.entries, this.entries.length);
-            return copy;
+        }
+
+        @Override
+        protected ColumnsBuilder<T> newBuilder() {
+            return new ColumnsBuilder<T>();
         }
 
         @Override

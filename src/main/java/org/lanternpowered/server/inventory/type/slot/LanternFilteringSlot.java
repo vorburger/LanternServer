@@ -26,7 +26,11 @@
 package org.lanternpowered.server.inventory.type.slot;
 
 import org.lanternpowered.server.inventory.AbstractSlot;
+import org.lanternpowered.server.inventory.PeekedOfferTransactionResult;
+import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.slot.FilteringSlot;
+
+import java.util.Optional;
 
 public class LanternFilteringSlot extends AbstractSlot implements FilteringSlot {
 

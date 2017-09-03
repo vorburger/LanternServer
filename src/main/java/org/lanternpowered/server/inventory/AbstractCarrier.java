@@ -25,26 +25,35 @@
  */
 package org.lanternpowered.server.inventory;
 
+import static com.google.common.base.Preconditions.checkState;
+
+import com.google.common.base.MoreObjects;
 import org.spongepowered.api.item.inventory.Carrier;
+import org.spongepowered.api.item.inventory.type.CarriedInventory;
 
-import java.util.Optional;
+import javax.annotation.Nullable;
 
-public abstract class AbstractEquipmentInventory<C extends Carrier> extends AbstractOrderedSlotsInventory implements IEquipmentInventory<C> {
+@SuppressWarnings("unchecked")
+public abstract class AbstractCarrier<T extends AbstractInventory & CarriedInventory<AbstractCarrier<T>>> implements Carrier {
 
-    private final CarrierReference<C> carrierReference;
+    @Nullable private T inventory;
 
-    protected AbstractEquipmentInventory(Class<C> carrierType) {
-        this.carrierReference = CarrierReference.of(carrierType);
+    void setInventory(T inventory) {
+        this.inventory = inventory;
     }
 
     @Override
-    public Optional<C> getCarrier() {
-        return this.carrierReference.get();
+    public T getInventory() {
+        checkState(this.inventory != null, "The inventory is not initialized yet");
+        return this.inventory;
     }
 
     @Override
-    protected void setCarrier(Carrier carrier) {
-        super.setCarrier(carrier);
-        this.carrierReference.set(carrier);
+    public String toString() {
+        return toStringHelper().toString();
+    }
+
+    protected MoreObjects.ToStringHelper toStringHelper() {
+        return MoreObjects.toStringHelper(this);
     }
 }

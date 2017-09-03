@@ -28,6 +28,7 @@ package org.lanternpowered.server.inventory.client;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import org.lanternpowered.server.inventory.AbstractSlot;
 import org.lanternpowered.server.inventory.behavior.HotbarBehavior;
 import org.lanternpowered.server.inventory.behavior.SimpleHotbarBehavior;
 import org.lanternpowered.server.network.message.Message;
@@ -115,6 +116,11 @@ public class PlayerClientContainer extends ClientContainer {
             this.previousSelectedHotbarSlot = selectedHotbarSlot;
             messages.add(new MessagePlayInOutHeldItemChange(selectedHotbarSlot));
         }
+    }
+
+    @Override
+    public ClientSlot.Slot bindSlot(int index, AbstractSlot slot) {
+        return super.bindSlot(index, slot);
     }
 
     public void handleHeldItemChange(int hotbarSlotIndex) {

@@ -27,21 +27,27 @@ package org.lanternpowered.server.inventory.behavior;
 
 import static com.google.common.base.Preconditions.checkState;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Streams;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.event.LanternEventHelper;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.inventory.AbstractInventory;
-import org.lanternpowered.server.inventory.AbstractMutableInventory;
+import org.lanternpowered.server.inventory.AbstractOrderedChildrenInventory;
 import org.lanternpowered.server.inventory.AbstractSlot;
+import org.lanternpowered.server.inventory.IInventory;
 import org.lanternpowered.server.inventory.LanternContainer;
 import org.lanternpowered.server.inventory.LanternItemStack;
 import org.lanternpowered.server.inventory.LanternItemStackSnapshot;
 import org.lanternpowered.server.inventory.OpenableInventory;
 import org.lanternpowered.server.inventory.PeekedOfferTransactionResult;
+import org.lanternpowered.server.inventory.PeekedPollTransactionResult;
+import org.lanternpowered.server.inventory.PeekedSetTransactionResult;
 import org.lanternpowered.server.inventory.PlayerInventoryContainer;
 import org.lanternpowered.server.inventory.client.ClientContainer;
 import org.lanternpowered.server.inventory.client.ClientSlot;
 import org.lanternpowered.server.inventory.client.PlayerClientContainer;
+import org.lanternpowered.server.inventory.vanilla.LanternHotbarInventory;
 import org.lanternpowered.server.inventory.vanilla.LanternPlayerInventory;
 import org.lanternpowered.server.item.recipe.crafting.CraftingMatrix;
 import org.lanternpowered.server.item.recipe.crafting.ExtendedCraftingResult;
@@ -75,8 +81,6 @@ import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -143,20 +147,20 @@ public class VanillaContainerInteractionBehavior extends AbstractContainerIntera
 
                     final AbstractInventory targetInventory = this.container.getPlayerInventory()
                             .getView(LanternPlayerInventory.View.REVERSE_MAIN_AND_HOTBAR);
-                    PeekedOfferTransactionResult peekResult = targetInventory.peekOfferFastTransactions(itemStack1);
+                    PeekedOfferTransactionResult peekResult = targetInventory.peekOffer(itemStack1);
 
-                    if (peekResult != null) {
+                    if (peekResult.isSuccess()) {
                         transactions.add(new SlotTransaction(slot, resultItem, ItemStackSnapshot.NONE));
 
-                        final ItemStack restItem = peekResult.getRejectedItem().orElse(null);
-                        if (restItem != null) {
-                            final int added = itemStack1.getQuantity() - restItem.getQuantity();
+                        final ItemStack rejectedItem = peekResult.getRejectedItem().orElse(null);
+                        if (rejectedItem != null) {
+                            final int added = itemStack1.getQuantity() - rejectedItem.getQuantity();
                             times = added / resultItem.getQuantity();
                             final int diff = added % resultItem.getQuantity();
                             if (diff != 0) {
                                 itemStack1.setQuantity(resultItem.getQuantity() * times);
-                                peekResult = targetInventory.peekOfferFastTransactions(itemStack1);
-                                checkState(peekResult != null);
+                                peekResult = targetInventory.peekOffer(itemStack1);
+                                checkState(peekResult.isSuccess());
                             }
                         }
 
@@ -177,14 +181,14 @@ public class VanillaContainerInteractionBehavior extends AbstractContainerIntera
 
             if (itemStack != null) {
                 final PeekedOfferTransactionResult result = getShiftPeekOfferResult(slot, itemStack.copy());
-                if (result != null) {
+                if (result.isSuccess()) {
                     transactions.addAll(result.getTransactions());
-                    final ItemStack rest = result.getOfferResult().getRest();
-                    if (rest != null) {
-                        transactions.addAll(slot.peekPollTransactions(itemStack.getQuantity() - rest.getQuantity(),
+                    final ItemStack rejectedItem = result.getRejectedItem().orElse(null);
+                    if (rejectedItem != null) {
+                        transactions.addAll(slot.peekPoll(itemStack.getQuantity() - rejectedItem.getQuantity(),
                                 stack -> true).get().getTransactions());
                     } else {
-                        transactions.addAll(slot.peekPollTransactions(
+                        transactions.addAll(slot.peekPoll(
                                 stack -> true).get().getTransactions());
                     }
                 }
@@ -210,7 +214,7 @@ public class VanillaContainerInteractionBehavior extends AbstractContainerIntera
                 !(clientSlot instanceof ClientSlot.Slot)) {
             return;
         }
-        final LanternSlot slot = ((ClientSlot.Slot) clientSlot).getSlot();
+        final AbstractSlot slot = ((ClientSlot.Slot) clientSlot).getSlot();
         final Cause cause = Cause.builder().named(NamedCause.SOURCE, player).build();
         final ItemStackSnapshot oldItem = LanternItemStack.toSnapshot(getCursorItem());
         ItemStackSnapshot newItem = oldItem;
@@ -221,30 +225,29 @@ public class VanillaContainerInteractionBehavior extends AbstractContainerIntera
             int quantity = cursorItem.getQuantity();
             final int maxQuantity = cursorItem.getMaxStackQuantity();
             if (quantity < maxQuantity) {
-                final AbstractMutableInventory inventory;
+                final AbstractInventory inventory;
                 if (clientContainer instanceof PlayerClientContainer) {
-                    inventory = this.container.getPlayerInventory().getInventoryView(HumanInventoryView.ALL_PRIORITY_MAIN);
+                    inventory = this.container.getPlayerInventory().getView(LanternPlayerInventory.View.ALL_PRIORITY_MAIN);
                 } else {
-                    inventory = new AbstractChildrenInventory(null, null, Arrays.asList(
-                            this.container.getOpenInventory(),
-                            this.container.getPlayerInventory().getInventoryView(HumanInventoryView.PRIORITY_MAIN_AND_HOTBAR)));
+                    inventory = AbstractOrderedChildrenInventory.viewBuilder()
+                            .inventory(this.container.getOpenInventory())
+                            .inventory(this.container.getPlayerInventory().getView(LanternPlayerInventory.View.PRIORITY_MAIN_AND_HOTBAR))
+                            .build();
                 }
 
                 // Try first to get enough unfinished stacks
-                PeekPollTransactionsResult peekResult = inventory.peekPollTransactions(maxQuantity - quantity, stack ->
-                        stack.getQuantity() < stack.getMaxStackQuantity() &&
-                                ((LanternItemStack) cursorItem).similarTo(stack)).orElse(null);
+                PeekedPollTransactionResult peekResult = inventory.peekPoll(maxQuantity - quantity, stack ->
+                        stack.getQuantity() < stack.getMaxStackQuantity() && ((LanternItemStack) cursorItem).similarTo(stack)).orElse(null);
                 if (peekResult != null) {
-                    quantity += peekResult.getPeekedItem().getQuantity();
+                    quantity += peekResult.getPolledItem().getQuantity();
                     transactions.addAll(peekResult.getTransactions());
                 }
                 // Get the last items for the stack from a full stack
                 if (quantity <= maxQuantity) {
-                    peekResult = this.container.peekPollTransactions(maxQuantity - quantity, stack ->
-                            stack.getQuantity() >= stack.getMaxStackQuantity() &&
-                                    ((LanternItemStack) cursorItem).similarTo(stack)).orElse(null);
+                    peekResult = this.container.peekPoll(maxQuantity - quantity, stack ->
+                            stack.getQuantity() >= stack.getMaxStackQuantity() && ((LanternItemStack) cursorItem).similarTo(stack)).orElse(null);
                     if (peekResult != null) {
-                        quantity += peekResult.getPeekedItem().getQuantity();
+                        quantity += peekResult.getPolledItem().getQuantity();
                         transactions.addAll(peekResult.getTransactions());
                     }
                 }
@@ -304,7 +307,7 @@ public class VanillaContainerInteractionBehavior extends AbstractContainerIntera
             return;
         }
         // Clicking inside the container
-        final LanternSlot slot = ((ClientSlot.Slot) clientSlot).getSlot();
+        final AbstractSlot slot = ((ClientSlot.Slot) clientSlot).getSlot();
         if (mouseButton == MouseButton.MIDDLE) {
             final Cause cause = Cause.builder().named(NamedCause.SOURCE, player).build();
             final ItemStackSnapshot oldItem = LanternItemStack.toSnapshot(getCursorItem());
@@ -390,29 +393,23 @@ public class VanillaContainerInteractionBehavior extends AbstractContainerIntera
                 Transaction<ItemStackSnapshot> cursorTransaction = null;
 
                 if (getCursorItem() != null && !(slot instanceof OutputSlot)) {
-                    final PeekOfferTransactionsResult result = slot.peekOfferFastTransactions(getCursorItem());
-                    if (result.getOfferResult().isSuccess()) {
+                    final PeekedOfferTransactionResult result = slot.peekOffer(getCursorItem());
+                    if (result.isSuccess()) {
                         transactions.addAll(result.getTransactions());
                         cursorTransaction = new Transaction<>(getCursorItem().createSnapshot(),
-                                LanternItemStack.toSnapshot(result.getOfferResult().getRest()));
+                                LanternItemStack.toSnapshot(result.getRejectedItem().orElse(null)));
                     } else {
-                        final PeekSetTransactionsResult result1 = slot.peekSetTransactions(getCursorItem());
-                        if (result1.getTransactionResult().getType().equals(InventoryTransactionResult.Type.SUCCESS)) {
-                            final Collection<ItemStackSnapshot> replaceItems = result1.getTransactionResult().getReplacedItems();
-                            if (!replaceItems.isEmpty()) {
-                                cursorTransaction = new Transaction<>(getCursorItem().createSnapshot(),
-                                        replaceItems.iterator().next());
-                            } else {
-                                cursorTransaction = new Transaction<>(getCursorItem().createSnapshot(),
-                                        ItemStackSnapshot.NONE);
-                            }
+                        final PeekedSetTransactionResult result1 = slot.peekSet(getCursorItem());
+                        if (result1.isSuccess()) {
+                            cursorTransaction = new Transaction<>(getCursorItem().createSnapshot(),
+                                    LanternItemStack.toSnapshot(result1.getReplacedItem().orElse(null)));
                             transactions.addAll(result1.getTransactions());
                         }
                     }
                 } else if (getCursorItem() == null) {
-                    final PeekPollTransactionsResult result = slot.peekPollTransactions(stack -> true).orElse(null);
+                    final PeekedPollTransactionResult result = slot.peekPoll(stack -> true).orElse(null);
                     if (result != null) {
-                        cursorTransaction = new Transaction<>(ItemStackSnapshot.NONE, LanternItemStack.toSnapshot(result.getPeekedItem()));
+                        cursorTransaction = new Transaction<>(ItemStackSnapshot.NONE, LanternItemStack.toSnapshot(result.getPolledItem()));
                         transactions.addAll(result.getTransactions());
                     } else {
                         cursorTransaction = new Transaction<>(ItemStackSnapshot.NONE, ItemStackSnapshot.NONE);
@@ -431,16 +428,16 @@ public class VanillaContainerInteractionBehavior extends AbstractContainerIntera
                     int stackSize = slot.getStackSize();
                     if (stackSize != 0) {
                         stackSize = stackSize - (stackSize / 2);
-                        final PeekPollTransactionsResult result = slot.peekPollTransactions(stackSize, stack -> true).get();
+                        final PeekedPollTransactionResult result = slot.peekPoll(stackSize, stack -> true).get();
                         transactions.addAll(result.getTransactions());
-                        cursorTransaction = new Transaction<>(ItemStackSnapshot.NONE, result.getPeekedItem().createSnapshot());
+                        cursorTransaction = new Transaction<>(ItemStackSnapshot.NONE, result.getPolledItem().createSnapshot());
                     }
                 } else {
                     final ItemStack itemStack = getCursorItem().copy();
                     itemStack.setQuantity(1);
 
-                    final PeekOfferTransactionsResult result = slot.peekOfferFastTransactions(itemStack);
-                    if (result.getOfferResult().isSuccess()) {
+                    final PeekedOfferTransactionResult result = slot.peekOffer(itemStack);
+                    if (result.isSuccess()) {
                         final ItemStackSnapshot oldCursor = getCursorItem().createSnapshot();
                         int quantity = getCursorItem().getQuantity() - 1;
                         if (quantity <= 0) {
@@ -452,14 +449,13 @@ public class VanillaContainerInteractionBehavior extends AbstractContainerIntera
                         }
                         transactions.addAll(result.getTransactions());
                     } else {
-                        final PeekSetTransactionsResult result1 = slot.peekSetTransactions(getCursorItem());
-                        if (result1.getTransactionResult().getType().equals(InventoryTransactionResult.Type.SUCCESS) &&
-                                result1.getTransactionResult().getRejectedItems().isEmpty()) {
-                            final Collection<ItemStackSnapshot> replaceItems = result1.getTransactionResult().getReplacedItems();
-                            if (!replaceItems.isEmpty()) {
-                                setCursorItem(replaceItems.iterator().next().createStack());
+                        final PeekedSetTransactionResult result1 = slot.peekSet(getCursorItem());
+                        if (result1.isSuccess()) {
+                            final ItemStack replacedItem = result1.getReplacedItem().orElse(null);
+                            if (replacedItem != null) {
+                                setCursorItem(replacedItem);
                                 cursorTransaction = new Transaction<>(getCursorItem().createSnapshot(),
-                                        replaceItems.iterator().next());
+                                        LanternItemStack.toSnapshot(replacedItem));
                             } else {
                                 cursorTransaction = new Transaction<>(getCursorItem().createSnapshot(),
                                         ItemStackSnapshot.NONE);
@@ -485,7 +481,7 @@ public class VanillaContainerInteractionBehavior extends AbstractContainerIntera
                 !(clientSlot instanceof ClientSlot.Slot)) {
             return;
         }
-        final LanternSlot slot = ((ClientSlot.Slot) clientSlot).getSlot();
+        final AbstractSlot slot = ((ClientSlot.Slot) clientSlot).getSlot();
 
         final Cause cause = Cause.builder().named("SpawnCause", SpawnCause.builder()
                 .type(SpawnTypes.DROPPED_ITEM).build()).named(NamedCause.SOURCE, player).build();
@@ -496,8 +492,8 @@ public class VanillaContainerInteractionBehavior extends AbstractContainerIntera
 
         final ItemStackSnapshot item = LanternItemStack.toSnapshot(getCursorItem());
         cursorTransaction = new Transaction<>(item, item);
-        final Optional<PeekPollTransactionsResult> result = ctrl ? slot.peekPollTransactions(itemStack -> true) :
-                slot.peekPollTransactions(1, itemStack -> true);
+        final Optional<PeekedPollTransactionResult> result = ctrl ? slot.peekPoll(itemStack -> true) :
+                slot.peekPoll(1, itemStack -> true);
         if (result.isPresent()) {
             final List<SlotTransaction> transactions = result.get().getTransactions();
             slotTransactions.addAll(transactions);
@@ -527,8 +523,8 @@ public class VanillaContainerInteractionBehavior extends AbstractContainerIntera
         if (!(hotbarSlot instanceof ClientSlot.Slot)) {
             return;
         }
-        final LanternSlot slot1 = ((ClientSlot.Slot) clientSlot).getSlot();
-        final LanternSlot hotbarSlot1 = ((ClientSlot.Slot) hotbarSlot).getSlot();
+        final AbstractSlot slot1 = ((ClientSlot.Slot) clientSlot).getSlot();
+        final AbstractSlot hotbarSlot1 = ((ClientSlot.Slot) hotbarSlot).getSlot();
         if (slot1 != hotbarSlot1) {
             final Cause cause = Cause.builder().named(NamedCause.SOURCE, clientContainer.getPlayer()).build();
             final List<SlotTransaction> transactions = new ArrayList<>();
@@ -567,7 +563,7 @@ public class VanillaContainerInteractionBehavior extends AbstractContainerIntera
         if (player != this.container.getPlayerInventory().getCarrier().orElse(null)) {
             return;
         }
-        final List<LanternSlot> slots = clientSlots.stream()
+        final List<AbstractSlot> slots = clientSlots.stream()
                 .filter(clientSlot -> clientSlot instanceof ClientSlot.Slot)
                 .map(clientSlot -> ((ClientSlot.Slot) clientSlot).getSlot())
                 .collect(Collectors.toList());
@@ -587,10 +583,10 @@ public class VanillaContainerInteractionBehavior extends AbstractContainerIntera
             final int rest = quantity - itemsPerSlot * slotCount;
 
             final List<SlotTransaction> transactions = new ArrayList<>();
-            for (LanternSlot slot : slots) {
+            for (AbstractSlot slot : slots) {
                 final ItemStack itemStack = cursorItem.copy();
                 itemStack.setQuantity(itemsPerSlot);
-                transactions.addAll(slot.peekOfferFastTransactions(itemStack).getTransactions());
+                transactions.addAll(slot.peekOffer(itemStack).getTransactions());
             }
 
             ItemStackSnapshot newCursorItem = ItemStackSnapshot.NONE;
@@ -610,10 +606,10 @@ public class VanillaContainerInteractionBehavior extends AbstractContainerIntera
             final int size = Math.min(slots.size(), quantity);
 
             final List<SlotTransaction> transactions = new ArrayList<>();
-            for (LanternSlot slot : slots) {
+            for (AbstractSlot slot : slots) {
                 final ItemStack itemStack = cursorItem.copy();
                 itemStack.setQuantity(1);
-                transactions.addAll(slot.peekOfferFastTransactions(itemStack).getTransactions());
+                transactions.addAll(slot.peekOffer(itemStack).getTransactions());
             }
             quantity -= size;
 
@@ -645,10 +641,10 @@ public class VanillaContainerInteractionBehavior extends AbstractContainerIntera
                         entities.add(LanternEventHelper.createDroppedItem(player.getLocation(), itemStack.createSnapshot())));
             }
         } else if (clientSlot instanceof ClientSlot.Slot) {
-            final LanternSlot slot = ((ClientSlot.Slot) clientSlot).getSlot();
+            final AbstractSlot slot = ((ClientSlot.Slot) clientSlot).getSlot();
             final Cause cause = Cause.builder().named(NamedCause.SOURCE, player).build();
 
-            final PeekSetTransactionsResult result = slot.peekSetTransactions(itemStack);
+            final PeekedSetTransactionResult result = slot.peekSet(itemStack);
 
             // We do not know the remaining stack in the cursor,
             // so just use none as new item
@@ -673,13 +669,13 @@ public class VanillaContainerInteractionBehavior extends AbstractContainerIntera
         if (!(hotbarClientSlot instanceof ClientSlot.Slot)) {
             return;
         }
-        final LanternHotbar hotbar = player.getInventory().getHotbar();
-        final LanternSlot slot = ((ClientSlot.Slot) clientSlot).getSlot();
+        final LanternHotbarInventory hotbar = player.getInventory().getHotbar();
+        final AbstractSlot slot = ((ClientSlot.Slot) clientSlot).getSlot();
 
         // The slot we will swap items with
-        LanternSlot hotbarSlot = hotbar.getSelectedSlot();
+        AbstractSlot hotbarSlot = hotbar.getSelectedSlot();
         if (hotbarSlot.peek().isPresent()) {
-            final Optional<LanternSlot> optSlot = hotbar.getSlots().stream()
+            final Optional<AbstractSlot> optSlot = Streams.stream(hotbar.<AbstractSlot>slots())
                     .filter(slot1 -> !slot1.peek().isPresent())
                     .findFirst();
             if (optSlot.isPresent()) {
@@ -725,33 +721,37 @@ public class VanillaContainerInteractionBehavior extends AbstractContainerIntera
         final LanternPlayerInventory playerInventory = this.container.getPlayerInventory();
         final OpenableInventory openableInventory = (OpenableInventory) this.container.getOpenInventory();
         IInventory targetInventory = openableInventory.getShiftClickTarget(this.container, slot);
-        final boolean mainSlot = playerInventory.getMain().isChild(slot);
+        final boolean mainSlot = playerInventory.getMain().containsInventory(slot);
         if (targetInventory == null && !mainSlot) {
-            targetInventory = playerInventory.getInventoryView(HumanInventoryView.REVERSE_MAIN_AND_HOTBAR);
+            targetInventory = playerInventory.getView(LanternPlayerInventory.View.REVERSE_MAIN_AND_HOTBAR);
         }
-        PeekOfferTransactionsResult result = null;
+        PeekedOfferTransactionResult result = null;
         ItemStack itemStack1 = itemStack;
         if (targetInventory != null) {
-            result = ((AbstractInventory) targetInventory).peekOfferFastTransactions(itemStack1);
-            itemStack1 = result.getOfferResult().getRest();
+            result = targetInventory.peekOffer(itemStack1);
+            itemStack1 = result.getRejectedItem().orElse(null);
             if (mainSlot && itemStack1 != null && !openableInventory.disableShiftClickWhenFull()) {
                 targetInventory = null;
             }
         }
         if (targetInventory == null) {
-            if (slot.parent() instanceof LanternHotbar) {
-                targetInventory = playerInventory.getInventoryView(HumanInventoryView.MAIN);
+            if (slot.parent() instanceof LanternHotbarInventory) {
+                targetInventory = playerInventory.getView(LanternPlayerInventory.View.MAIN);
             } else {
                 targetInventory = playerInventory.getHotbar();
             }
-            PeekOfferTransactionsResult result1 = ((AbstractInventory) targetInventory).peekOfferFastTransactions(itemStack1);
-            if (result != null) {
-                if (result1.getOfferResult().isSuccess()) {
-                    result1.getTransactions().addAll(result.getTransactions());
-                    result = result1;
+            final PeekedOfferTransactionResult result1 = targetInventory.peekOffer(itemStack1);
+            if (result != null && result.isSuccess()) {
+                if (result1.isSuccess()) {
+                    return new PeekedOfferTransactionResult(
+                            InventoryTransactionResult.Type.SUCCESS, ImmutableList.<SlotTransaction>builder()
+                                    .addAll(result.getTransactions())
+                                    .addAll(result1.getTransactions())
+                                    .build(),
+                            result1.getRejectedItem().orElse(null));
                 }
             } else {
-                result = result1;
+                return result1;
             }
         }
         return result;

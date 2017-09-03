@@ -31,6 +31,7 @@ import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResu
 import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.annotation.Nullable;
 
@@ -41,13 +42,19 @@ public class PeekedSetTransactionResult extends PeekedOfferTransactionResult {
     /**
      * Constructs a new {@link PeekedSetTransactionResult}.
      *
+     * @param type The type of the transaction result
      * @param transactions The slot transactions that will occur
      * @param rejectedItem The rejected item stack, this can occur if the stack doesn't fit the inventory
      * @param replacedItem The replaced item stack
      */
-    public PeekedSetTransactionResult(List<SlotTransaction> transactions, @Nullable ItemStack rejectedItem, @Nullable ItemStack replacedItem) {
-        super(transactions, rejectedItem);
+    public PeekedSetTransactionResult(InventoryTransactionResult.Type type, List<SlotTransaction> transactions,
+            @Nullable ItemStack rejectedItem, @Nullable ItemStack replacedItem) {
+        super(type, transactions, rejectedItem);
         this.replacedItem = replacedItem;
+    }
+
+    public Optional<ItemStack> getReplacedItem() {
+        return Optional.ofNullable(this.replacedItem);
     }
 
     @Override

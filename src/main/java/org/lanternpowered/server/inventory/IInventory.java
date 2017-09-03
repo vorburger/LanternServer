@@ -104,6 +104,8 @@ public interface IInventory extends Inventory {
 
     Optional<PeekedPollTransactionResult> peekPoll(int limit, Predicate<ItemStack> matcher);
 
+    PeekedOfferTransactionResult peekOffer(ItemStack itemStack);
+
     /**
      * Peeks for the result {@link SlotTransaction}s and {@link InventoryTransactionResult}
      * that would occur if you try to set a item through {@link Inventory#set(ItemStack)}.
@@ -111,7 +113,7 @@ public interface IInventory extends Inventory {
      * @param itemStack The item stack to set
      * @return The peeked transaction result
      */
-    Optional<PeekedSetTransactionResult> peekSet(@Nullable ItemStack itemStack);
+    PeekedSetTransactionResult peekSet(@Nullable ItemStack itemStack);
 
     /**
      * Check whether the supplied item can be inserted into this one of the children of the

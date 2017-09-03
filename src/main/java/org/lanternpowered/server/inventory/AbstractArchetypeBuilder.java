@@ -62,21 +62,12 @@ public abstract class AbstractArchetypeBuilder<R extends T, T extends AbstractIn
         return (B) this;
     }
 
-    @Override
-    protected void build(R inventory) {
-        if (inventory instanceof AbstractMutableInventory) {
-            final String pluginId = (this.pluginContainer == null ? Lantern.getImplementationPlugin() : this.pluginContainer).getId();
-            ((AbstractMutableInventory) inventory).setArchetype(buildArchetype(pluginId, UUID.randomUUID().toString()));
-        }
-    }
-
     /**
      * Constructs a {@link LanternInventoryArchetype} from this builder.
      *
      * @return The inventory archetype
      */
     public LanternInventoryArchetype<R> buildArchetype() {
-        checkState(this.supplier != null);
         final String pluginId = (this.pluginContainer == null ? Lantern.getImplementationPlugin() : this.pluginContainer).getId();
         return buildArchetype(pluginId, UUID.randomUUID().toString());
     }
@@ -89,11 +80,19 @@ public abstract class AbstractArchetypeBuilder<R extends T, T extends AbstractIn
      * @return The inventory archetype
      */
     public LanternInventoryArchetype<R> buildArchetype(String pluginId, String id) {
+        checkState(this.supplier != null);
         if (this.cachedArchetype != null && this.cachedArchetype.getId()
                 .equals(pluginId + ':' + id.toLowerCase(Locale.ENGLISH))) {
             return this.cachedArchetype;
         }
-        return this.cachedArchetype = new LanternInventoryArchetype<>(pluginId, id, copy());
+        return this.cachedArchetype = new BuilderInventoryArchetype<>(pluginId, id, copy());
+    }
+
+    protected void copyTo(B builder) {
+        builder.supplier = this.supplier;
+        builder.pluginContainer = this.pluginContainer;
+        builder.properties.putAll(this.properties);
+        builder.propertiesByName.putAll(this.propertiesByName);
     }
 
     /**
@@ -101,7 +100,13 @@ public abstract class AbstractArchetypeBuilder<R extends T, T extends AbstractIn
      *
      * @return The copy
      */
-    protected abstract B copy();
+    protected final B copy() {
+        final B copy = newBuilder();
+        copyTo(copy);
+        return copy;
+    }
+
+    protected abstract B newBuilder();
 
     /**
      * Gets a {@link List} with all the children {@link InventoryArchetype}s.

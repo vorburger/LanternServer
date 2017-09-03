@@ -23,22 +23,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory;
+package org.lanternpowered.server.inventory.vanilla;
 
+import org.lanternpowered.server.inventory.CarrierReference;
+import org.lanternpowered.server.inventory.IArmorEquipableInventory;
+import org.lanternpowered.server.inventory.type.LanternInventoryColumn;
+import org.spongepowered.api.entity.ArmorEquipable;
 import org.spongepowered.api.item.inventory.Carrier;
 
 import java.util.Optional;
 
-public abstract class AbstractEquipmentInventory<C extends Carrier> extends AbstractOrderedSlotsInventory implements IEquipmentInventory<C> {
+public class LanternPlayerEquipmentInventory extends LanternInventoryColumn implements IArmorEquipableInventory {
 
-    private final CarrierReference<C> carrierReference;
-
-    protected AbstractEquipmentInventory(Class<C> carrierType) {
-        this.carrierReference = CarrierReference.of(carrierType);
-    }
+    private final CarrierReference<ArmorEquipable> carrierReference = CarrierReference.of(ArmorEquipable.class);
 
     @Override
-    public Optional<C> getCarrier() {
+    public Optional<ArmorEquipable> getCarrier() {
         return this.carrierReference.get();
     }
 

@@ -54,12 +54,14 @@ import org.lanternpowered.server.entity.living.player.tab.LanternTabListEntry;
 import org.lanternpowered.server.entity.living.player.tab.LanternTabListEntryBuilder;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
+import org.lanternpowered.server.inventory.AbstractOrderedInventory;
 import org.lanternpowered.server.inventory.LanternContainer;
 import org.lanternpowered.server.inventory.OpenableInventory;
 import org.lanternpowered.server.inventory.PlayerContainerSession;
 import org.lanternpowered.server.inventory.PlayerInventoryContainer;
-import org.lanternpowered.server.inventory.block.EnderChestInventory;
 import org.lanternpowered.server.inventory.vanilla.LanternPlayerInventory;
+import org.lanternpowered.server.inventory.vanilla.VanillaInventoryArchetypes;
+import org.lanternpowered.server.inventory.vanilla.block.ChestInventory;
 import org.lanternpowered.server.item.CooldownTracker;
 import org.lanternpowered.server.network.NetworkSession;
 import org.lanternpowered.server.network.entity.NetworkIdHolder;
@@ -211,7 +213,7 @@ public class LanternPlayer extends LanternHumanoid implements ProxySubject, Play
     /**
      * The ender chest inventory of this {@link Player}.
      */
-    private final EnderChestInventory enderChestInventory;
+    private final ChestInventory enderChestInventory;
 
     /**
      * The {@link LanternContainer} of the players inventory.
@@ -259,9 +261,9 @@ public class LanternPlayer extends LanternHumanoid implements ProxySubject, Play
     public LanternPlayer(LanternGameProfile gameProfile, NetworkSession session) {
         super(checkNotNull(gameProfile, "gameProfile").getUniqueId());
         this.interactionHandler = new PlayerInteractionHandler(this);
-        this.inventory = new LanternPlayerInventory(null, null, this);
+        this.inventory = VanillaInventoryArchetypes.PLAYER.builder().withCarrier(this).build(Lantern.getMinecraftPlugin());
         this.inventoryContainer = new PlayerInventoryContainer(this.inventory);
-        this.enderChestInventory = new EnderChestInventory(null);
+        this.enderChestInventory = VanillaInventoryArchetypes.ENDER_CHEST.builder().withCarrier(this).build(Lantern.getMinecraftPlugin());
         this.containerSession = new PlayerContainerSession(this);
         this.session = session;
         this.gameProfile = gameProfile;
@@ -918,7 +920,7 @@ public class LanternPlayer extends LanternHumanoid implements ProxySubject, Play
         if (inventory instanceof PlayerInventory) {
             return Optional.empty();
         } else if (inventory instanceof OpenableInventory) {
-            container = new LanternContainer(this.inventory, (OpenableInventory) inventory);
+            container = new LanternContainer(this.inventory, (AbstractOrderedInventory<?>) inventory);
         } else {
             throw new UnsupportedOperationException("Unsupported inventory type: " + inventory);
         }
@@ -1043,7 +1045,7 @@ public class LanternPlayer extends LanternHumanoid implements ProxySubject, Play
     }
 
     @Override
-    public EnderChestInventory getEnderChestInventory() {
+    public ChestInventory getEnderChestInventory() {
         return this.enderChestInventory;
     }
 

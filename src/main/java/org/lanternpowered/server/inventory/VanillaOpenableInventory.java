@@ -30,6 +30,7 @@ import org.lanternpowered.server.inventory.client.ClientContainer;
 import org.lanternpowered.server.inventory.client.ContainerPart;
 import org.spongepowered.api.item.inventory.type.OrderedInventory;
 
+@SuppressWarnings("unchecked")
 public interface VanillaOpenableInventory extends OpenableInventory, OrderedInventory {
 
     /**
@@ -47,8 +48,8 @@ public interface VanillaOpenableInventory extends OpenableInventory, OrderedInve
         clientContainer.bindInteractionBehavior(new VanillaContainerInteractionBehavior(container));
         final ContainerPart part = clientContainer.getTop();
         // Register the top inventory slots
-        ((LanternOrderedInventory) this).getIndexBySlots().object2IntEntrySet().forEach(entry ->
-                part.bindSlot(entry.getIntValue(), entry.getKey()));
+        ((AbstractOrderedInventory<AbstractSlot>) this).getSlotsToIndexMap().object2IntEntrySet()
+                .forEach(entry -> part.bindSlot(entry.getIntValue(), entry.getKey()));
         return clientContainer;
     }
 }

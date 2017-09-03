@@ -37,8 +37,8 @@ public class LanternMainPlayerInventory extends AbstractGridInventory implements
     protected void init() {
         super.init();
 
-        this.hotbar = query(LanternHotbarInventory.class).first();
         this.grid = query(AbstractGridInventory.class).first();
+        this.hotbar = query(LanternHotbarInventory.class).first();
     }
 
     @Override

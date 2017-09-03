@@ -32,13 +32,7 @@ import org.lanternpowered.server.data.ValueCollection;
 import org.lanternpowered.server.data.element.ElementListener;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternGame;
-import org.lanternpowered.server.inventory.AbstractSlot;
-import org.lanternpowered.server.inventory.LanternInventoryArchetype;
-import org.lanternpowered.server.inventory.filter.ItemFilter;
-import org.lanternpowered.server.inventory.type.LanternOrderedSlotsInventory;
-import org.lanternpowered.server.inventory.type.slot.LanternFuelSlot;
-import org.lanternpowered.server.inventory.type.slot.LanternInputSlot;
-import org.lanternpowered.server.inventory.type.slot.LanternOutputSlot;
+import org.lanternpowered.server.inventory.PeekedOfferTransactionResult;
 import org.lanternpowered.server.inventory.vanilla.VanillaInventoryArchetypes;
 import org.lanternpowered.server.inventory.vanilla.block.FurnaceInventory;
 import org.lanternpowered.server.item.recipe.IIngredient;
@@ -63,17 +57,21 @@ import java.util.OptionalInt;
 public class LanternFurnace extends LanternTileEntity implements Furnace, ITileEntityRefreshBehavior {
 
     // The inventory of the furnace
-    private final FurnaceInventory inventory = VanillaInventoryArchetypes.FURNACE.builder()
-            .withCarrier(this).build(Lantern.getMinecraftPlugin());
+    private final FurnaceInventory inventory;
 
     // The tick since the last pulse
     private long lastTick = -1;
+
+    public LanternFurnace() {
+        this.inventory = VanillaInventoryArchetypes.FURNACE.builder()
+                .withCarrier(this).build(Lantern.getMinecraftPlugin());
+        this.inventory.enableCachedProgress();
+    }
 
     @Override
     public void registerKeys() {
         super.registerKeys();
 
-        this.inventory.enableCachedProgress();
         final ElementListener<Integer> clearProperty = (oldElement, newElement) -> this.inventory.resetCachedProgress();
 
         final ValueCollection c = getValueCollection();
@@ -134,9 +132,9 @@ public class LanternFurnace extends LanternTileEntity implements Furnace, ITileE
                         // Check if the item can be smelted
                         if (smeltingResult.isPresent()) {
                             // Check if the result could be added to the output
-                            final PeekOfferTransactionsResult peekResult = this.inventory.getOutputSlot().peekOfferFastTransactions(
+                            final PeekedOfferTransactionResult peekResult = this.inventory.getOutputSlot().peekOffer(
                                     smeltingResult.get().getResult().createStack());
-                            if (peekResult.getOfferResult().isSuccess()) {
+                            if (peekResult.isSuccess()) {
                                 maxCookTime = ((ISmeltingRecipe) smeltingRecipe.get())
                                         .getSmeltTime(inputSlotItemSnapshot).orElse(200);
                             }
@@ -267,9 +265,8 @@ public class LanternFurnace extends LanternTileEntity implements Furnace, ITileE
                 if (itemStack.getQuantity() >= quantity) {
                     final ItemStack result = smeltingResult.get().getResult().createStack();
                     // Check if the result could be added to the output
-                    final PeekOfferTransactionsResult peekResult = this.inventory.getOutputSlot()
-                            .peekOfferFastTransactions(result);
-                    if (peekResult.getOfferResult().isSuccess()) {
+                    final PeekedOfferTransactionResult peekResult = this.inventory.getOutputSlot().peekOffer(result);
+                    if (peekResult.isSuccess()) {
                         this.inventory.getInputSlot().poll(quantity);
                         this.inventory.getOutputSlot().offer(result);
                         return true;

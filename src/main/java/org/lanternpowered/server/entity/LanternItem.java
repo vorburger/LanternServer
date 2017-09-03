@@ -31,7 +31,9 @@ import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.data.ValueCollection;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.entity.event.CollectEntityEvent;
+import org.lanternpowered.server.inventory.IInventory;
 import org.lanternpowered.server.inventory.LanternItemStackSnapshot;
+import org.lanternpowered.server.inventory.PeekedOfferTransactionResult;
 import org.lanternpowered.server.network.entity.EntityProtocolTypes;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.Transaction;
@@ -52,6 +54,7 @@ import org.spongepowered.api.item.inventory.entity.PlayerInventory;
 import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.util.Direction;
 
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -175,16 +178,16 @@ public class LanternItem extends LanternEntity implements Item {
             if (inventory instanceof PlayerInventory) {
                 inventory = ((PlayerInventory) inventory).getMain();
             }
-            final PeekOfferTransactionsResult result = ((AbstractInventory) inventory).peekOfferFastTransactions(itemStack);
-            final ItemStack rest = result.getOfferResult().getRest();
+            final PeekedOfferTransactionResult peekResult = ((IInventory) inventory).peekOffer(itemStack);
+            final ItemStack rejected = peekResult.getRejectedItem().orElse(null);
             final Cause.Builder cause = Cause.source(entity);
             cause.named("OriginalItemStack", itemStack);
-            if (rest != null) {
-                cause.named("RestItemStack", rest);
+            if (rejected != null) {
+                cause.named("RejectedItemStack", rejected);
             }
             final ChangeInventoryEvent.Pickup event = SpongeEventFactory.createChangeInventoryEventPickup(
-                    cause.build(), this, inventory, result.getTransactions());
-            event.setCancelled(!result.getOfferResult().isSuccess());
+                    cause.build(), this, inventory, peekResult.getTransactions());
+            event.setCancelled(!peekResult.isSuccess());
             Sponge.getEventManager().post(event);
             if (event.isCancelled() && !isRemoved()) { // Don't continue if the entity was removed during the event
                 continue;
@@ -193,16 +196,16 @@ public class LanternItem extends LanternEntity implements Item {
                     .filter(Transaction::isValid)
                     .forEach(transaction -> transaction.getSlot().set(transaction.getFinal().createStack()));
             final int added;
-            if (rest != null) {
-                added = itemStack.getQuantity() - rest.getQuantity();
-                itemStack = rest;
+            if (rejected != null) {
+                added = itemStack.getQuantity() - rejected.getQuantity();
+                itemStack = rejected;
             } else {
                 added = itemStack.getQuantity();
             }
             if (added != 0 && entity instanceof Living) {
                 triggerEvent(new CollectEntityEvent((Living) entity, added));
             }
-            if (rest == null || isRemoved()) {
+            if (rejected == null || isRemoved()) {
                 itemStack = null;
             }
             if (itemStack == null) {

@@ -46,8 +46,8 @@ public class LanternInventoryBuilder<T extends AbstractInventory> implements Inv
         return new LanternInventoryBuilder<>();
     }
 
-    @Nullable private LanternInventoryArchetype<?> inventoryArchetype;
-    @Nullable private AbstractBuilder<?,?,?> builder;
+    @Nullable private LanternInventoryArchetype<T> inventoryArchetype;
+    @Nullable private AbstractBuilder builder;
     @Nullable private Carrier carrier;
 
     private LanternInventoryBuilder() {
@@ -56,7 +56,7 @@ public class LanternInventoryBuilder<T extends AbstractInventory> implements Inv
     @Override
     public LanternInventoryBuilder<T> from(Inventory value) {
         checkNotNull(value, "value");
-        this.inventoryArchetype = (LanternInventoryArchetype<?>) value.getArchetype();
+        this.inventoryArchetype = (LanternInventoryArchetype<T>) value.getArchetype();
         this.builder = null; // Regenerate the builder if needed
         return this;
     }
@@ -72,14 +72,15 @@ public class LanternInventoryBuilder<T extends AbstractInventory> implements Inv
     @Override
     public LanternInventoryBuilder<T> of(InventoryArchetype archetype) {
         checkNotNull(archetype, "archetype");
-        this.inventoryArchetype = (LanternInventoryArchetype<?>) archetype;
+        this.inventoryArchetype = (LanternInventoryArchetype<T>) archetype;
         this.builder = null; // Regenerate the builder if needed
         return this;
     }
 
     public <N extends AbstractInventory> LanternInventoryBuilder<N> of(LanternInventoryArchetype<N> archetype) {
         checkNotNull(archetype, "archetype");
-        this.inventoryArchetype = archetype;
+        this.inventoryArchetype = (LanternInventoryArchetype<T>) archetype;
+        archetype.getBuilder();
         this.builder = null; // Regenerate the builder if needed
         return (LanternInventoryBuilder<N>) this;
     }
@@ -94,7 +95,7 @@ public class LanternInventoryBuilder<T extends AbstractInventory> implements Inv
         final InventoryProperty<String, ?> property1 = (InventoryProperty<String, ?>) property;
         PropertyKeySetter.setKey(property1, name); // Modify the name of the property
         if (this.builder == null) {
-            this.builder = this.inventoryArchetype.builder.copy();
+            this.builder = this.inventoryArchetype.getBuilder().copy();
         }
         this.builder.property(property1);
         return this;
@@ -112,13 +113,16 @@ public class LanternInventoryBuilder<T extends AbstractInventory> implements Inv
         checkState(this.inventoryArchetype != null, "The inventory archetype must be set");
         final AbstractInventory inventory;
         if (this.builder != null) {
-            inventory = this.builder.build(plugin);
+            inventory = this.builder.build(plugin, this.inventoryArchetype);
         } else {
-            inventory = this.inventoryArchetype.builder.build(plugin);
+            inventory = this.inventoryArchetype.getBuilder().build(plugin, this.inventoryArchetype);
         }
         if (inventory instanceof AbstractMutableInventory && this.carrier != null) {
             final AbstractMutableInventory mutableInventory = (AbstractMutableInventory) inventory;
-            mutableInventory.setCarrier(this.carrier);
+            mutableInventory.setCarrier0(this.carrier);
+        }
+        if (this.carrier instanceof AbstractCarrier) {
+            ((AbstractCarrier) this.carrier).setInventory(inventory);
         }
         return (T) inventory;
     }

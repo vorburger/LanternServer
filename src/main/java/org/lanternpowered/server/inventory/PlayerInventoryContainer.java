@@ -29,9 +29,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.lanternpowered.server.inventory.client.ClientContainer;
 import org.lanternpowered.server.inventory.client.PlayerClientContainer;
-import org.lanternpowered.server.inventory.entity.LanternPlayerInventory;
+import org.lanternpowered.server.inventory.vanilla.LanternPlayerInventory;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.text.translation.Translation;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -43,7 +42,7 @@ public class PlayerInventoryContainer extends LanternContainer {
     private PlayerClientContainer clientContainer;
 
     public PlayerInventoryContainer(LanternPlayerInventory playerInventory) {
-        super((Translation) null, playerInventory, null);
+        super(playerInventory);
         // Construct the client container and attach the player
         this.clientContainer = playerInventory.constructClientContainer(this);
         this.clientContainer.bind(playerInventory.getCarrier().get());

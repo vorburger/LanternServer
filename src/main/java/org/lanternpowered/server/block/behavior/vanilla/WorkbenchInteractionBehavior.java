@@ -31,6 +31,9 @@ import org.lanternpowered.server.behavior.BehaviorResult;
 import org.lanternpowered.server.behavior.Parameters;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.block.behavior.types.InteractWithBlockBehavior;
+import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.inventory.carrier.LocatableCarrier;
+import org.lanternpowered.server.inventory.vanilla.VanillaInventoryArchetypes;
 import org.lanternpowered.server.inventory.vanilla.block.CraftingTableInventory;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
@@ -38,14 +41,16 @@ import org.spongepowered.api.item.inventory.Container;
 
 import java.util.Optional;
 
-public class CraftingTableInteractionBehavior implements InteractWithBlockBehavior {
+public class WorkbenchInteractionBehavior implements InteractWithBlockBehavior {
 
     @Override
     public BehaviorResult tryInteract(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
         final Optional<Player> optPlayer = context.get(Parameters.PLAYER);
         if (optPlayer.isPresent()) {
-            final Optional<Container> optContainer = optPlayer.get().openInventory(
-                    new CraftingTableInventory(optPlayer.get().getInventory(), null), Cause.source(optPlayer.get()).build());
+            final CraftingTableInventory craftingTableInventory = VanillaInventoryArchetypes.WORKBENCH.builder()
+                    .withCarrier(new LocatableCarrier(context.tryGet(Parameters.BLOCK_LOCATION)))
+                    .build(Lantern.getMinecraftPlugin());
+            final Optional<Container> optContainer = optPlayer.get().openInventory(craftingTableInventory, Cause.source(optPlayer.get()).build());
             if (optContainer.isPresent()) {
                 return BehaviorResult.SUCCESS;
             }

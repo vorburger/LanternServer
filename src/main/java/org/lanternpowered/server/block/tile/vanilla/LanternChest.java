@@ -26,6 +26,7 @@
 package org.lanternpowered.server.block.tile.vanilla;
 
 import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.inventory.AbstractGridInventory;
 import org.lanternpowered.server.inventory.vanilla.VanillaInventoryArchetypes;
 import org.lanternpowered.server.inventory.vanilla.block.ChestInventory;
 import org.spongepowered.api.block.BlockState;
@@ -36,6 +37,7 @@ import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.effect.sound.SoundCategories;
 import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.item.inventory.Inventory;
+import org.spongepowered.api.item.inventory.InventoryArchetype;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -44,6 +46,14 @@ import java.util.Optional;
 import java.util.Random;
 
 public class LanternChest extends LanternContainerTile<ChestInventory> implements Chest {
+
+    private static final class DoubleChestInventory extends ChestInventory {
+
+        @Override
+        public InventoryArchetype getArchetype() {
+            return VanillaInventoryArchetypes.DOUBLE_CHEST;
+        }
+    }
 
     private static final Direction[] HORIZONTAL_DIRECTIONS = { Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST };
 
@@ -75,13 +85,18 @@ public class LanternChest extends LanternContainerTile<ChestInventory> implement
             }
             final Optional<TileEntity> optTileEntity = location.getRelative(directionToCheck).getTileEntity();
             if (optTileEntity.isPresent() && optTileEntity.get() instanceof LanternChest) {
+                final AbstractGridInventory.RowsViewBuilder<DoubleChestInventory> doubleChestBuilder = AbstractGridInventory.rowsViewBuilder()
+                        .typeSupplier(DoubleChestInventory::new);
                 if (directionToCheck != Direction.WEST && directionToCheck != Direction.NORTH) {
-                    return Optional.of(new TileDoubleChestInventory(null, null,
-                            this.inventory, ((LanternChest) optTileEntity.get()).inventory));
+                    doubleChestBuilder
+                            .grid(0, this.inventory)
+                            .grid(3, ((LanternChest) optTileEntity.get()).inventory);
                 } else {
-                    return Optional.of(new TileDoubleChestInventory(null, null,
-                            ((LanternChest) optTileEntity.get()).inventory, this.inventory));
+                    doubleChestBuilder
+                            .grid(0, ((LanternChest) optTileEntity.get()).inventory)
+                            .grid(3, this.inventory);
                 }
+                return Optional.of(doubleChestBuilder.build());
             }
         }
         return Optional.empty();

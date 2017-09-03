@@ -23,28 +23,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory;
+package org.lanternpowered.server.inventory.carrier;
 
-import org.spongepowered.api.item.inventory.Carrier;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.Optional;
+import com.google.common.base.MoreObjects;
+import org.lanternpowered.server.inventory.AbstractCarrier;
+import org.lanternpowered.server.inventory.AbstractInventory;
+import org.spongepowered.api.item.inventory.type.CarriedInventory;
+import org.spongepowered.api.world.Locatable;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
-public abstract class AbstractEquipmentInventory<C extends Carrier> extends AbstractOrderedSlotsInventory implements IEquipmentInventory<C> {
+public class LocatableCarrier<T extends AbstractInventory & CarriedInventory<AbstractCarrier<T>>> extends AbstractCarrier<T> implements Locatable {
 
-    private final CarrierReference<C> carrierReference;
+    private final Location<World> location;
 
-    protected AbstractEquipmentInventory(Class<C> carrierType) {
-        this.carrierReference = CarrierReference.of(carrierType);
+    public LocatableCarrier(Location<World> location) {
+        checkNotNull(location, "location");
+        this.location = location;
     }
 
     @Override
-    public Optional<C> getCarrier() {
-        return this.carrierReference.get();
+    public Location<World> getLocation() {
+        return this.location;
     }
 
     @Override
-    protected void setCarrier(Carrier carrier) {
-        super.setCarrier(carrier);
-        this.carrierReference.set(carrier);
+    protected MoreObjects.ToStringHelper toStringHelper() {
+        return super.toStringHelper()
+                .add("location", this.location);
     }
 }

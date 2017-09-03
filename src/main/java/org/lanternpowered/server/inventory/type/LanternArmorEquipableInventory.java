@@ -23,28 +23,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory;
+package org.lanternpowered.server.inventory.type;
 
-import org.spongepowered.api.item.inventory.Carrier;
+import org.lanternpowered.server.inventory.AbstractArmorEquipableInventory;
 
-import java.util.Optional;
+public class LanternArmorEquipableInventory extends AbstractArmorEquipableInventory {
 
-public abstract class AbstractEquipmentInventory<C extends Carrier> extends AbstractOrderedSlotsInventory implements IEquipmentInventory<C> {
-
-    private final CarrierReference<C> carrierReference;
-
-    protected AbstractEquipmentInventory(Class<C> carrierType) {
-        this.carrierReference = CarrierReference.of(carrierType);
-    }
-
-    @Override
-    public Optional<C> getCarrier() {
-        return this.carrierReference.get();
-    }
-
-    @Override
-    protected void setCarrier(Carrier carrier) {
-        super.setCarrier(carrier);
-        this.carrierReference.set(carrier);
-    }
 }

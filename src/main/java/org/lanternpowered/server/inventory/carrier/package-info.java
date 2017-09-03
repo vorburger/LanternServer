@@ -23,10 +23,5 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory.type;
-
-import org.lanternpowered.server.inventory.AbstractCarriedEquipmentInventory;
-
-public class LanternCarriedEquipmentInventory extends AbstractCarriedEquipmentInventory {
-
-}
+@org.spongepowered.api.util.annotation.NonnullByDefault
+package org.lanternpowered.server.inventory.carrier;

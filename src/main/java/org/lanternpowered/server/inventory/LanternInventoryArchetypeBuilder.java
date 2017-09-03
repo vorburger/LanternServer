@@ -80,7 +80,7 @@ public class LanternInventoryArchetypeBuilder implements InventoryArchetype.Buil
         // Dimension doesn't matter, this means that we can just create a ordered children archetype
         if (inventoryDimension == null) {
             for (LanternInventoryArchetype<?> archetype : this.archetypes) {
-                if (archetype.builder instanceof AbstractSlot.Builder) {
+                if (archetype.getBuilder() instanceof AbstractSlot.Builder) {
 
                 }
             }

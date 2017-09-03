@@ -25,26 +25,18 @@
  */
 package org.lanternpowered.server.inventory;
 
+import org.spongepowered.api.entity.ArmorEquipable;
 import org.spongepowered.api.item.inventory.Carrier;
+import org.spongepowered.api.item.inventory.equipment.EquipmentInventory;
 
+import java.lang.ref.WeakReference;
 import java.util.Optional;
 
-public abstract class AbstractEquipmentInventory<C extends Carrier> extends AbstractOrderedSlotsInventory implements IEquipmentInventory<C> {
+import javax.annotation.Nullable;
 
-    private final CarrierReference<C> carrierReference;
+public abstract class AbstractArmorEquipableInventory extends AbstractEquipmentInventory<ArmorEquipable> implements IArmorEquipableInventory {
 
-    protected AbstractEquipmentInventory(Class<C> carrierType) {
-        this.carrierReference = CarrierReference.of(carrierType);
-    }
-
-    @Override
-    public Optional<C> getCarrier() {
-        return this.carrierReference.get();
-    }
-
-    @Override
-    protected void setCarrier(Carrier carrier) {
-        super.setCarrier(carrier);
-        this.carrierReference.set(carrier);
+    public AbstractArmorEquipableInventory() {
+        super(ArmorEquipable.class);
     }
 }

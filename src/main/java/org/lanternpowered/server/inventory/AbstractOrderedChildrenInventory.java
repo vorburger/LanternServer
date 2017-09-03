@@ -97,7 +97,7 @@ public abstract class AbstractOrderedChildrenInventory extends AbstractOrderedIn
     }
 
     @Override
-    Object2IntMap<AbstractSlot> getSlotsToIndexMap() {
+    protected Object2IntMap<AbstractSlot> getSlotsToIndexMap() {
         return this.slotsToIndex == null ? Object2IntMaps.emptyMap() : this.slotsToIndex;
     }
 
@@ -151,10 +151,14 @@ public abstract class AbstractOrderedChildrenInventory extends AbstractOrderedIn
         }
 
         @Override
-        protected Builder<T> copy() {
-            final Builder<T> copy = new Builder<>();
+        protected void copyTo(Builder<T> copy) {
+            super.copyTo(copy);
             copy.inventories.addAll(this.inventories);
-            return copy;
+        }
+
+        @Override
+        protected Builder<T> newBuilder() {
+            return new Builder<>();
         }
 
         @Override
@@ -164,7 +168,7 @@ public abstract class AbstractOrderedChildrenInventory extends AbstractOrderedIn
     }
 
     public static final class ViewBuilder<T extends AbstractOrderedChildrenInventory>
-            extends AbstractBuilder<T, AbstractOrderedChildrenInventory, ViewBuilder<T>>  {
+            extends AbstractViewBuilder<T, AbstractOrderedChildrenInventory, ViewBuilder<T>>  {
 
         private final List<PrioritizedObject<AbstractMutableInventory>> inventories = new ArrayList<>();
 

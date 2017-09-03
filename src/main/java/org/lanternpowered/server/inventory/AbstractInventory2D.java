@@ -57,7 +57,8 @@ public abstract class AbstractInventory2D extends AbstractOrderedSlotsInventory 
     }
 
     void init(List<? extends AbstractSlot> slots, int columns, int rows, @Nullable List<? extends AbstractSlot> prioritizedSlots) {
-        checkState(columns * rows == slots.size());
+        checkState(columns * rows == slots.size(), "Slots mismatch");
+        checkState(prioritizedSlots == null || columns * rows == prioritizedSlots.size(), "Slots mismatch");
 
         this.columns = columns;
         this.rows = rows;

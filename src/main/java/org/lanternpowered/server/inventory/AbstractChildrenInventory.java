@@ -39,7 +39,9 @@ import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
+import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -127,15 +129,18 @@ public abstract class AbstractChildrenInventory<C extends AbstractMutableInvento
             }
             if (child instanceof AbstractChildrenInventory) {
                 ((AbstractChildrenInventory) child).queryInventories(inventories, predicate);
-            } else {
-                inventories.addAll(child.queryInventories(predicate));
             }
         }
     }
 
     @Override
+    void setCarrier0(Carrier carrier) {
+        getChildren().forEach(child -> child.setCarrier0(carrier));
+        super.setCarrier0(carrier);
+    }
+
+    @Override
     protected void setCarrier(Carrier carrier) {
-        getChildren().forEach(child -> child.setCarrier(carrier));
     }
 
     @Override
@@ -154,8 +159,8 @@ public abstract class AbstractChildrenInventory<C extends AbstractMutableInvento
     }
 
     @Override
-    public Optional<PeekedSetTransactionResult> peekSet(@Nullable ItemStack itemStack) {
-        return Optional.empty();
+    public PeekedSetTransactionResult peekSet(@Nullable ItemStack itemStack) {
+        return new PeekedSetTransactionResult(InventoryTransactionResult.Type.FAILURE, ImmutableList.of(), itemStack, null);
     }
 
     @Override
@@ -421,6 +426,64 @@ public abstract class AbstractChildrenInventory<C extends AbstractMutableInvento
             }
         }
         return Optional.ofNullable(stack);
+    }
+
+    private PeekedOfferTransactionResult peekOffer(ItemStack stack, Set<Inventory> processed, boolean add) {
+        PeekedOfferTransactionResult peekResult = null;
+        final List<SlotTransaction> transactions = new ArrayList<>();
+        // Loop through the slots
+        for (AbstractInventory inventory : getChildren()) {
+            if (!add && processed.contains(inventory)) {
+                continue;
+            }
+            peekResult = inventory.peekOffer(stack);
+            if (peekResult.isSuccess()) {
+                final Optional<ItemStack> rejectedItem = peekResult.getRejectedItem();
+                transactions.addAll(peekResult.getTransactions());
+                if (!rejectedItem.isPresent()) {
+                    return new PeekedOfferTransactionResult(InventoryTransactionResult.Type.SUCCESS, transactions, null);
+                }
+                stack = rejectedItem.get();
+            }
+            if (add) {
+                processed.add(inventory);
+            }
+        }
+        if (peekResult == null) {
+            return new PeekedOfferTransactionResult(InventoryTransactionResult.Type.FAILURE, ImmutableList.of(), stack);
+        }
+        return new PeekedOfferTransactionResult(InventoryTransactionResult.Type.SUCCESS, transactions, peekResult.getRejectedItem().orElse(null));
+    }
+
+    @Override
+    public PeekedOfferTransactionResult peekOffer(ItemStack itemStack) {
+        checkNotNull(itemStack, "itemStack");
+        final PeekedOfferTransactionResult peekResult;
+        final Set<Inventory> processed = new HashSet<>();
+        final Inventory inventory = queryAny(itemStack);
+        if (inventory instanceof AbstractChildrenInventory) {
+            peekResult = ((AbstractChildrenInventory) inventory).peekOffer(itemStack, processed, true);
+            if (peekResult.isSuccess()) {
+                if (!peekResult.getRejectedItem().isPresent()) {
+                    return peekResult;
+                }
+                itemStack = peekResult.getRejectedItem().get();
+            }
+        } else {
+            peekResult = null;
+        }
+        final PeekedOfferTransactionResult peekResult1 = peekOffer(itemStack, processed, false);
+        if (peekResult == null || !peekResult.isSuccess()) {
+            return peekResult1;
+        } else if (!peekResult1.isSuccess()) {
+            return peekResult;
+        }
+        return new PeekedOfferTransactionResult(InventoryTransactionResult.Type.SUCCESS,
+                ImmutableList.<SlotTransaction>builder()
+                        .addAll(peekResult.getTransactions())
+                        .addAll(peekResult1.getTransactions())
+                        .build(),
+                peekResult1.getRejectedItem().orElse(null));
     }
 
     @Override

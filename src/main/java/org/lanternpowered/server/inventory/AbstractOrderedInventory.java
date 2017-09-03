@@ -50,7 +50,7 @@ public abstract class AbstractOrderedInventory<C extends AbstractMutableInventor
      */
     static final int INVALID_INDEX = -1;
 
-    abstract Object2IntMap<AbstractSlot> getSlotsToIndexMap();
+    protected abstract Object2IntMap<AbstractSlot> getSlotsToIndexMap();
 
     // Supply the slot indexes for the children
 

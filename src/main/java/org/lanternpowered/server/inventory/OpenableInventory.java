@@ -27,7 +27,6 @@ package org.lanternpowered.server.inventory;
 
 import org.lanternpowered.server.inventory.client.ClientContainer;
 import org.lanternpowered.server.inventory.client.ClientSlot;
-import org.lanternpowered.server.inventory.slot.LanternSlot;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.Slot;
@@ -73,7 +72,7 @@ public interface OpenableInventory extends IInventory {
     /**
      * Constructs a {@link ClientContainer} for this {@link OpenableInventory}
      * and the {@link LanternContainer}. This is the place to assign
-     * {@link LanternSlot}s to {@link ClientSlot}s.
+     * {@link AbstractSlot}s to {@link ClientSlot}s.
      *
      * @return The constructed client container
      */

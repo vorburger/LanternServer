@@ -34,7 +34,6 @@ import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.inventory.AbstractSlot;
 import org.lanternpowered.server.inventory.LanternItemStack;
 import org.lanternpowered.server.inventory.PeekedOfferTransactionResult;
-import org.lanternpowered.server.inventory.slot.LanternSlot;
 import org.lanternpowered.server.item.behavior.types.InteractWithItemBehavior;
 import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.event.SpongeEventFactory;
@@ -43,6 +42,7 @@ import org.spongepowered.api.event.item.inventory.ChangeInventoryEvent;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ArmorQuickEquipInteractionBehavior implements InteractWithItemBehavior {
@@ -52,16 +52,16 @@ public class ArmorQuickEquipInteractionBehavior implements InteractWithItemBehav
         final LanternPlayer player = (LanternPlayer) context.tryGet(Parameters.PLAYER);
         final ItemStack itemStack = context.tryGet(Parameters.USED_ITEM_STACK);
 
-        final PeekedOfferTransactionResult result = player.getInventory().getEquipment().peekOfferFastTransactions(itemStack.copy());
-        if (result.getOfferResult().isSuccess()) {
-            final List<SlotTransaction> transactions = result.getTransactions();
+        final PeekedOfferTransactionResult peekResult = player.getInventory().getEquipment().peekOffer(itemStack.copy());
+        if (peekResult.isSuccess()) {
+            final List<SlotTransaction> transactions = new ArrayList<>(peekResult.getTransactions());
             final AbstractSlot slot = (AbstractSlot) context.get(Parameters.USED_SLOT).orElse(null);
             if (slot != null) {
                 transactions.add(new SlotTransaction(
-                        slot, itemStack.createSnapshot(), LanternItemStack.toSnapshot(result.getOfferResult().getRest())));
+                        slot, itemStack.createSnapshot(), LanternItemStack.toSnapshot(peekResult.getRejectedItem().orElse(null))));
             }
             final ChangeInventoryEvent.Equipment event = SpongeEventFactory.createChangeInventoryEventEquipment(
-                    Cause.source(player).build(), player.getInventory(), result.getTransactions());
+                    Cause.source(player).build(), player.getInventory(), transactions);
             if (event.isCancelled()) {
                 return BehaviorResult.CONTINUE;
             }

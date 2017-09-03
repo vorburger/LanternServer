@@ -30,11 +30,13 @@ import static com.google.common.base.Preconditions.checkState;
 import static org.lanternpowered.server.util.Conditions.checkPlugin;
 
 import org.lanternpowered.server.game.Lantern;
+import org.spongepowered.api.item.inventory.InventoryArchetypes;
 import org.spongepowered.api.item.inventory.InventoryProperty;
 import org.spongepowered.api.plugin.PluginContainer;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
@@ -111,7 +113,7 @@ public abstract class AbstractBuilder<R extends T, T extends AbstractInventory, 
      * @return The inventory
      */
     public R build() {
-        return build0(this.pluginContainer == null ? Lantern.getImplementationPlugin() : this.pluginContainer);
+        return build0(this.pluginContainer == null ? Lantern.getImplementationPlugin() : this.pluginContainer, null);
     }
 
     /**
@@ -122,16 +124,46 @@ public abstract class AbstractBuilder<R extends T, T extends AbstractInventory, 
      * @return The inventory
      */
     public R build(Object plugin) {
-        return build0(checkPlugin(plugin, "plugin"));
+        return build(plugin, null);
     }
 
-    private R build0(PluginContainer plugin) {
+    R build(Object plugin, @Nullable LanternInventoryArchetype<R> archetype) {
+        return build0(checkPlugin(plugin, "plugin"), archetype);
+    }
+
+    R build0(@Nullable PluginContainer plugin, @Nullable LanternInventoryArchetype<R> archetype) {
         checkState(this.supplier != null);
+        if (plugin == null) {
+            plugin = this.pluginContainer == null ? Lantern.getImplementationPlugin() : this.pluginContainer;
+        }
         final R inventory = this.supplier.get();
         if (inventory instanceof AbstractMutableInventory) {
             ((AbstractMutableInventory) inventory).setPlugin(plugin);
         }
-        build(inventory);
+        try {
+            build(inventory);
+        } catch (Exception e) {
+            if (archetype == null) {
+                archetype = (LanternInventoryArchetype<R>) inventory.getArchetype();
+            }
+            final String id;
+            try {
+                id = inventory.getArchetype() == InventoryArchetypes.UNKNOWN ? "unknown" : inventory.getArchetype().getId();
+            } catch (Exception e1) {
+                throw e;
+            }
+            throw new RuntimeException("An error occurred while constructing " + id + " with builder type " +
+                    archetype.getBuilder().getClass().getName(), e);
+        }
+        if (inventory instanceof AbstractMutableInventory) {
+            final AbstractMutableInventory mutableInventory = (AbstractMutableInventory) inventory;
+            if (archetype != null) {
+                mutableInventory.setArchetype(archetype);
+            } else if (this instanceof AbstractArchetypeBuilder) {
+                final String pluginId = (this.pluginContainer == null ? Lantern.getImplementationPlugin() : this.pluginContainer).getId();
+                mutableInventory.setArchetype(((AbstractArchetypeBuilder) this).buildArchetype(pluginId, UUID.randomUUID().toString()));
+            }
+        }
         return inventory;
     }
 

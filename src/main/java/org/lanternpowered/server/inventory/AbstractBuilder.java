@@ -29,10 +29,17 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static org.lanternpowered.server.util.Conditions.checkPlugin;
 
+import com.google.common.collect.ImmutableMap;
 import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.text.translation.TextTranslation;
 import org.spongepowered.api.item.inventory.InventoryArchetypes;
 import org.spongepowered.api.item.inventory.InventoryProperty;
+import org.spongepowered.api.item.inventory.property.InventoryCapacity;
+import org.spongepowered.api.item.inventory.property.InventoryDimension;
+import org.spongepowered.api.item.inventory.property.InventoryTitle;
 import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.translation.Translation;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -41,7 +48,7 @@ import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
 
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "ConstantConditions"})
 public abstract class AbstractBuilder<R extends T, T extends AbstractInventory, B extends AbstractBuilder<R, T, B>> {
 
     protected static final int DEFAULT_PRIORITY = 1000;
@@ -63,11 +70,12 @@ public abstract class AbstractBuilder<R extends T, T extends AbstractInventory, 
     }
 
     @Nullable protected Supplier<R> supplier;
-    protected final Map<Class<?>, InventoryProperty<String, ?>> properties = new HashMap<>();
-    protected final Map<String, InventoryProperty<String, ?>> propertiesByName = new HashMap<>();
+    protected final Map<Class<?>, Map<String, InventoryProperty<String, ?>>> properties = new HashMap<>();
+    @Nullable protected Map<Class<?>, Map<String, InventoryProperty<String, ?>>> cachedProperties;
 
     // Catalog properties
     @Nullable protected PluginContainer pluginContainer;
+    @Nullable protected Translation translation;
 
     /**
      * Sets the {@link Supplier} for the {@link AbstractInventory}, the
@@ -91,9 +99,31 @@ public abstract class AbstractBuilder<R extends T, T extends AbstractInventory, 
      */
     public B property(InventoryProperty<String, ?> property) {
         checkNotNull(property, "property");
-        this.properties.put(property.getClass(), property);
-        this.propertiesByName.put(property.getKey(), property);
+        checkState(!(property instanceof InventoryCapacity), "The inventory capacity cannot be modified with a property.");
+        checkState(!(property instanceof InventoryDimension), "The inventory dimension cannot be modified with a property.");
+        putProperty(property);
+        if (property instanceof InventoryTitle) {
+            this.translation = TextTranslation.of((Text) property.getValue());
+        }
         return (B) this;
+    }
+
+    /**
+     * Sets the title {@link Translation}.
+     *
+     * @param translation The title translation
+     * @return This builder, for chaining
+     */
+    public B title(Translation translation) {
+        checkNotNull(translation, "translation");
+        this.translation = translation;
+        putProperty(new InventoryTitle(Text.of(translation)));
+        return (B) this;
+    }
+
+    private void putProperty(InventoryProperty<String, ?> property) {
+        this.properties.computeIfAbsent(property.getClass(), type -> new HashMap<>()).put(property.getKey(), property);
+        this.cachedProperties = null;
     }
 
     /**
@@ -138,7 +168,20 @@ public abstract class AbstractBuilder<R extends T, T extends AbstractInventory, 
         }
         final R inventory = this.supplier.get();
         if (inventory instanceof AbstractMutableInventory) {
-            ((AbstractMutableInventory) inventory).setPlugin(plugin);
+            final AbstractMutableInventory mutableInventory = (AbstractMutableInventory) inventory;
+            mutableInventory.setPlugin(plugin);
+            // Copy the properties and set them in the inventory
+            if (this.cachedProperties == null) {
+                final ImmutableMap.Builder<Class<?>, Map<String, InventoryProperty<String, ?>>> builder = ImmutableMap.builder();
+                for (Map.Entry<Class<?>, Map<String, InventoryProperty<String, ?>>> entry : this.properties.entrySet()) {
+                    builder.put(entry.getKey(), ImmutableMap.copyOf(entry.getValue()));
+                }
+                this.cachedProperties = builder.build();
+            }
+            mutableInventory.setProperties((Map) this.cachedProperties);
+        }
+        if (this.translation != null) {
+            inventory.setName(this.translation);
         }
         try {
             build(inventory);

@@ -33,12 +33,17 @@ import org.spongepowered.api.item.inventory.EmptyInventory;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
 import org.spongepowered.api.item.inventory.InventoryArchetypes;
+import org.spongepowered.api.item.inventory.InventoryProperty;
+import org.spongepowered.api.item.inventory.property.AbstractInventoryProperty;
 import org.spongepowered.api.plugin.PluginContainer;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.annotation.Nullable;
@@ -56,6 +61,17 @@ public abstract class AbstractMutableInventory extends AbstractInventory {
 
     private final Set<InventoryViewerListener> viewerListeners = new HashSet<>();
     private final Set<InventoryCloseListener> closeListeners = new HashSet<>();
+
+    @Nullable private Map<Class<?>, Map<Object, InventoryProperty<?,?>>> properties;
+
+    /**
+     * Sets the properties map of this inventory.
+     *
+     * @param properties The properties map
+     */
+    void setProperties(Map<Class<?>, Map<Object, InventoryProperty<?,?>>> properties) {
+        this.properties = properties;
+    }
 
     /**
      * Sets the {@link PluginContainer} of this inventory.
@@ -100,6 +116,41 @@ public abstract class AbstractMutableInventory extends AbstractInventory {
      * @return The slots
      */
     protected abstract List<AbstractSlot> getSlotInventories();
+
+    @Override
+    protected <T extends InventoryProperty<?, ?>> Optional<T> tryGetProperty(Class<T> propertyType, @Nullable Object key) {
+        checkNotNull(propertyType, "propertyType");
+        if (this.properties != null) {
+            final Map<Object, InventoryProperty<?, ?>> properties = this.properties.get(propertyType);
+            if (properties != null) {
+                InventoryProperty<?, ?> property;
+                if (key != null) {
+                    property = properties.get(key);
+                } else {
+                    property = properties.get(AbstractInventoryProperty.getDefaultKey(propertyType));
+                    if (property == null) {
+                        property = properties.values().stream().findFirst().orElse(null);
+                    }
+                }
+                if (property != null) {
+                    return Optional.of(propertyType.cast(property));
+                }
+            }
+        }
+        return super.tryGetProperty(propertyType, key);
+    }
+
+    @Override
+    protected <T extends InventoryProperty<?, ?>> List<T> tryGetProperties(Class<T> propertyType) {
+        final List<T> propertyList = super.tryGetProperties(propertyType);
+        if (this.properties != null) {
+            final Map<Object, InventoryProperty<?, ?>> properties = this.properties.get(propertyType);
+            if (properties != null) {
+                propertyList.addAll((Collection<? extends T>) properties.values());
+            }
+        }
+        return propertyList;
+    }
 
     @Override
     void close() {

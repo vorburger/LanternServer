@@ -75,7 +75,7 @@ public class PlayerInventoryContainer extends LanternContainer {
         return this.clientContainer;
     }
 
-    public void init() {
+    public void initClientContainer() {
         this.clientContainer.init();
     }
 }

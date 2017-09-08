@@ -473,7 +473,7 @@ public class LanternPlayer extends LanternHumanoid implements ProxySubject, Play
             this.session.send(new MessagePlayOutSelectAdvancementTree(
                     get(LanternKeys.OPEN_ADVANCEMENT_TREE).get().map(AdvancementTree::getInternalId).orElse(null)));
             setScoreboard(world.getScoreboard());
-            this.inventoryContainer.init();
+            this.inventoryContainer.initClientContainer();
             this.bossBars.forEach(bossBar -> bossBar.resendBossBar(this));
             // Add the player to the world
             world.addPlayer(this);

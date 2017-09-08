@@ -54,6 +54,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -568,16 +569,25 @@ public abstract class AbstractSlot extends AbstractMutableInventory implements I
             return this;
         }
 
+        @Nullable
+        private <R extends InventoryProperty<String, ?>> R findProperty(Class<R> type) {
+            final Map<String, InventoryProperty<String, ?>> properties = this.properties.get(type);
+            if (properties == null) {
+                return null;
+            }
+            return (R) properties.values().stream().findFirst().orElse(null);
+        }
+
         @Override
         protected void build(AbstractSlot inventory) {
             if (this.cachedResultItemFilter == null && this.hasItemFilter) {
                 ItemFilter itemFilter = this.itemFilter;
                 // Attempt to generate the ItemFilter
-                final AcceptsItems acceptsItems = (AcceptsItems) this.properties.get(AcceptsItems.class);
+                final AcceptsItems acceptsItems = findProperty(AcceptsItems.class);
                 if (acceptsItems != null) {
                     itemFilter = PropertyItemFilters.of(acceptsItems);
                 }
-                final EquipmentSlotType equipmentSlotType = (EquipmentSlotType) this.properties.get(EquipmentSlotType.class);
+                final EquipmentSlotType equipmentSlotType = findProperty(EquipmentSlotType.class);
                 if (equipmentSlotType != null) {
                     EquipmentItemFilter equipmentItemFilter = EquipmentItemFilter.of(equipmentSlotType);
                     if (itemFilter != null) {
@@ -585,7 +595,7 @@ public abstract class AbstractSlot extends AbstractMutableInventory implements I
                     }
                     itemFilter = equipmentItemFilter;
                 }
-                final ArmorSlotType armorSlotType = (ArmorSlotType) this.properties.get(ArmorSlotType.class);
+                final ArmorSlotType armorSlotType = findProperty(ArmorSlotType.class);
                 if (armorSlotType != null) {
                     EquipmentItemFilter equipmentItemFilter = EquipmentItemFilter.of(armorSlotType);
                     if (itemFilter != null) {

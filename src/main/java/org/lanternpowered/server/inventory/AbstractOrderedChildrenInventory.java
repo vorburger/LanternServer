@@ -29,6 +29,7 @@ import com.google.common.collect.ImmutableList;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMaps;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import org.lanternpowered.server.inventory.type.LanternOrderedChildrenInventory;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
 import org.spongepowered.api.item.inventory.ItemStack;
@@ -43,12 +44,12 @@ import javax.annotation.Nullable;
 @SuppressWarnings("unchecked")
 public abstract class AbstractOrderedChildrenInventory extends AbstractOrderedInventory<AbstractMutableInventory> {
 
-    public static Builder<AbstractOrderedChildrenInventory> builder() {
-        return new Builder();
+    public static Builder<LanternOrderedChildrenInventory> builder() {
+        return new Builder<>().typeSupplier(LanternOrderedChildrenInventory::new);
     }
 
-    public static ViewBuilder<AbstractOrderedChildrenInventory> viewBuilder() {
-        return new ViewBuilder();
+    public static ViewBuilder<LanternOrderedChildrenInventory> viewBuilder() {
+        return new ViewBuilder<>().typeSupplier(LanternOrderedChildrenInventory::new);
     }
 
     @Nullable private List<AbstractMutableInventory> children;
@@ -141,7 +142,11 @@ public abstract class AbstractOrderedChildrenInventory extends AbstractOrderedIn
         @Override
         protected void build(AbstractOrderedChildrenInventory inventory) {
             final ImmutableList<PrioritizedObject<? extends AbstractMutableInventory>> prioritizedChildrenObjects = this.inventories.stream()
-                    .map(e -> new PrioritizedObject<>(e.object.build(), e.priority))
+                    .map(e -> {
+                        final AbstractMutableInventory inventory1 = e.object.build();
+                        inventory1.setParentSafely(inventory);
+                        return new PrioritizedObject<>(inventory1, e.priority);
+                    })
                     .collect(ImmutableList.toImmutableList());
             final ImmutableList<AbstractMutableInventory> children = prioritizedChildrenObjects.stream()
                     .map(e -> e.object).collect(ImmutableList.toImmutableList());

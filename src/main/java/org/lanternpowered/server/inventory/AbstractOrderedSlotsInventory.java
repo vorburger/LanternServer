@@ -32,6 +32,7 @@ import com.google.common.collect.ImmutableList;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMaps;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import org.lanternpowered.server.inventory.type.LanternOrderedSlotsInventory;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
 import org.spongepowered.api.item.inventory.ItemStack;
 
@@ -48,8 +49,8 @@ import javax.annotation.Nullable;
 @SuppressWarnings("unchecked")
 public abstract class AbstractOrderedSlotsInventory extends AbstractOrderedInventory<AbstractSlot> {
 
-    public static Builder<AbstractOrderedSlotsInventory> builder() {
-        return new Builder();
+    public static Builder<LanternOrderedSlotsInventory> builder() {
+        return new Builder<>().typeSupplier(LanternOrderedSlotsInventory::new);
     }
 
     @Nullable private List<AbstractSlot> slots;
@@ -198,7 +199,11 @@ public abstract class AbstractOrderedSlotsInventory extends AbstractOrderedInven
                         "Slot isn't set at index %s, the size of the inventory is expanded up to %s", i, this.slots.size());
             }
             final ImmutableList<PrioritizedObject<? extends AbstractSlot>> prioritizedChildrenObjects = this.slots.stream()
-                    .map(e -> new PrioritizedObject<>(e.object.build(), e.priority))
+                    .map(e -> {
+                        final AbstractSlot inventory1 = e.object.build();
+                        inventory1.setParentSafely(inventory);
+                        return new PrioritizedObject<>(inventory1, e.priority);
+                    })
                     .collect(ImmutableList.toImmutableList());
             final ImmutableList<AbstractSlot> slots = prioritizedChildrenObjects.stream()
                     .map(e -> e.object).collect(ImmutableList.toImmutableList());

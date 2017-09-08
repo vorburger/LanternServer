@@ -27,12 +27,15 @@ package org.lanternpowered.server.inventory;
 
 import static com.google.common.base.Preconditions.checkState;
 
+import com.google.common.collect.ImmutableMap;
 import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
 import org.spongepowered.api.item.inventory.InventoryProperty;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -91,8 +94,11 @@ public abstract class AbstractArchetypeBuilder<R extends T, T extends AbstractIn
     protected void copyTo(B builder) {
         builder.supplier = this.supplier;
         builder.pluginContainer = this.pluginContainer;
-        builder.properties.putAll(this.properties);
-        builder.propertiesByName.putAll(this.propertiesByName);
+        builder.properties.clear();
+        for (Map.Entry<Class<?>, Map<String, InventoryProperty<String, ?>>> entry : this.properties.entrySet()) {
+            builder.properties.put(entry.getKey(), new HashMap<>(entry.getValue()));
+        }
+        builder.cachedProperties = this.cachedProperties;
     }
 
     /**

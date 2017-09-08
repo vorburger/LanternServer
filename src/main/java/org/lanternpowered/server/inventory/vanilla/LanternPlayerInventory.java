@@ -37,8 +37,8 @@ import org.lanternpowered.server.inventory.LanternContainer;
 import org.lanternpowered.server.inventory.OpenableInventory;
 import org.lanternpowered.server.inventory.behavior.VanillaContainerInteractionBehavior;
 import org.lanternpowered.server.inventory.client.PlayerClientContainer;
-import org.lanternpowered.server.inventory.type.LanternArmorEquipableInventory;
 import org.lanternpowered.server.inventory.type.LanternCraftingInventory;
+import org.lanternpowered.server.inventory.type.LanternOrderedChildrenInventory;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.Inventory;
@@ -104,7 +104,7 @@ public class LanternPlayerInventory extends AbstractOrderedChildrenInventory imp
 
         // Construct the inventory views
 
-        final AbstractInventory priorityMainAndHotbar = AbstractOrderedChildrenInventory.viewBuilder()
+        final LanternOrderedChildrenInventory priorityMainAndHotbar = AbstractOrderedChildrenInventory.viewBuilder()
                 .inventory(this.mainInventory.getGrid())
                 .inventory(this.mainInventory.getHotbar())
                 .build();

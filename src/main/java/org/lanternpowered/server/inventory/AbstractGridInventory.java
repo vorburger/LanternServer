@@ -653,8 +653,6 @@ public abstract class AbstractGridInventory extends AbstractInventory2D implemen
         @Override
         protected void build(T inventory) {
             final List<PrioritizedObject<AbstractSlot>>[] columnSlots = new List[this.columns];
-            System.out.println(this.rows);
-            System.out.println(this.columns);
             for (int x = 0; x < this.columns; x++) {
                 columnSlots[x] = new ArrayList<>();
             }
@@ -716,9 +714,6 @@ public abstract class AbstractGridInventory extends AbstractInventory2D implemen
                     .map(e -> e.object).collect(ImmutableList.toImmutableList());
             final ImmutableList<AbstractSlot> prioritizedSlots = prioritizedSlotObjects.stream().sorted()
                     .map(e -> e.object).collect(ImmutableList.toImmutableList());
-            System.out.println(slots.size());
-            System.out.println(rows.build().size());
-            System.out.println(columns.build().size());
             inventory.init(slots, rows.build(), columns.build(), prioritizedSlots);
         }
 

@@ -26,7 +26,7 @@
 package org.lanternpowered.server.inventory.vanilla;
 
 import static org.lanternpowered.server.plugin.InternalPluginsInfo.Minecraft;
-import static org.lanternpowered.server.text.translation.TranslationHelper.t;
+import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
 
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.inventory.AbstractGridInventory;
@@ -53,7 +53,6 @@ import org.lanternpowered.server.inventory.vanilla.block.FurnaceInventory;
 import org.lanternpowered.server.inventory.vanilla.block.JukeboxInventory;
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
 import org.spongepowered.api.item.inventory.property.EquipmentSlotType;
-import org.spongepowered.api.item.inventory.property.InventoryTitle;
 
 public final class VanillaInventoryArchetypes {
 
@@ -180,11 +179,14 @@ public final class VanillaInventoryArchetypes {
                 builder.slot(x, y, SLOT);
             }
         }
-        CHEST = builder.property(new InventoryTitle(t("container.chest")))
+        CHEST = builder
+                .title(tr("container.chest"))
                 .buildArchetype(Minecraft.IDENTIFIER, "chest");
-        SHULKER_BOX = builder.property(new InventoryTitle(t("container.shulkerBox")))
+        SHULKER_BOX = builder
+                .title(tr("container.shulkerBox"))
                 .buildArchetype(Minecraft.IDENTIFIER, "shulker_box");
-        ENDER_CHEST = builder.property(new InventoryTitle(t("container.enderchest")))
+        ENDER_CHEST = builder
+                .title(tr("container.enderchest"))
                 .buildArchetype(Minecraft.IDENTIFIER, "ender_chest");
     }
 
@@ -193,7 +195,7 @@ public final class VanillaInventoryArchetypes {
     ////////////////////
 
     public static final LanternInventoryArchetype<ChestInventory> DOUBLE_CHEST = AbstractGridInventory.rowsBuilder()
-            .property(new InventoryTitle(t("container.chestDouble")))
+            .title(tr("container.chestDouble"))
             .grid(0, CHEST)
             .grid(3, CHEST)
             .typeSupplier(ChestInventory::new)
@@ -207,7 +209,7 @@ public final class VanillaInventoryArchetypes {
 
     static {
         final AbstractGridInventory.SlotsBuilder<DispenserInventory> builder = AbstractGridInventory.slotsBuilder()
-                .property(new InventoryTitle(t("container.dispenser")))
+                .title(tr("container.dispenser"))
                 .typeSupplier(DispenserInventory::new)
                 .expand(3, 3);
         for (int y = 0; y < 3; y++) {
@@ -231,7 +233,7 @@ public final class VanillaInventoryArchetypes {
     ///////////////
 
     public static final LanternInventoryArchetype<FurnaceInventory> FURNACE = LanternOrderedSlotsInventory.builder()
-            .property(new InventoryTitle(t("container.furnace")))
+            .title(tr("container.furnace"))
             .slot(INPUT_SLOT)
             .slot(FUEL_SLOT)
             .slot(OUTPUT_SLOT)
@@ -316,8 +318,8 @@ public final class VanillaInventoryArchetypes {
     ////////////////
 
     public static final LanternInventoryArchetype<LanternCraftingInventory> CRAFTING = AbstractOrderedChildrenInventory.builder()
-            .inventory(CRAFTING_GRID)
             .inventory(CRAFTING_OUTPUT_SLOT)
+            .inventory(CRAFTING_GRID)
             .typeSupplier(LanternCraftingInventory::new)
             .buildArchetype(Minecraft.IDENTIFIER, "crafting");
 
@@ -344,8 +346,8 @@ public final class VanillaInventoryArchetypes {
     /////////////////
 
     public static final LanternInventoryArchetype<CraftingTableInventory> WORKBENCH = AbstractOrderedChildrenInventory.builder()
-            .inventory(WORKBENCH_GRID)
             .inventory(CRAFTING_OUTPUT_SLOT)
+            .inventory(WORKBENCH_GRID)
             .typeSupplier(CraftingTableInventory::new)
             .buildArchetype(Minecraft.IDENTIFIER, "workbench");
 

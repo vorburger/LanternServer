@@ -37,7 +37,7 @@ repositories {
         url 'https://oss.sonatype.org/content/groups/public'
     }
     maven {
-        url = 'https://oss.sonatype.org/content/repositories/snapshots/'
+        url 'https://oss.sonatype.org/content/repositories/snapshots/'
     }
 }
 
@@ -75,9 +75,9 @@ ext.fastutilVersion = '7.1.0'
 // Project dependencies
 dependencies {
     // Add the test plugins to the class path
-    compile testPlugins
+    runtime testPlugins
     // Add the test data packs to the class path
-    compile testDataPacks
+    runtime testDataPacks
 
     // Launch Options
     compile 'net.sf.jopt-simple:jopt-simple:5.0.3'

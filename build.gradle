@@ -306,8 +306,8 @@ artifacts {
 }
 api.configurations.archives.artifacts.clear()
 
-pom.whenConfigured { p ->
-    List<Dependency> dependencies = p.dependencies
+install.repositories.mavenInstaller.pom.whenConfigured { pom ->
+    List<Dependency> dependencies = pom.dependencies
     dependencies.removeIf { d ->
         def full = d.group + ':' + d.name;
         // Remove the test plugins and api from the artifact pom
@@ -317,6 +317,7 @@ pom.whenConfigured { p ->
         }
         return false
     }
+    pom.dependencies = dependencies
 }
 
 // Gradle version used for generating the Gradle wrapper

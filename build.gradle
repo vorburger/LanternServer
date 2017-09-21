@@ -307,12 +307,13 @@ artifacts {
 api.configurations.archives.artifacts.clear()
 
 install.repositories.mavenInstaller.pom.whenConfigured { pom ->
-    List<Dependency> dependencies = pom.dependencies
+    def dependencies = pom.dependencies
     dependencies.removeIf { d ->
-        def full = d.group + ':' + d.name;
+        def full = d.groupId + ':' + d.artifactId;
         // Remove the test plugins and api from the artifact pom
         if (full == ((String) "$testPlugins.group:$testPlugins.name") ||
                 full == ((String) "$api.group:$api.name")) {
+            println "DEBUG"
             return true
         }
         return false

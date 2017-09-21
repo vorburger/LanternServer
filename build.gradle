@@ -306,6 +306,19 @@ artifacts {
 }
 api.configurations.archives.artifacts.clear()
 
+pom.whenConfigured { p ->
+    List<Dependency> dependencies = p.dependencies
+    dependencies.removeIf { d ->
+        def full = d.group + ':' + d.name;
+        // Remove the test plugins and api from the artifact pom
+        if (full == ((String) "$testPlugins.group:$testPlugins.name") ||
+                full == ((String) "$api.group:$api.name")) {
+            return true
+        }
+        return false
+    }
+}
+
 // Gradle version used for generating the Gradle wrapper
 task wrapper(type: Wrapper) {
     gradleVersion = '4.0'

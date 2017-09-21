@@ -21,6 +21,7 @@ apply from: rootProject.file('gradle/lantern.gradle')
 // Apply plugin
 apply plugin: 'org.lanternpowered.gradle'
 apply plugin: 'org.lanternpowered.run-configs'
+apply plugin: 'maven'
 
 // Basic project information
 archivesBaseName = 'lanternserver'
@@ -232,10 +233,14 @@ task fastutilJar(type: ShadowJar) {
 
 // A task to build faster
 task buildFast(dependsOn: build)
+// A task to install faster
+task installFast(dependsOn: install)
 
 gradle.taskGraph.whenReady { TaskExecutionGraph graph ->
     // Mark the fast util jar as not update to make it regenerate
-    fastutilJar.outputs.upToDateWhen { graph.allTasks.contains(buildFast) && fastutilJar.archivePath.exists() }
+    fastutilJar.outputs.upToDateWhen {
+        (graph.allTasks.contains(buildFast) || graph.allTasks.contains(installFast)) && fastutilJar.archivePath.exists()
+    }
 }
 
 task fatJar(type: Jar, dependsOn: [jar, fastutilJar]) {
@@ -298,7 +303,6 @@ artifacts {
     archives fatJar
     archives sourceJar
 }
-api.configurations.archives.artifacts.clear()
 
 // Gradle version used for generating the Gradle wrapper
 task wrapper(type: Wrapper) {

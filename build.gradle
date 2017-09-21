@@ -303,6 +303,7 @@ artifacts {
     archives fatJar
     archives sourceJar
 }
+api.configurations.archives.artifacts.clear()
 
 // Gradle version used for generating the Gradle wrapper
 task wrapper(type: Wrapper) {

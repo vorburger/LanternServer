@@ -144,6 +144,7 @@ runConfigurations {
 jar {
     exclude 'log4j2.xml'
     rename 'log4j2_prod.xml', 'log4j2.xml'
+    classifier ''
 
     // Include the api classes
     from api.sourceSets.main.output

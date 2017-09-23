@@ -70,7 +70,7 @@ public final class HandlerForgeHandshakeInAck implements Handler<MessageForgeHan
                     session.send(new MessageForgeHandshakeInOutAck(ForgeServerHandshakePhase.WAITING_ACK));
                     phase.set(ForgeServerHandshakePhase.COMPLETE);
                 }
-                Lantern.getLogger().info("{}: Forge handshake -> Received ack (waitingServerData) message.",
+                Lantern.getLogger().debug("{}: Forge handshake -> Received ack (waitingServerData) message.",
                         session.getGameProfile().getName().get());
                 break;
             case COMPLETE:
@@ -81,7 +81,7 @@ public final class HandlerForgeHandshakeInAck implements Handler<MessageForgeHan
                     session.send(new MessageForgeHandshakeInOutAck(ForgeServerHandshakePhase.COMPLETE));
                     phase.set(ForgeServerHandshakePhase.DONE);
                 }
-                Lantern.getLogger().info("{}: Forge handshake -> Received ack (waitingServerComplete) message.",
+                Lantern.getLogger().debug("{}: Forge handshake -> Received ack (waitingServerComplete) message.",
                         session.getGameProfile().getName().get());
                 break;
             case DONE:
@@ -92,12 +92,12 @@ public final class HandlerForgeHandshakeInAck implements Handler<MessageForgeHan
                 } else {
                     if (message.getPhase().equals(ForgeClientHandshakePhase.PENDING_COMPLETE)) {
                         session.send(new MessageForgeHandshakeInOutAck(ForgeServerHandshakePhase.DONE));
-                        Lantern.getLogger().info("{}: Forge handshake -> Received ack (pendingComplete) message.",
+                        Lantern.getLogger().debug("{}: Forge handshake -> Received ack (pendingComplete) message.",
                                 session.getGameProfile().getName().get());
                     } else {
                         session.setProtocolState(ProtocolState.PLAY);
                         session.initPlayer();
-                        Lantern.getLogger().info("{}: Forge handshake -> Received ack (complete) message.",
+                        Lantern.getLogger().debug("{}: Forge handshake -> Received ack (complete) message.",
                                 session.getGameProfile().getName().get());
                     }
                 }

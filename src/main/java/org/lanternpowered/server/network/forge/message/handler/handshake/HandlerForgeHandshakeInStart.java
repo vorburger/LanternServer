@@ -72,9 +72,9 @@ public final class HandlerForgeHandshakeInStart implements Handler<MessageForgeH
         if (Lantern.getGame().getGlobalConfig().getForge().isEnabled() && fml) {
             phase.set(ForgeServerHandshakePhase.HELLO);
             session.send(new MessageForgeHandshakeInOutHello());
-            Lantern.getLogger().info("{}: Start forge handshake.", session.getGameProfile().getName().get());
+            Lantern.getLogger().debug("{}: Start forge handshake.", session.getGameProfile().getName().get());
         } else {
-            Lantern.getLogger().info("{}: Skip forge handshake.", session.getGameProfile().getName().get());
+            Lantern.getLogger().debug("{}: Skip forge handshake.", session.getGameProfile().getName().get());
             phase.set(ForgeServerHandshakePhase.DONE);
             session.setProtocolState(ProtocolState.PLAY);
             session.initPlayer();

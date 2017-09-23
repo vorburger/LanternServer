@@ -53,6 +53,6 @@ public final class HandlerForgeHandshakeInModList implements Handler<MessageForg
         // Just use a empty map for now
         session.send(new MessageForgeHandshakeInOutModList(new HashMap<>()));
         phase.set(ForgeServerHandshakePhase.WAITING_ACK);
-        Lantern.getLogger().info("{}: Forge handshake -> Received modList message.", session.getGameProfile().getName().get());
+        Lantern.getLogger().debug("{}: Forge handshake -> Received modList message.", session.getGameProfile().getName().get());
     }
 }

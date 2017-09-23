@@ -31,7 +31,7 @@ import io.netty.util.Attribute;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.NetworkSession;
-import org.lanternpowered.server.network.forge.handshake.ForgeHandshakePhase;
+import org.lanternpowered.server.network.forge.ForgeProtocol;
 import org.lanternpowered.server.network.forge.handshake.ForgeServerHandshakePhase;
 import org.lanternpowered.server.network.forge.message.type.handshake.MessageForgeHandshakeInOutHello;
 import org.lanternpowered.server.network.forge.message.type.handshake.MessageForgeHandshakeInStart;
@@ -48,7 +48,7 @@ public final class HandlerForgeHandshakeInStart implements Handler<MessageForgeH
 
     @Override
     public void handle(NetworkContext context, MessageForgeHandshakeInStart message) {
-        final Attribute<ForgeServerHandshakePhase> phase = context.getChannel().attr(ForgeHandshakePhase.PHASE);
+        final Attribute<ForgeServerHandshakePhase> phase = context.getChannel().attr(ForgeProtocol.HANDSHAKE_PHASE);
         final NetworkSession session = context.getSession();
         if (phase.get() != null && phase.get() != ForgeServerHandshakePhase.START) {
             session.disconnect(t("Retrieved unexpected forge handshake start message."));
@@ -59,9 +59,9 @@ public final class HandlerForgeHandshakeInStart implements Handler<MessageForgeH
         final Set<String> channels = new HashSet<>(Sponge.getChannelRegistrar()
                 .getRegisteredChannels(Platform.Type.SERVER));
         if (fml) {
-            channels.add("FML");
-            channels.add("FML|HS");
-            channels.add("FML|MP");
+            channels.add(ForgeProtocol.MAIN_CHANNEL);
+            channels.add(ForgeProtocol.HANDSHAKE_CHANNEL);
+            channels.add(ForgeProtocol.MULTI_PART_MESSAGE_CHANNEL);
         }
         if (!channels.isEmpty()) {
             session.send(new MessagePlayInOutRegisterChannels(channels));

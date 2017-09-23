@@ -23,29 +23,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.forge.message.handler.handshake;
+package org.lanternpowered.server.network.forge;
 
-import static org.lanternpowered.server.text.translation.TranslationHelper.t;
-
-import io.netty.util.Attribute;
-import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.network.NetworkContext;
-import org.lanternpowered.server.network.forge.ForgeProtocol;
+import io.netty.util.AttributeKey;
 import org.lanternpowered.server.network.forge.handshake.ForgeServerHandshakePhase;
-import org.lanternpowered.server.network.forge.message.type.handshake.MessageForgeHandshakeInOutHello;
-import org.lanternpowered.server.network.message.handler.Handler;
-import org.lanternpowered.server.network.NetworkSession;
 
-public final class HandlerForgeHandshakeInHello implements Handler<MessageForgeHandshakeInOutHello> {
+public final class ForgeProtocol {
 
-    @Override
-    public void handle(NetworkContext context, MessageForgeHandshakeInOutHello message) {
-        final NetworkSession session = context.getSession();
-        final Attribute<ForgeServerHandshakePhase> phase = session.getChannel().attr(ForgeProtocol.HANDSHAKE_PHASE);
-        if (phase.get() != ForgeServerHandshakePhase.HELLO) {
-            session.disconnect(t("Retrieved unexpected forge handshake hello message."));
-            return;
-        }
-        Lantern.getLogger().debug("{}: Forge handshake -> Received hello message.", session.getGameProfile().getName().get());
+    /**
+     * The attribute key of the server handshake phase.
+     */
+    public static final AttributeKey<ForgeServerHandshakePhase> HANDSHAKE_PHASE = AttributeKey.valueOf("fml-handshake-phase");
+
+    /**
+     * The name of the main channel.
+     */
+    public static final String MAIN_CHANNEL = "FML";
+
+    /**
+     * The name of the forge handshake channel.
+     */
+    public static final String HANDSHAKE_CHANNEL = "FML|HS";
+
+    /**
+     * The name of the forge multi part message channel.
+     */
+    public static final String MULTI_PART_MESSAGE_CHANNEL = "FML|MP";
+
+    private ForgeProtocol() {
     }
 }

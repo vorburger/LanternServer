@@ -25,6 +25,8 @@
  */
 package org.lanternpowered.server.network.forge.message.codec.handshake;
 
+import static org.lanternpowered.server.network.forge.ForgeProtocol.HANDSHAKE_CHANNEL;
+
 import io.netty.handler.codec.CodecException;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
@@ -69,7 +71,7 @@ public final class ProcessorForgeHandshakeOutRegistryData implements Processor<M
                 buf.writeString(en.getKey());
                 buf.writeString(en.getValue());
             }
-            output.add(new MessagePlayInOutChannelPayload("FML|HS", buf));
+            output.add(new MessagePlayInOutChannelPayload(HANDSHAKE_CHANNEL, buf));
         }
     }
 }

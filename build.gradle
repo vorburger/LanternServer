@@ -12,7 +12,7 @@ buildscript {
 
 plugins {
     id 'com.github.hierynomus.license' version '0.14.0'
-    id 'com.github.johnrengelman.shadow' version '1.2.4'
+    id 'com.github.johnrengelman.shadow' version '2.0.1'
     id 'org.spongepowered.plugin' version '0.8.1'
 }
 
@@ -55,7 +55,8 @@ configurations {
     // A configuration that will be excluded
     // in the generated pom file
     compileExcluded
-    compile.extendsFrom compileExcluded
+    compileTinyJson
+    compile.extendsFrom(compileExcluded, compileTinyJson)
 }
 
 ext.testDataPacks = project(':test-data-packs')
@@ -70,6 +71,9 @@ dependencies {
     compileExcluded testDataPacks
     // Add the sponge api
     compileExcluded api
+    // Add a tiny json library just to read the
+    // library files
+    compileTinyJson 'com.googlecode.json-simple:json-simple:1.1.1'
 
     // Launch Options
     compile 'net.sf.jopt-simple:jopt-simple:5.0.3'
@@ -136,8 +140,8 @@ import groovy.json.JsonBuilder
 processResources {
     // Minimize the json files
     doLast {
-        fileTree(dir: outputs.files.asPath, include: 'internal/*.json').each {
-            File file -> file.text = JsonOutput.toJson(new JsonSlurper().parse(file))
+        fileTree(dir: outputs.files.asPath, include: 'internal/*.json').each { File file ->
+            file.text = JsonOutput.toJson(new JsonSlurper().parse(file))
         }
     }
 }
@@ -170,14 +174,27 @@ configurations.compile.resolvedConfiguration.resolvedArtifacts.each { ResolvedAr
 ///  sponge classes, and all their resources. ///
 /////////////////////////////////////////////////
 
-jar {
+jar.enabled = false
+
+task theJar(type: ShadowJar) {
+    classifier = ''
+    duplicatesStrategy = 'EXCLUDE'
+    includeEmptyDirs = false
+
     exclude 'log4j2.xml'
     rename 'log4j2_prod.xml', 'log4j2.xml'
 
+    // Include the lantern classes
+    from sourceSets.main.output
     // Include the api classes
     from api.sourceSets.main.output
     // Include generated event classes
     from fileTree(api.tasks.genEventImpl.outputs.files.first())
+
+    // Include the tiny json library
+    from zipTree(project.configurations.compileTinyJson.first())
+    // Relocate the library
+    relocate('org.json.simple', 'org.lanternpowered.launch.org.json.simple')
 
     // Include the java 6 classes
     from sourceSets.java6.output
@@ -225,20 +242,22 @@ jar {
     data['repositories'] = repositoryEntries
     data['dependencies'] = dependencyEntries
 
-    def librariesFile = new File(buildDir, 'libraries.json')
+    def librariesFile = new File(buildDir, 'dependencies.json')
     librariesFile.text = new JsonBuilder(data).toPrettyString()
 
     from librariesFile
 }
+// Run theJar on build
+assemble.dependsOn theJar
 
 /////////////////////////////////////////
 /// Generate a fat jar which includes ///
 ///     all the dependency jars.      ///
 /////////////////////////////////////////
 
-task fatJar(type: Jar, dependsOn: jar) {
+task fatJar(type: Jar, dependsOn: theJar) {
     // Include the default jar
-    from zipTree(jar.archivePath)
+    from zipTree(theJar.archivePath)
 
     // Always update the fat jar
     outputs.upToDateWhen { false }
@@ -264,7 +283,7 @@ assemble.dependsOn fatJar
 /////////////////////////////////////////////
 
 afterEvaluate {
-    [jar, fatJar]*.manifest {
+    [theJar, fatJar]*.manifest {
         attributes(
                 'Main-Class': 'org.lanternpowered.launch.VersionCheckingMain',
                 'Implementation-Name': project.name,
@@ -292,7 +311,7 @@ sourceJar {
 }
 
 artifacts {
-    archives jar
+    archives theJar
     archives sourceJar
 }
 

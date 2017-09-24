@@ -25,18 +25,27 @@
  */
 package org.lanternpowered.launch;
 
-import static java.nio.file.FileVisitResult.CONTINUE;
-import static java.nio.file.FileVisitResult.TERMINATE;
 import static java.util.Objects.requireNonNull;
 
+import org.json.simple.parser.ParseException;
+import org.lanternpowered.launch.dependencies.Dependencies;
+import org.lanternpowered.launch.dependencies.DependenciesParser;
+import org.lanternpowered.launch.dependencies.Dependency;
+import org.lanternpowered.launch.dependencies.Repository;
 import org.lanternpowered.launch.transformer.ClassTransformer;
 import org.lanternpowered.launch.transformer.Exclusion;
 import org.lanternpowered.server.LanternServer;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
@@ -44,18 +53,16 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
-import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.security.CodeSigner;
 import java.security.CodeSource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -67,8 +74,10 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 /**
  * A {@link ClassLoader} that gives complete control over all the libraries used by
@@ -85,14 +94,116 @@ public final class LanternClassLoader extends URLClassLoader {
     private static final LanternClassLoader classLoader;
     private static final Method findBootstrapClassMethod;
 
-    static {
+    private static LanternClassLoader load() throws IOException {
         ClassLoader.registerAsParallelCapable();
 
-        // All the folders are from lantern or sponge,
-        // in development mode are all the libraries on
-        // the classpath, so there is no need to add them
-        // to the library classloader
-        final List<URL> urls = new ArrayList<>();
+        // Get the bootstrap class loader
+        final ClassLoader classLoader = LanternClassLoader.class.getClassLoader();
+
+        // Load the dependencies files
+        final List<Dependencies> dependenciesEntries = new ArrayList<>();
+
+        // Load the dependencies file within the jar, not available in the IDE
+        final URL dependenciesURL = classLoader.getResource("dependencies.json");
+        if (dependenciesURL != null) {
+            try {
+                dependenciesEntries.add(DependenciesParser.read(new BufferedReader(new InputStreamReader(dependenciesURL.openStream()))));
+            } catch (ParseException e) {
+                throw new IllegalStateException("Failed to parse the dependencies.json file within the jar.", e);
+            }
+        }
+
+        // Try to generate or load the dependencies file
+        final Path dependenciesFile = Paths.get("dependencies.json");
+        if (!Files.exists(dependenciesFile)) {
+            try (BufferedWriter writer = Files.newBufferedWriter(dependenciesFile)) {
+                writer.write("{\n    \"repositories\": [\n    ],\n    \"dependencies\": [\n    ]\n}");
+            }
+        } else {
+            try {
+                dependenciesEntries.add(DependenciesParser.read(Files.newBufferedReader(dependenciesFile)));
+            } catch (ParseException e) {
+                throw new IllegalStateException("Failed to parse the dependencies.json file within the root directory.", e);
+            }
+        }
+
+        // Merge the dependencies files
+        final List<URL> repositoryUrls = new ArrayList<>();
+        final Map<String, Dependency> dependencyMap = new HashMap<>();
+
+        for (Dependencies dependencies : dependenciesEntries) {
+            dependencies.getRepositories().stream().map(Repository::getUrl)
+                    .filter(e -> !repositoryUrls.contains(e)).forEach(repositoryUrls::add);
+            for (Dependency dependency : dependencies.getDependencies()) {
+                dependencyMap.put(dependency.getGroup() + ':' + dependency.getName(), dependency);
+            }
+        }
+
+        String localRepoPath = System.getProperty("maven.repo.local");
+        if (localRepoPath == null) {
+            final String mavenHome = System.getenv("M2_HOME");
+            if (mavenHome != null) {
+                final Path settingsPath = Paths.get(mavenHome, "conf", "setting.xml");
+                if (Files.exists(settingsPath)) {
+                    try {
+                        final DocumentBuilder documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+                        final Document document = documentBuilder.parse(settingsPath.toFile());
+
+                        final Element element = document.getElementById("localRepository");
+                        if (element != null) {
+                            localRepoPath = element.getTextContent();
+                        }
+                    } catch (ParserConfigurationException | SAXException e) {
+                        throw new IllegalStateException(e);
+                    }
+                }
+            }
+        }
+        if (localRepoPath == null) {
+            localRepoPath = "~/.m/repository";
+        }
+        localRepoPath = localRepoPath.trim();
+        if (localRepoPath.charAt(0) == '~') {
+            localRepoPath = System.getProperty("user.home") + '/' + localRepoPath.substring(2);
+        }
+
+        // Try to find the local maven repository
+        repositoryUrls.add(0, new File(localRepoPath).toURL());
+
+        final List<FileRepository> repositories = new ArrayList<>();
+        for (URL repositoryUrl : repositoryUrls) {
+            if (repositoryUrl.getProtocol().equals("file")) {
+                final File baseFile = new File(repositoryUrl.getFile());
+                repositories.add(dependency -> {
+                    final File file = new File(baseFile, dependency.toPath());
+                    System.out.println(file.getAbsolutePath());
+                    try {
+                        return file.exists() ? file.toURL() : null;
+                    } catch (MalformedURLException e) {
+                        throw new IllegalStateException(e);
+                    }
+                });
+            } else {
+                String repositoryUrlBase = repositoryUrl.toString();
+                if (repositoryUrlBase.endsWith("/")) {
+                    repositoryUrlBase = repositoryUrlBase.substring(0, repositoryUrlBase.length() - 1);
+                }
+                final String urlBase = repositoryUrlBase;
+                repositories.add(dependency -> {
+                    try {
+                        final URL url = new URL(urlBase + "/" + dependency.toPath());
+                        System.out.println(url);
+                        try (InputStream ignored = url.openStream()) {
+                        } catch (IOException e) {
+                            return null;
+                        }
+                        return url;
+                    } catch (MalformedURLException e) {
+                        throw new IllegalStateException(e);
+                    }
+                });
+            }
+        }
 
         // If we are outside development mode, the server will be packed
         // into a jar. We will also need to make sure that this one gets
@@ -116,6 +227,53 @@ public final class LanternClassLoader extends URLClassLoader {
         }
         Environment.set(environment);
 
+        // Scan the jar for library jars
+        if (location != null) {
+            repositories.add(dependency -> {
+                System.out.println("libraries/" + dependency.toPath());
+                return classLoader.getResource("libraries/" + dependency.toPath());
+            });
+        }
+
+        final List<URL> libraryUrls = new ArrayList<>();
+
+        // Download or load all the dependencies
+        final Path internalLibrariesPath = Paths.get(".cached-dependencies");
+        for (Dependency dependency : dependencyMap.values()) {
+            final Path target = internalLibrariesPath.resolve(dependency.toPath());
+            libraryUrls.add(target.toUri().toURL());
+            final String id = String.format("%s:%s:%s", dependency.getGroup(), dependency.getName(), dependency.getVersion());
+            if (Files.exists(target)) {
+                System.out.printf("Loaded: \"%s\"\n", id);
+                continue;
+            }
+            URL url = null;
+            for (FileRepository repository : repositories) {
+                url = repository.get(dependency);
+                if (url != null) {
+                    break;
+                }
+            }
+            if (url == null) {
+                throw new IllegalStateException("The following dependency could not be found: " + id);
+            }
+            final Path parent = target.getParent();
+            if (!Files.exists(parent)) {
+                Files.createDirectories(parent);
+            }
+            System.out.printf("Downloading \"%s\" from: %s\n", id, url);
+            try (ReadableByteChannel i = Channels.newChannel(url.openStream());
+                    FileOutputStream o = new FileOutputStream(target.toFile())) {
+                o.getChannel().transferFrom(i, 0, Long.MAX_VALUE);
+            }
+        }
+
+        // All the folders are from lantern or sponge,
+        // in development mode are all the libraries on
+        // the classpath, so there is no need to add them
+        // to the library classloader
+        final List<URL> urls = new ArrayList<>();
+
         final String classPath = System.getProperty("java.class.path");
         final String[] libraries = classPath.split(File.pathSeparator);
         for (String library : libraries) {
@@ -129,93 +287,25 @@ public final class LanternClassLoader extends URLClassLoader {
             }
         }
 
-        final ClassLoader parent = LanternClassLoader.class.getClassLoader();
-        final List<URL> libraryUrls = new ArrayList<>();
-        final List<String> libraryNames = new ArrayList<>();
-
-        // First cleanup old libraries
-        final Path internalLibrariesPath = Paths.get(".internal-libraries");
-        if (Files.exists(internalLibrariesPath)) {
-            try {
-                Files.walkFileTree(internalLibrariesPath, new SimpleFileVisitor<Path>() {
-                    @Override
-                    public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                        Files.delete(file);
-                        return CONTINUE;
-                    }
-
-                    @Override
-                    public FileVisitResult visitFileFailed(Path file, IOException e) {
-                        e.printStackTrace();
-                        return TERMINATE;
-                    }
-
-                    @Override
-                    public FileVisitResult postVisitDirectory(Path dir, IOException e) throws IOException {
-                        if (e != null) {
-                            e.printStackTrace();
-                            return TERMINATE;
-                        }
-                        Files.delete(dir);
-                        return CONTINUE;
-                    }
-                });
-            } catch (IOException e) {
-                System.out.println("Failed to cleanup the internal libraries: " + e);
-            }
-        }
-        // Scan the jar for library jars
-        if (location != null) {
-            try (ZipInputStream is = new ZipInputStream(location.openStream())) {
-                ZipEntry e;
-                while ((e = is.getNextEntry()) != null) {
-                    final String name = e.getName();
-                    // Check if it's a library jar
-                    if (name.startsWith("libraries") && name.endsWith(".jar")) {
-                        // Yay
-                        final String n = name.substring("libraries/".length());
-                        final URL url = parent.getResource(name);
-                        requireNonNull(url, "Something funky happened");
-                        final Path path = internalLibrariesPath.resolve(n);
-                        final Path p = path.getParent();
-                        if (!Files.exists(p)) {
-                            Files.createDirectories(p);
-                            if (Files.exists(path)) {
-                                Files.delete(path);
-                            }
-                        }
-
-                        try (ReadableByteChannel i = Channels.newChannel(url.openStream());
-                                FileOutputStream o = new FileOutputStream(path.toFile())) {
-                            o.getChannel().transferFrom(i, 0, Long.MAX_VALUE);
-                        }
-
-                        libraryUrls.add(path.toUri().toURL());
-                        libraryNames.add(n);
-                    }
-                }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        if ("true".equalsIgnoreCase(System.getProperty("log-loaded-libraries"))) {
-            // Sort the library names, no mess, or at least try to reduce it
-            Collections.sort(libraryNames);
-            libraryNames.forEach(name -> System.out.println("Loaded library: " + name));
-        }
-
         // The server class loader will load lantern, the api and all the plugins
         final LanternClassLoader serverClassLoader = new LanternClassLoader(
-                urls.toArray(new URL[urls.size()]), libraryUrls.toArray(new URL[libraryUrls.size()]), parent);
-
-        classLoader = serverClassLoader;
+                urls.toArray(new URL[urls.size()]), libraryUrls.toArray(new URL[libraryUrls.size()]), classLoader);
         Thread.currentThread().setContextClassLoader(serverClassLoader);
+        return serverClassLoader;
+    }
 
+    static {
         try {
-            findBootstrapClassMethod = ClassLoader.class.getDeclaredMethod("findBootstrapClassOrNull", String.class);
-            findBootstrapClassMethod.setAccessible(true);
-        } catch (NoSuchMethodException e) {
-            throw new RuntimeException(e);
+            classLoader = load();
+
+            try {
+                findBootstrapClassMethod = ClassLoader.class.getDeclaredMethod("findBootstrapClassOrNull", String.class);
+                findBootstrapClassMethod.setAccessible(true);
+            } catch (NoSuchMethodException e) {
+                throw new RuntimeException(e);
+            }
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
         }
     }
 

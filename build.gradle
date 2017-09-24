@@ -266,12 +266,7 @@ assemble.dependsOn fatJar
 /////////////////////////////////////////////
 
 afterEvaluate {
-    applyManifest(jar)
-    applyManifest(fatJar)
-}
-
-void applyManifest(def jar) {
-    jar.manifest {
+    [jar, fatJar]*.manifest {
         attributes(
                 'Main-Class': 'org.lanternpowered.launch.VersionCheckingMain',
                 'Implementation-Name': project.name,

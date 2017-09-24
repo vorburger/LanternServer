@@ -27,13 +27,6 @@ apply plugin: 'maven'
 archivesBaseName = 'lanternserver'
 version = '1.0.0-SNAPSHOT'
 
-// Repositories
-repositories {
-    mavenCentral()
-    maven { url 'https://repo.spongepowered.org/maven' }
-    maven { url 'https://oss.sonatype.org/content/groups/public' }
-}
-
 sourceSets {
     java6 {
         compileClasspath += main.compileClasspath + main.output
@@ -44,6 +37,11 @@ sourceSets {
 compileJava6Java {
     sourceCompatibility = '1.6'
     targetCompatibility = '1.6'
+}
+
+idea.module {
+    // The java6 sourceset
+    sourceDirs += file('src/java6/java')
 }
 
 // Disable some tasks to make the building go faster
@@ -103,7 +101,7 @@ dependencies {
     compile 'net.minecrell:terminalconsoleappender:1.0.0'
 
     // Fastutil
-    compile "it.unimi.dsi:fastutil:7.1.0"
+    compile 'it.unimi.dsi:fastutil:7.1.0'
 
     // Database connectors
     compile 'com.zaxxer:HikariCP:2.6.3'
@@ -122,11 +120,6 @@ dependencies {
     testCompile 'org.mockito:mockito-core:2.8.47'
 }
 
-idea.module {
-    // The java6 sourceset
-    sourceDirs += file('src/java6/java')
-}
-
 runConfigurations {
     theConfig {
         name = 'Lantern Server'
@@ -135,8 +128,50 @@ runConfigurations {
     }
 }
 
-// The base jar, includes all the lantern and sponge classes,
-// including generated event classes
+// Always print full stack trace if something goes wrong in the unit tests
+test.testLogging.exceptionFormat = 'full'
+
+import groovy.json.JsonSlurper
+import groovy.json.JsonOutput
+import groovy.json.JsonBuilder
+
+processResources {
+    // Minimize the json files
+    doLast {
+        fileTree(dir: outputs.files.asPath, include: 'internal/*.json').each {
+            File file -> file.text = JsonOutput.toJson(new JsonSlurper().parse(file))
+        }
+    }
+}
+
+////////////////////////////////////
+/// Collect Dependency Artifacts ///
+////////////////////////////////////
+
+def ignoredDependencyArtifacts = new HashSet<>()
+// Don't include the api again
+ignoredDependencyArtifacts.add "$api.group:$api.name"
+ignoredDependencyArtifacts.add "$testDataPacks.group:$testDataPacks.name"
+ignoredDependencyArtifacts.add "$testPlugins.group:$testPlugins.name"
+// We already include 'asm-all'
+ignoredDependencyArtifacts.add 'org.ow2.asm:asm'
+
+def dependencyArtifacts = new ArrayList<>()
+
+configurations.compile.resolvedConfiguration.resolvedArtifacts.each { ResolvedArtifact a ->
+    def id = a.moduleVersion.id
+    def e = "$id.group:$id.name"
+    // Check if we want the artifact, check for the java (String) and groovy strings (GString)
+    if (!ignoredDependencyArtifacts.contains(e) && !ignoredDependencyArtifacts.contains((String) e)) {
+        dependencyArtifacts.add(a)
+    }
+}
+
+/////////////////////////////////////////////////
+/// Generate the jar with all the lantern and ///
+///  sponge classes, and all their resources. ///
+/////////////////////////////////////////////////
+
 jar {
     exclude 'log4j2.xml'
     rename 'log4j2_prod.xml', 'log4j2.xml'
@@ -148,7 +183,87 @@ jar {
 
     // Include the java 6 classes
     from sourceSets.java6.output
+
+    /////////////////////////////////////////
+    /// Generate a json file with all the ///
+    //    dependencies and repositories.  ///
+    /////////////////////////////////////////
+
+    def specifiedUrls = new HashSet<>()
+    def repositoryEntries = new ArrayList<>()
+    // Generate a json file with all the dependencies and repositories
+    repositories.each { repo ->
+        URL url = repo.url.toURL()
+        if (url.protocol == 'file') {
+            return
+        }
+        def s = url.toString()
+        if (specifiedUrls.contains(s)) {
+            return
+        }
+        specifiedUrls.add(s)
+
+        def properties = new HashMap<>()
+        properties['url'] = s
+
+        repositoryEntries.add(properties)
+    }
+
+    def dependencyEntries = new ArrayList<>()
+    dependencyArtifacts.each { ResolvedArtifact a ->
+        def d = dependencies.create(a.moduleVersion.id.toString())
+
+        // Generate the properties
+        def properties = new HashMap<>()
+        properties['group'] = d.group
+        properties['name'] = d.name
+        properties['version'] = d.version
+
+        // Add them to the list
+        dependencyEntries.add(properties)
+    }
+
+    def data = new HashMap<>()
+    data['repositories'] = repositoryEntries
+    data['dependencies'] = dependencyEntries
+
+    def librariesFile = new File(buildDir, 'libraries.json')
+    librariesFile.text = new JsonBuilder(data).toPrettyString()
+
+    from librariesFile
 }
+
+/////////////////////////////////////////
+/// Generate a fat jar which includes ///
+///     all the dependency jars.      ///
+/////////////////////////////////////////
+
+task fatJar(type: Jar, dependsOn: jar) {
+    // Include the default jar
+    from zipTree(jar.archivePath)
+
+    // Always update the fat jar
+    outputs.upToDateWhen { false }
+
+    // Generate the dependencies
+    classifier = 'fat'
+
+    dependencyArtifacts.each { ResolvedArtifact a ->
+        Dependency d = dependencies.create(a.moduleVersion.id.toString())
+        from (a.file, { spec ->
+            spec.rename {
+                "libraries/${d.group.replace('.', '/')}/$d.name/$d.version/$d.name-${d.version}.jar"
+            }
+        })
+    }
+}
+// Run fatJar on build
+assemble.dependsOn fatJar
+
+/////////////////////////////////////////////
+/// Apply manifest file properties to the ///
+///        fat and normal jars.           ///
+/////////////////////////////////////////////
 
 afterEvaluate {
     applyManifest(jar)
@@ -171,57 +286,10 @@ void applyManifest(def jar) {
     }
 }
 
-import groovy.json.JsonSlurper
-import groovy.json.JsonOutput
-
-processResources {
-    // Minimize the json files
-    doLast {
-        fileTree(dir: outputs.files.asPath, include: 'internal/*.json').each {
-            File file -> file.text = JsonOutput.toJson(new JsonSlurper().parse(file))
-        }
-    }
-}
-
-test {
-    testLogging {
-        exceptionFormat = 'full' // Always print full stack trace if something goes wrong in the unit tests
-    }
-}
-
-task fatJar(type: Jar, dependsOn: jar) {
-    // Include the default jar
-    from zipTree(jar.archivePath)
-
-    // Always update the fat jar
-    outputs.upToDateWhen { false }
-
-    // Generate the dependencies
-    classifier = 'fat'
-
-    // All the entries that should be ignored
-    Set<String> entries = []
-    // Don't include the api again
-    entries.add "$api.group:$api.name"
-    entries.add "$testDataPacks.group:$testDataPacks.name"
-    entries.add "$testPlugins.group:$testPlugins.name"
-    // We already include 'asm-all'
-    entries.add 'org.ow2.asm:asm'
-
-    configurations.compile.resolvedConfiguration.resolvedArtifacts.each { ResolvedArtifact a ->
-        def id = a.moduleVersion.id
-        def e = "$id.group:$id.name"
-        // Check if we want the artifact, check for the java (String) and groovy strings (GString)
-        if (!entries.contains(e) && !entries.contains((String) e)) {
-            Dependency d = dependencies.create(id.toString())
-            from (a.file, { spec ->
-                spec.rename {
-                    "libraries/${d.group.replace('.', '/')}/$d.name/$d.version/$d.name-${d.version}.jar"
-                }
-            })
-        }
-    }
-}
+////////////////////////////////////////////////////
+/// Generate a source jar which includes all the ///
+//    sources from lantern and the sponge api.   ///
+////////////////////////////////////////////////////
 
 sourceJar {
     from sourceSets.java6.allSource
@@ -230,13 +298,14 @@ sourceJar {
     from api.sourceSets.ap.allSource
 }
 
-// Run fatJar on build
-assemble.dependsOn fatJar
-
 artifacts {
     archives jar
     archives sourceJar
 }
+
+////////////////////////////////////
+/// Gradle Wrapper update tasks. ///
+////////////////////////////////////
 
 // Gradle version used for generating the Gradle wrapper
 task wrapper(type: Wrapper) {

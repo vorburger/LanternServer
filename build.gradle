@@ -39,19 +39,17 @@ compileJava6Java {
     targetCompatibility = '1.6'
 }
 
-idea.module {
-    // The java6 sourceset
-    sourceDirs += file('src/java6/java')
-}
+// The java6 sourceset
+idea.module.sourceDirs += file('src/java6/java')
 
-// Disable some tasks to make the building go faster
-api.tasks.javadoc.enabled = false
-api.tasks.javadocJar.enabled = false
-api.tasks.checkstyleMain.enabled = false
-api.tasks.checkstyleTest.enabled = false
-// Disable this task to avoid that we turn the dependency
-// dirty when we call this on our project
-api.tasks.wrapper.enabled = false
+// Disable some tasks to make the building go faster and
+// disable the wrapper task to avoid that we turn the
+// dependency dirty when we call this on our project.
+[api.tasks.javadoc,
+ api.tasks.javadocJar,
+ api.tasks.checkstyleMain,
+ api.tasks.checkstyleTest,
+ api.tasks.wrapper]*.enabled = false
 
 configurations {
     // A configuration that will be excluded
@@ -304,7 +302,7 @@ artifacts {
 
 // Gradle version used for generating the Gradle wrapper
 task wrapper(type: Wrapper) {
-    gradleVersion = '4.0'
+    gradleVersion = '4.2'
 }
 
 // A custom update wrapper task, using a custom task prevents

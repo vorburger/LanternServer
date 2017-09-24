@@ -23,25 +23,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.effect.sound;
+package org.lanternpowered.server.game.registry.forge;
 
-import org.lanternpowered.server.plugin.InternalPluginsInfo;
-import org.spongepowered.api.effect.sound.SoundType;
+import org.spongepowered.api.CatalogType;
+import org.spongepowered.api.registry.CatalogRegistryModule;
 
-public final class LanternSoundTypeBuilder implements SoundType.Builder {
+public interface ForgeCatalogRegistryModule<T extends CatalogType> extends CatalogRegistryModule<T> {
 
-    @Override
-    public SoundType.Builder from(SoundType value) {
-        return this;
-    }
-
-    @Override
-    public SoundType.Builder reset() {
-        return this;
-    }
-
-    @Override
-    public SoundType build(String id) {
-        return new LanternSoundType.Virtual(InternalPluginsInfo.SpongePlatform.IDENTIFIER, id, id);
-    }
+    /**
+     * Gets the {@link ForgeRegistryData} for this registry.
+     *
+     * @return The forge registry data
+     */
+    ForgeRegistryData getRegistryData();
 }

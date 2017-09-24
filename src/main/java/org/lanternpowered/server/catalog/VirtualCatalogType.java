@@ -23,25 +23,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.effect.sound;
+package org.lanternpowered.server.catalog;
 
-import org.lanternpowered.server.plugin.InternalPluginsInfo;
-import org.spongepowered.api.effect.sound.SoundType;
+import org.spongepowered.api.CatalogType;
 
-public final class LanternSoundTypeBuilder implements SoundType.Builder {
+public interface VirtualCatalogType extends CatalogType {
 
-    @Override
-    public SoundType.Builder from(SoundType value) {
-        return this;
-    }
-
-    @Override
-    public SoundType.Builder reset() {
-        return this;
-    }
-
-    @Override
-    public SoundType build(String id) {
-        return new LanternSoundType.Virtual(InternalPluginsInfo.SpongePlatform.IDENTIFIER, id, id);
-    }
 }

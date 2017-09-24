@@ -26,11 +26,13 @@
 package org.lanternpowered.server.game.registry.type.item;
 
 import org.lanternpowered.server.game.registry.InternalPluginCatalogRegistryModule;
+import org.lanternpowered.server.game.registry.forge.ForgeCatalogRegistryModule;
+import org.lanternpowered.server.game.registry.forge.ForgeRegistryData;
 import org.lanternpowered.server.item.enchantment.LanternEnchantment;
 import org.spongepowered.api.item.Enchantment;
 import org.spongepowered.api.item.Enchantments;
 
-public class EnchantmentRegistryModule extends InternalPluginCatalogRegistryModule<Enchantment> {
+public class EnchantmentRegistryModule extends InternalPluginCatalogRegistryModule<Enchantment> implements ForgeCatalogRegistryModule<Enchantment> {
 
     private static final EnchantmentRegistryModule INSTANCE = new EnchantmentRegistryModule();
 
@@ -73,5 +75,10 @@ public class EnchantmentRegistryModule extends InternalPluginCatalogRegistryModu
         register(new LanternEnchantment("minecraft", "lure", "enchantment.fishingSpeed", 62));
         register(new LanternEnchantment("minecraft", "mending", "enchantment.mending", 70));
         register(new LanternEnchantment("minecraft", "vanishing_curse", "enchantment.vanishing_curse", 71));
+    }
+
+    @Override
+    public ForgeRegistryData getRegistryData() {
+        return new ForgeRegistryData("minecraft:enchantments", getRegistryDataMappings());
     }
 }

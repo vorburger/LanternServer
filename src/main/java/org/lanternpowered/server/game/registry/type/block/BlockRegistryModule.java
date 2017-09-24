@@ -76,6 +76,7 @@ import org.lanternpowered.server.block.trait.LanternBooleanTraits;
 import org.lanternpowered.server.block.trait.LanternEnumTraits;
 import org.lanternpowered.server.block.trait.LanternIntegerTraits;
 import org.lanternpowered.server.block.translation.SpongeTranslationProvider;
+import org.lanternpowered.server.catalog.VirtualCatalogType;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.data.type.LanternBedPart;
 import org.lanternpowered.server.data.type.LanternDirtType;
@@ -92,6 +93,8 @@ import org.lanternpowered.server.data.type.LanternStoneType;
 import org.lanternpowered.server.data.type.LanternTreeType;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
+import org.lanternpowered.server.game.registry.forge.ForgeCatalogRegistryModule;
+import org.lanternpowered.server.game.registry.forge.ForgeRegistryData;
 import org.lanternpowered.server.game.registry.type.data.InstrumentTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.KeyRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
@@ -118,7 +121,8 @@ import java.util.function.Supplier;
         EquipmentTypeRegistryModule.class,
         InstrumentTypeRegistryModule.class,
 })
-public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryModule<BlockType> implements BlockRegistry {
+public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryModule<BlockType> implements BlockRegistry,
+        ForgeCatalogRegistryModule<BlockType> {
 
     private static final BlockRegistryModule INSTANCE = new BlockRegistryModule();
 
@@ -144,10 +148,15 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         return this.blockStateByPackedType.size();
     }
 
-    public Object2IntMap<String> getRegistryData() {
+    @Override
+    public ForgeRegistryData getRegistryData() {
         final Object2IntMap<String> map = new Object2IntOpenHashMap<>();
-        this.blockTypeByInternalId.short2ObjectEntrySet().forEach(entry -> map.put(entry.getValue().getId(), entry.getShortKey()));
-        return map;
+        this.blockTypeByInternalId.short2ObjectEntrySet().forEach(entry -> {
+            if (!(entry.getValue() instanceof VirtualCatalogType)) {
+                map.put(entry.getValue().getId(), entry.getShortKey());
+            }
+        });
+        return new ForgeRegistryData("minecraft:blocks", map);
     }
 
     private void register0(int internalId, LanternBlockType blockType, BlockState2DataFunction stateToDataConverter) {

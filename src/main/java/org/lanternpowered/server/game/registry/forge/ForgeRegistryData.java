@@ -23,25 +23,41 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.effect.sound;
+package org.lanternpowered.server.game.registry.forge;
 
-import org.lanternpowered.server.plugin.InternalPluginsInfo;
-import org.spongepowered.api.effect.sound.SoundType;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
 
-public final class LanternSoundTypeBuilder implements SoundType.Builder {
+public final class ForgeRegistryData {
 
-    @Override
-    public SoundType.Builder from(SoundType value) {
-        return this;
+    private final String moduleId;
+    private final Object2IntMap<String> mappings;
+
+    /**
+     * Constructs a new {@link ForgeRegistryData} object.
+     *
+     * @param moduleId The module id
+     * @param mappings The mappings
+     */
+    public ForgeRegistryData(String moduleId, Object2IntMap<String> mappings) {
+        this.moduleId = moduleId;
+        this.mappings = mappings;
     }
 
-    @Override
-    public SoundType.Builder reset() {
-        return this;
+    /**
+     * Gets the module id.
+     *
+     * @return The module id
+     */
+    public String getModuleId() {
+        return this.moduleId;
     }
 
-    @Override
-    public SoundType build(String id) {
-        return new LanternSoundType.Virtual(InternalPluginsInfo.SpongePlatform.IDENTIFIER, id, id);
+    /**
+     * Gets the mappings.
+     *
+     * @return The mappings
+     */
+    public Object2IntMap<String> getMappings() {
+        return this.mappings;
     }
 }

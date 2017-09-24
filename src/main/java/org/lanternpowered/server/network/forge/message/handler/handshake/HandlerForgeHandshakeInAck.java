@@ -29,9 +29,8 @@ import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
 import io.netty.util.Attribute;
 import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
-import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
-import org.lanternpowered.server.game.registry.type.world.biome.BiomeRegistryModule;
+import org.lanternpowered.server.game.registry.forge.ForgeCatalogRegistryModule;
+import org.lanternpowered.server.game.registry.forge.ForgeRegistryData;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.NetworkSession;
 import org.lanternpowered.server.network.forge.ForgeProtocol;
@@ -60,12 +59,13 @@ public final class HandlerForgeHandshakeInAck implements Handler<MessageForgeHan
                             message.getPhase(), ForgeClientHandshakePhase.WAITING_SERVER_DATA));
                 } else {
                     final List<MessageForgeHandshakeOutRegistryData.Entry> entries = new ArrayList<>();
-                    entries.add(new MessageForgeHandshakeOutRegistryData.Entry("minecraft:blocks",
-                            BlockRegistryModule.get().getRegistryData(), new HashMap<>(), new HashSet<>()));
-                    entries.add(new MessageForgeHandshakeOutRegistryData.Entry("minecraft:items",
-                            ItemRegistryModule.get().getRegistryData(), new HashMap<>(), new HashSet<>()));
-                    entries.add(new MessageForgeHandshakeOutRegistryData.Entry("minecraft:biomes",
-                            BiomeRegistryModule.get().getRegistryData(), new HashMap<>(), new HashSet<>()));
+                    Lantern.getRegistry().getCatalogRegistryModules().forEach(module -> {
+                        if (module instanceof ForgeCatalogRegistryModule) {
+                            final ForgeRegistryData data = ((ForgeCatalogRegistryModule) module).getRegistryData();
+                            entries.add(new MessageForgeHandshakeOutRegistryData.Entry(
+                                    data.getModuleId(), data.getMappings(), new HashMap<>(), new HashSet<>()));
+                        }
+                    });
                     session.send(new MessageForgeHandshakeOutRegistryData(entries));
                     session.send(new MessageForgeHandshakeInOutAck(ForgeServerHandshakePhase.WAITING_ACK));
                     phase.set(ForgeServerHandshakePhase.COMPLETE);

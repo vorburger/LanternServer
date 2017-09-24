@@ -34,7 +34,10 @@ import it.unimi.dsi.fastutil.objects.Object2ShortMap;
 import it.unimi.dsi.fastutil.objects.Object2ShortOpenHashMap;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectMap;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectOpenHashMap;
+import org.lanternpowered.server.catalog.VirtualCatalogType;
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
+import org.lanternpowered.server.game.registry.forge.ForgeCatalogRegistryModule;
+import org.lanternpowered.server.game.registry.forge.ForgeRegistryData;
 import org.lanternpowered.server.world.biome.LanternBiomeType;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.biome.BiomeTypes;
@@ -42,7 +45,8 @@ import org.spongepowered.api.world.biome.BiomeTypes;
 import java.util.Optional;
 
 // TODO Lookup biome registry data from the worlds.
-public final class BiomeRegistryModule extends AdditionalPluginCatalogRegistryModule<BiomeType> implements BiomeRegistry {
+public final class BiomeRegistryModule extends AdditionalPluginCatalogRegistryModule<BiomeType> implements BiomeRegistry,
+        ForgeCatalogRegistryModule<BiomeType> {
 
     private static final BiomeRegistryModule INSTANCE = new BiomeRegistryModule();
 
@@ -59,10 +63,15 @@ public final class BiomeRegistryModule extends AdditionalPluginCatalogRegistryMo
         super(BiomeTypes.class);
     }
 
-    public Object2IntMap<String> getRegistryData() {
+    @Override
+    public ForgeRegistryData getRegistryData() {
         final Object2IntMap<String> map = new Object2IntOpenHashMap<>();
-        this.biomeTypeByInternalId.short2ObjectEntrySet().forEach(entry -> map.put(entry.getValue().getId(), entry.getShortKey()));
-        return map;
+        this.biomeTypeByInternalId.short2ObjectEntrySet().forEach(entry -> {
+            if (!(entry.getValue() instanceof VirtualCatalogType)) {
+                map.put(entry.getValue().getId(), entry.getShortKey());
+            }
+        });
+        return new ForgeRegistryData("minecraft:biomes", map);
     }
 
     @Override

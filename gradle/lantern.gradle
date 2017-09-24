@@ -24,11 +24,6 @@ repositories {
 ext.api = rootProject.project('SpongeAPI')
 evaluationDependsOn api.path
 
-// Project dependencies
-dependencies {
-    compile api
-}
-
 // Process the resource files
 processResources {
     // Note: Do not use this method to remove resources, rename them, etc. this
@@ -41,13 +36,13 @@ processResources {
 // A task to generate a jar with all the compiled classes and resources
 jar {
     classifier = 'base'
-    duplicatesStrategy = 'exclude'
+    duplicatesStrategy = 'EXCLUDE'
 }
 
 // A task to generate a jar with all the source code and resources
 task sourceJar(type: Jar) {
     classifier = 'sources'
-    duplicatesStrategy = 'exclude'
+    duplicatesStrategy = 'EXCLUDE'
 
     from sourceSets.main.allSource
     // Include the license file
@@ -75,3 +70,6 @@ license {
         java = 'SLASHSTAR_STYLE'
     }
 }
+
+// Don't generate artifacts for the SpongeAPI
+api.configurations.archives.artifacts.clear()

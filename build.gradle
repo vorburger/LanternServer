@@ -30,15 +30,8 @@ version = '1.0.0-SNAPSHOT'
 // Repositories
 repositories {
     mavenCentral()
-    maven {
-        url 'http://repo.spongepowered.org/maven'
-    }
-    maven {
-        url 'https://oss.sonatype.org/content/groups/public'
-    }
-    maven {
-        url 'https://oss.sonatype.org/content/repositories/snapshots/'
-    }
+    maven { url 'http://repo.spongepowered.org/maven' }
+    maven { url 'https://oss.sonatype.org/content/groups/public' }
 }
 
 sourceSets {
@@ -63,21 +56,24 @@ api.tasks.checkstyleTest.enabled = false
 api.tasks.wrapper.enabled = false
 
 configurations {
-    fastutil
-    compile {
-        extendsFrom fastutil
-    }
+    // A configuration that will be excluded
+    // in the generated pom file
+    compileExcluded
+    compile.extendsFrom compileExcluded
 }
 
 ext.testDataPacks = project(':test-data-packs')
 ext.testPlugins = project(':test-plugins')
-ext.fastutilVersion = '7.1.0'
+evaluationDependsOn testPlugins.path
+
 // Project dependencies
 dependencies {
     // Add the test plugins to the class path
-    runtime testPlugins
+    compileExcluded testPlugins
     // Add the test data packs to the class path
-    runtime testDataPacks
+    compileExcluded testDataPacks
+    // Add the sponge api
+    compileExcluded api
 
     // Launch Options
     compile 'net.sf.jopt-simple:jopt-simple:5.0.3'
@@ -104,10 +100,10 @@ dependencies {
     // Console
     compile 'org.jline:jline-terminal-jna:3.4.0'
     compile 'net.java.dev.jna:jna:4.4.0'
-    compile 'net.minecrell:terminalconsoleappender:1.0.0-SNAPSHOT'
+    compile 'net.minecrell:terminalconsoleappender:1.0.0'
 
     // Fastutil
-    fastutil "it.unimi.dsi:fastutil:$fastutilVersion"
+    compile "it.unimi.dsi:fastutil:7.1.0"
 
     // Database connectors
     compile 'com.zaxxer:HikariCP:2.6.3'
@@ -144,7 +140,7 @@ runConfigurations {
 jar {
     exclude 'log4j2.xml'
     rename 'log4j2_prod.xml', 'log4j2.xml'
-    classifier ''
+    classifier 'base'
 
     // Include the api classes
     from api.sourceSets.main.output
@@ -194,57 +190,7 @@ test {
     }
 }
 
-// A task to minimize the fastutil jar to only
-// include the classes we actually used
-task fastutilJar(type: ShadowJar) {
-    // The classifier
-    classifier = 'fastutil'
-    // Exclude empty directories
-    includeEmptyDirs = false
-    // Include all the fastutil classes into the process
-    from zipTree(project.configurations.fastutil.first())
-
-    // Loop through the files and check for the files which
-    // should be included in the final jar
-    transform(DependencyClassTransformer) {
-        dependencyFiles.include 'it/unimi/dsi/fastutil/**'
-        filesToScan.include 'it/unimi/dsi/fastutil/bytes/Byte2CharOpenHashMap.class'
-        filesToScan.include 'it/unimi/dsi/fastutil/bytes/Byte2ObjectOpenHashMap.class'
-        filesToScan.include 'it/unimi/dsi/fastutil/objects/Object2CharOpenHashMap.class'
-        filesToScan.include 'it/unimi/dsi/fastutil/objects/Object2IntMaps.class'
-        filesToScan.include 'it/unimi/dsi/fastutil/objects/Object2IntOpenHashMap.class'
-        filesToScan.include 'it/unimi/dsi/fastutil/objects/Object2LongMaps.class'
-        filesToScan.include 'it/unimi/dsi/fastutil/objects/Object2LongOpenHashMap.class'
-        filesToScan.include 'it/unimi/dsi/fastutil/objects/Object2ShortOpenHashMap.class'
-        filesToScan.include 'it/unimi/dsi/fastutil/chars/Char2ByteOpenHashMap.class'
-        filesToScan.include 'it/unimi/dsi/fastutil/chars/Char2IntOpenHashMap.class'
-        filesToScan.include 'it/unimi/dsi/fastutil/chars/Char2ObjectArrayMap.class'
-        filesToScan.include 'it/unimi/dsi/fastutil/chars/Char2ObjectOpenHashMap.class'
-        filesToScan.include 'it/unimi/dsi/fastutil/ints/Int2ObjectMaps.class'
-        filesToScan.include 'it/unimi/dsi/fastutil/ints/Int2ObjectLinkedOpenHashMap.class'
-        filesToScan.include 'it/unimi/dsi/fastutil/ints/Int2ObjectOpenHashMap.class'
-        filesToScan.include 'it/unimi/dsi/fastutil/ints/Int2LongOpenHashMap.class'
-        filesToScan.include 'it/unimi/dsi/fastutil/ints/IntArrayList.class'
-        filesToScan.include 'it/unimi/dsi/fastutil/ints/IntLists.class'
-        filesToScan.include 'it/unimi/dsi/fastutil/ints/IntOpenHashSet.class'
-        filesToScan.include 'it/unimi/dsi/fastutil/shorts/Short2ObjectOpenHashMap.class'
-        filesToScan.include 'it/unimi/dsi/fastutil/shorts/Short2ShortOpenHashMap.class'
-    }
-}
-
-// A task to build faster
-task buildFast(dependsOn: build)
-// A task to install faster
-task installFast(dependsOn: install)
-
-gradle.taskGraph.whenReady { TaskExecutionGraph graph ->
-    // Mark the fast util jar as not update to make it regenerate
-    fastutilJar.outputs.upToDateWhen {
-        (graph.allTasks.contains(buildFast) || graph.allTasks.contains(installFast)) && fastutilJar.archivePath.exists()
-    }
-}
-
-task fatJar(type: Jar, dependsOn: [jar, fastutilJar]) {
+task fatJar(type: Jar, dependsOn: jar) {
     // Include the default jar
     from zipTree(jar.archivePath)
 
@@ -263,29 +209,18 @@ task fatJar(type: Jar, dependsOn: [jar, fastutilJar]) {
     // We already include 'asm-all'
     entries.add 'org.ow2.asm:asm'
 
-    Map<String, Tuple2<Dependency, File>> filesMap = new HashMap<>()
-    configurations.compile.resolvedConfiguration.resolvedArtifacts.each { a ->
+    configurations.compile.resolvedConfiguration.resolvedArtifacts.each { ResolvedArtifact a ->
         def id = a.moduleVersion.id
         def e = "$id.group:$id.name"
         // Check if we want the artifact, check for the java (String) and groovy strings (GString)
         if (!entries.contains(e) && !entries.contains((String) e)) {
-            filesMap[(String) e] = new Tuple2<>(dependencies.create(id.toString()), a.file)
+            Dependency d = dependencies.create(id.toString())
+            from (a.file, { spec ->
+                spec.rename {
+                    "libraries/${d.group.replace('.', '/')}/$d.name/$d.version/$d.name-${d.version}.jar"
+                }
+            })
         }
-    }
-
-    // Replace the fastutil dependency
-    filesMap['it.unimi.dsi:fastutil'] = new Tuple2<>(
-            dependencies.create("it.unimi.dsi:fastutil:$fastutilVersion-minimized"), fastutilJar.archivePath)
-
-    // Include all the dependencies
-    for (Map.Entry<String, Tuple2<Dependency, File>> entry : filesMap.entrySet()) {
-        Tuple2<Dependency, File> t = entry.value
-        from (t.second, { spec ->
-            Dependency d = t.first
-            spec.rename {
-                "libraries/${d.group.replace('.', '/')}/$d.name/$d.version/$d.name-${d.version}.jar"
-            }
-        })
     }
 }
 
@@ -301,24 +236,7 @@ assemble.dependsOn fatJar
 
 artifacts {
     archives jar
-    archives fatJar
     archives sourceJar
-}
-api.configurations.archives.artifacts.clear()
-
-install.repositories.mavenInstaller.pom.whenConfigured { pom ->
-    def dependencies = pom.dependencies
-    dependencies.removeIf { d ->
-        def full = d.groupId + ':' + d.artifactId;
-        // Remove the test plugins and api from the artifact pom
-        if (full == ((String) "$testPlugins.group:$testPlugins.name") ||
-                full == ((String) "$api.group:$api.name")) {
-            println "DEBUG"
-            return true
-        }
-        return false
-    }
-    pom.dependencies = dependencies
 }
 
 // Gradle version used for generating the Gradle wrapper

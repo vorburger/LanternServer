@@ -30,7 +30,7 @@ version = '1.0.0-SNAPSHOT'
 // Repositories
 repositories {
     mavenCentral()
-    maven { url 'http://repo.spongepowered.org/maven' }
+    maven { url 'https://repo.spongepowered.org/maven' }
     maven { url 'https://oss.sonatype.org/content/groups/public' }
 }
 
@@ -140,7 +140,6 @@ runConfigurations {
 jar {
     exclude 'log4j2.xml'
     rename 'log4j2_prod.xml', 'log4j2.xml'
-    classifier 'base'
 
     // Include the api classes
     from api.sourceSets.main.output

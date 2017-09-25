@@ -299,10 +299,7 @@ public final class LanternClassLoader extends URLClassLoader {
 
         // Scan the jar for library jars
         if (location != null) {
-            repositories.add(path -> {
-                System.out.println("libraries/" + path);
-                return classLoader.getResourceAsStream("libraries/" + path);
-            });
+            repositories.add(path -> classLoader.getResourceAsStream("libraries/" + path));
         }
 
         final List<URL> libraryUrls = new ArrayList<>();

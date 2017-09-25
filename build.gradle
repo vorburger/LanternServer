@@ -225,18 +225,7 @@ task theJar(type: ShadowJar) {
     }
 
     def dependencyEntries = new ArrayList<>()
-    dependencyArtifacts.each { ResolvedArtifact a ->
-        def d = dependencies.create(a.moduleVersion.id.toString())
-
-        // Generate the properties
-        def properties = new HashMap<>()
-        properties['group'] = d.group
-        properties['name'] = d.name
-        properties['version'] = d.version
-
-        // Add them to the list
-        dependencyEntries.add(properties)
-    }
+    dependencyArtifacts.each { ResolvedArtifact a -> dependencyEntries.add(a.moduleVersion.id.toString()) }
 
     def data = new HashMap<>()
     data['repositories'] = repositoryEntries

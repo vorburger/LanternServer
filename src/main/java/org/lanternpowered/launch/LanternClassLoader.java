@@ -49,11 +49,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.*;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
-import java.nio.charset.CharsetEncoder;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -75,8 +76,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
+import java.util.zip.GZIPInputStream;
 
-import javax.net.ssl.*;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -98,7 +99,7 @@ public final class LanternClassLoader extends URLClassLoader {
 
     private interface FileRepository {
 
-        default URL get(Dependency dependency) {
+        default InputStream get(Dependency dependency) {
             final String group = dependency.getGroup();
             final String name = dependency.getName();
             final String version = dependency.getVersion();
@@ -109,9 +110,9 @@ public final class LanternClassLoader extends URLClassLoader {
             final String fileNameBase = String.format("%s-%s", name, version);
 
             // Attempt to get the url from the path
-            URL url = getUrl(directoryPath + fileNameBase + ".jar");
-            if (url != null) {
-                return url;
+            InputStream is = getStream(directoryPath + fileNameBase + ".jar");
+            if (is != null) {
+                return is;
             }
             final int length = Dependency.SNAPSHOT_TAG.length();
             final int index = version.indexOf(Dependency.SNAPSHOT_TAG);
@@ -120,20 +121,19 @@ public final class LanternClassLoader extends URLClassLoader {
             }
             // Check if a specific snapshot version is applied
             if (index != version.length() - length) {
-                url = getUrl(String.format("%s/%s-%s%s.jar", directoryPath, name,
+                is = getStream(String.format("%s/%s-%s%s.jar", directoryPath, name,
                         version.substring(0, index), version.substring(index + length)));
-                if (url != null) {
-                    return url;
+                if (is != null) {
+                    return is;
                 }
             }
-            url = getUrl(directoryPath + "maven-metadata.xml");
-            if (url == null) {
+            is = getStream(directoryPath + "maven-metadata.xml");
+            if (is == null) {
                 return null;
             }
             try {
                 final DocumentBuilder documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-                System.out.println(readLines(url));
-                final Document document = documentBuilder.parse(readLines(url));
+                final Document document = documentBuilder.parse(is);
 
                 // http://stackoverflow.com/questions/13786607/normalization-in-dom-parsing-with-java-how-does-it-work
                 document.getDocumentElement().normalize();
@@ -145,25 +145,14 @@ public final class LanternClassLoader extends URLClassLoader {
                 if (snapshot == null) return null;
                 final String timestamp = snapshot.getElementsByTagName("timestamp").item(0).getTextContent();
                 final String buildNumber = snapshot.getElementsByTagName("buildNumber").item(0).getTextContent();
-                return getUrl(String.format("%s%s-%s-%s.jar", directoryPath, fileNameBase, timestamp, buildNumber));
+                return getStream(String.format("%s%s-%s-%s-%s.jar", directoryPath, name,
+                        version.substring(0, index), timestamp, buildNumber));
             } catch (SAXException | ParserConfigurationException | IOException e) {
                 throw new IllegalStateException(e);
             }
         }
 
-        URL getUrl(String path);
-    }
-
-    private static String readLines(URL url) throws IOException {
-        final StringBuilder builder = new StringBuilder();
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                builder.append(line);
-            }
-        }
-        System.out.println(builder.toString());
-        return builder.toString();
+        InputStream getStream(String path);
     }
 
     private static LanternClassLoader load() throws IOException {
@@ -253,8 +242,8 @@ public final class LanternClassLoader extends URLClassLoader {
                 repositories.add(path -> {
                     final File file = new File(baseFile, path);
                     try {
-                        return file.exists() ? file.toURL() : null;
-                    } catch (MalformedURLException e) {
+                        return file.exists() ? file.toURL().openStream() : null;
+                    } catch (IOException e) {
                         throw new IllegalStateException(e);
                     }
                 });
@@ -267,14 +256,20 @@ public final class LanternClassLoader extends URLClassLoader {
                 repositories.add(path -> {
                     try {
                         final URL url = new URL(urlBase + "/" + path);
-                        System.out.println(url);
-                        try (InputStream ignored = url.openStream()) {
-                        } catch (IOException e) {
-                            return null;
+                        final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                        connection.setRequestMethod("GET");
+                        final String encoding = connection.getHeaderField("Content-Encoding");
+                        InputStream is = connection.getInputStream();
+                        if (encoding != null) {
+                            if (encoding.equals("gzip")) {
+                                is = new GZIPInputStream(is);
+                            } else {
+                                throw new IllegalStateException("Unsupported encoding: " + encoding);
+                            }
                         }
-                        return url;
-                    } catch (MalformedURLException e) {
-                        throw new IllegalStateException(e);
+                        return is;
+                    } catch (IOException e) {
+                        return null;
                     }
                 });
             }
@@ -306,7 +301,7 @@ public final class LanternClassLoader extends URLClassLoader {
         if (location != null) {
             repositories.add(path -> {
                 System.out.println("libraries/" + path);
-                return classLoader.getResource("libraries/" + path);
+                return classLoader.getResourceAsStream("libraries/" + path);
             });
         }
 
@@ -326,22 +321,22 @@ public final class LanternClassLoader extends URLClassLoader {
                 System.out.printf("Loaded: \"%s\"\n", id);
                 continue;
             }
-            URL url = null;
+            InputStream is = null;
             for (FileRepository repository : repositories) {
-                url = repository.get(dependency);
-                if (url != null) {
+                is = repository.get(dependency);
+                if (is != null) {
                     break;
                 }
             }
-            if (url == null) {
+            if (is == null) {
                 throw new IllegalStateException("The following dependency could not be found: " + id);
             }
             final Path parent = target.getParent();
             if (!Files.exists(parent)) {
                 Files.createDirectories(parent);
             }
-            System.out.printf("Downloading \"%s\" from: %s\n", id, url);
-            try (ReadableByteChannel i = Channels.newChannel(url.openStream());
+            System.out.printf("Downloading \"%s\" ...", id);
+            try (ReadableByteChannel i = Channels.newChannel(is);
                     FileOutputStream o = new FileOutputStream(target.toFile())) {
                 o.getChannel().transferFrom(i, 0, Long.MAX_VALUE);
             }
@@ -375,59 +370,6 @@ public final class LanternClassLoader extends URLClassLoader {
 
     static {
         try {
-            System.out.println("START");
-            HostnameVerifier hv = new HostnameVerifier()
-            {
-                public boolean verify(String urlHostName, SSLSession session)
-                {
-                    System.out.println("Warning: URL Host: " + urlHostName + " vs. "
-                            + session.getPeerHost());
-                    return true;
-                }
-            };
-
-            HttpsURLConnection.setDefaultHostnameVerifier(hv);
-
-            // Create a trust manager that does not validate certificate chains
-            TrustManager[] trustAllCerts = new TrustManager[]{
-                    new X509TrustManager() {
-                        public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                            return null;
-                        }
-                        public void checkClientTrusted(
-                                java.security.cert.X509Certificate[] certs, String authType) {
-                        }
-                        public void checkServerTrusted(
-                                java.security.cert.X509Certificate[] certs, String authType) {
-                        }
-                    }
-            };
-
-            // Install the all-trusting trust manager
-            try {
-                SSLContext sc = SSLContext.getInstance("SSL");
-                sc.init(null, trustAllCerts, null);
-                HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-            } catch (Exception e) {
-            }
-
-            Authenticator au = new Authenticator() {
-                @Override
-                protected PasswordAuthentication getPasswordAuthentication() {
-                    return new PasswordAuthentication(
-                            System.getProperties().getProperty("security.principal", "hguerrero"),
-                            System.getProperties().getProperty("security.credentials", "XX").toCharArray());
-                }
-            };
-
-            Authenticator.setDefault(au);
-            URL website = new URL("https://repo.spongepowered.org/maven/org/spongepowered/spongeapi/maven-metadata.xml");
-            ReadableByteChannel rbc = Channels.newChannel(website.openStream());
-            FileOutputStream fos = new FileOutputStream("test.xml");
-            fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
-            readLines(new URL("https://repo.spongepowered.org/maven/org/spongepowered/spongeapi/maven-metadata.xml"));
-                        System.out.println("END");
-
             classLoader = load();
 
             try {

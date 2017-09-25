@@ -299,7 +299,7 @@ public final class LanternClassLoader extends URLClassLoader {
 
         // Scan the jar for library jars
         if (location != null) {
-            repositories.add(path -> classLoader.getResourceAsStream("libraries/" + path));
+            repositories.add(path -> classLoader.getResourceAsStream("dependencies/" + path));
         }
 
         final List<URL> libraryUrls = new ArrayList<>();
@@ -332,7 +332,7 @@ public final class LanternClassLoader extends URLClassLoader {
             if (!Files.exists(parent)) {
                 Files.createDirectories(parent);
             }
-            System.out.printf("Downloading \"%s\" ...", id);
+            System.out.printf("Downloading \"%s\"\n", id);
             try (ReadableByteChannel i = Channels.newChannel(is);
                     FileOutputStream o = new FileOutputStream(target.toFile())) {
                 o.getChannel().transferFrom(i, 0, Long.MAX_VALUE);

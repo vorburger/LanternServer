@@ -258,7 +258,7 @@ task fatJar(type: Jar, dependsOn: theJar) {
         Dependency d = dependencies.create(a.moduleVersion.id.toString())
         from (a.file, { spec ->
             spec.rename {
-                "libraries/${d.group.replace('.', '/')}/$d.name/$d.version/$d.name-${d.version}.jar"
+                "dependencies/${d.group.replace('.', '/')}/$d.name/$d.version/$d.name-${d.version}.jar"
             }
         })
     }

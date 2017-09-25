@@ -29,6 +29,8 @@ import static java.util.Objects.requireNonNull;
 
 public final class Dependency {
 
+    public static final String SNAPSHOT_TAG = "-SNAPSHOT";
+
     private final String group;
     private final String name;
     private final String version;
@@ -51,8 +53,8 @@ public final class Dependency {
         return this.version;
     }
 
-    public String toPath() {
-        return String.format("%s/%s/%s/%s-%s.jar", this.group.replace('.', '/'), this.name, this.version, this.name, this.version);
+    public boolean isSnapshot() {
+        return this.version.contains(SNAPSHOT_TAG);
     }
 
     @Override

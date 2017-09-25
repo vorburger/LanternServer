@@ -25,16 +25,14 @@
  */
 package org.lanternpowered.launch.dependencies;
 
-import static java.util.Objects.requireNonNull;
-
 import java.net.URL;
 
-import javax.annotation.Nullable;
+import static java.util.Objects.requireNonNull;
 
 public final class Repository {
 
     private final URL url;
-    @Nullable private final String name;
+    private final String name;
 
     public Repository(URL url, String name) {
         this.url = requireNonNull(url, "url");

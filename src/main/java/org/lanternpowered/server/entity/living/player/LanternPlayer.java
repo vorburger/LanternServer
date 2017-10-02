@@ -44,6 +44,11 @@ import org.lanternpowered.server.data.io.store.item.WrittenBookItemTypeObjectSer
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.effect.AbstractViewer;
 import org.lanternpowered.server.effect.sound.LanternSoundType;
+import org.lanternpowered.server.effect.sound.entity.AbstractEntitySoundEffect;
+import org.lanternpowered.server.effect.sound.entity.DefaultLivingSoundEffect;
+import org.lanternpowered.server.effect.sound.entity.EntitySoundCollection;
+import org.lanternpowered.server.effect.sound.entity.EntitySoundPosition;
+import org.lanternpowered.server.effect.sound.entity.EntitySoundTypes;
 import org.lanternpowered.server.entity.event.SpectateEntityEvent;
 import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
 import org.lanternpowered.server.entity.living.player.tab.GlobalTabList;
@@ -97,6 +102,7 @@ import org.spongepowered.api.data.type.SkinPart;
 import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.sound.SoundCategory;
 import org.spongepowered.api.effect.sound.SoundType;
+import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.effect.sound.record.RecordType;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.Transform;
@@ -246,6 +252,9 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
         setBoundingBoxBase(BOUNDING_BOX_BASE);
         // Attach this player to the proxy user and load player data
         getProxyUser().setInternalUser(this);
+        setSoundCollection(EntitySoundCollection.builder()
+                .add(EntitySoundTypes.HURT, new DefaultLivingSoundEffect(EntitySoundPosition.HEAD, SoundTypes.ENTITY_GENERIC_HURT))
+                .build());
     }
 
     public Set<LanternBossBar> getBossBars() {

@@ -23,30 +23,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.game.registry.type.effect;
+package org.lanternpowered.server.effect.sound.entity;
 
-import org.lanternpowered.server.effect.sound.LanternSoundCategory;
-import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
-import org.spongepowered.api.effect.sound.SoundCategories;
-import org.spongepowered.api.effect.sound.SoundCategory;
-
-public final class SoundCategoryRegistryModule extends PluginCatalogRegistryModule<SoundCategory> {
-
-    public SoundCategoryRegistryModule() {
-        super(SoundCategories.class);
-    }
-
-    @Override
-    public void registerDefaults() {
-        register(new LanternSoundCategory("minecraft", "master", 0));
-        register(new LanternSoundCategory("minecraft", "music", 1));
-        register(new LanternSoundCategory("minecraft", "record", 2));
-        register(new LanternSoundCategory("minecraft", "weather", 3));
-        register(new LanternSoundCategory("minecraft", "block", 4));
-        register(new LanternSoundCategory("minecraft", "hostile", 5));
-        register(new LanternSoundCategory("minecraft", "neutral", 6));
-        register(new LanternSoundCategory("minecraft", "player", 7));
-        register(new LanternSoundCategory("minecraft", "ambient", 8));
-        register(new LanternSoundCategory("minecraft", "voice", 9));
-    }
+public enum EntitySoundPosition {
+    HEAD,
+    FEET,
 }

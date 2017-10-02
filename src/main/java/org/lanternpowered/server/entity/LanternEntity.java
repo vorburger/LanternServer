@@ -40,6 +40,7 @@ import org.lanternpowered.server.data.IAdditionalDataHolder;
 import org.lanternpowered.server.data.ValueCollection;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.data.property.AbstractPropertyHolder;
+import org.lanternpowered.server.effect.sound.entity.EntitySoundCollection;
 import org.lanternpowered.server.entity.event.DamagedEntityEvent;
 import org.lanternpowered.server.entity.event.EntityEvent;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
@@ -106,6 +107,8 @@ import javax.annotation.Nullable;
 
 public class LanternEntity implements Entity, IAdditionalDataHolder, AbstractPropertyHolder {
 
+    private static final EntitySoundCollection EMPTY_SOUND_COLLECTION = EntitySoundCollection.builder().build();
+
     @SuppressWarnings("unused")
     private static boolean bypassEntityTypeLookup;
 
@@ -133,6 +136,11 @@ public class LanternEntity implements Entity, IAdditionalDataHolder, AbstractPro
 
     // The scale of the entity
     private Vector3d scale = Vector3d.ONE;
+
+    /**
+     * The {@link EntitySoundCollection} of this entity.
+     */
+    private EntitySoundCollection soundCollection = EMPTY_SOUND_COLLECTION;
 
     /**
      * The entity protocol type of this entity.
@@ -348,6 +356,14 @@ public class LanternEntity implements Entity, IAdditionalDataHolder, AbstractPro
      */
     public void setOnGround(boolean onGround) {
         this.onGround = onGround;
+    }
+
+    public EntitySoundCollection getSoundCollection() {
+        return this.soundCollection;
+    }
+
+    public void setSoundCollection(EntitySoundCollection soundCollection) {
+        this.soundCollection = soundCollection;
     }
 
     @Override
@@ -724,6 +740,7 @@ public class LanternEntity implements Entity, IAdditionalDataHolder, AbstractPro
         if (!cancelled) {
             collectDamageFunctions(damageFunctions);
         }
+        double health = optHealth.get();
         // TODO: Damage modifiers, etc.
         final CauseStack causeStack = CauseStack.current();
         try (CauseStack.Frame frame = causeStack.pushCauseFrame()) {
@@ -739,15 +756,19 @@ public class LanternEntity implements Entity, IAdditionalDataHolder, AbstractPro
             damageFunctions.forEach(tuple -> tuple.getSecond().accept(event));
             damage = event.getFinalDamage();
             if (damage > 0) {
-                offer(Keys.HEALTH, Math.max(optHealth.get() - damage, 0));
+                health = Math.max(optHealth.get() - damage, 0);
+                offer(Keys.HEALTH, health);
             }
             if (damageSource instanceof IDamageSource) {
                 final double exhaustion = ((IDamageSource) damageSource).getExhaustion();
                 getValue(Keys.EXHAUSTION).ifPresent(value -> offer(Keys.EXHAUSTION, Math.min(value.getMaxValue(), value.get() + exhaustion)));
             }
         }
-        triggerEvent(DamagedEntityEvent.of());
+        handleDamage(health);
         return true;
+    }
+
+    protected void handleDamage(double health) {
     }
 
     protected void collectDamageFunctions(List<Tuple<DamageFunction, Consumer<DamageEntityEvent>>> damageFunctions) {

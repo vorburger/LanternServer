@@ -54,7 +54,6 @@ import org.lanternpowered.server.cause.entity.damage.source.LanternEntityDamageS
 import org.lanternpowered.server.cause.entity.damage.source.LanternFallingBlockDamageSourceBuilder;
 import org.lanternpowered.server.cause.entity.damage.source.LanternIndirectEntityDamageSourceBuilder;
 import org.lanternpowered.server.cause.entity.healing.source.LanternEntityHealingSourceBuilder;
-import org.lanternpowered.server.cause.entity.healing.source.LanternHealingSource;
 import org.lanternpowered.server.cause.entity.healing.source.LanternHealingSourceBuilder;
 import org.lanternpowered.server.config.user.ban.BanBuilder;
 import org.lanternpowered.server.data.DataRegistrar;
@@ -76,6 +75,10 @@ import org.lanternpowered.server.effect.particle.LanternParticleEffectBuilder;
 import org.lanternpowered.server.effect.potion.LanternPotionEffectBuilder;
 import org.lanternpowered.server.effect.potion.PotionType;
 import org.lanternpowered.server.effect.sound.LanternSoundTypeBuilder;
+import org.lanternpowered.server.effect.sound.entity.EntitySoundCollection;
+import org.lanternpowered.server.effect.sound.entity.EntitySoundEffect;
+import org.lanternpowered.server.effect.sound.entity.EntitySoundType;
+import org.lanternpowered.server.effect.sound.entity.LanternEntitySoundCollectionBuilder;
 import org.lanternpowered.server.entity.living.player.tab.LanternTabListEntryBuilder;
 import org.lanternpowered.server.event.LanternEventContextKeyBuilder;
 import org.lanternpowered.server.extra.accessory.Accessory;
@@ -147,8 +150,9 @@ import org.lanternpowered.server.game.registry.type.effect.ParticleOptionRegistr
 import org.lanternpowered.server.game.registry.type.effect.ParticleTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.effect.PotionEffectTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.effect.PotionTypeRegistryModule;
-import org.lanternpowered.server.game.registry.type.effect.SoundCategoryRegistryModule;
-import org.lanternpowered.server.game.registry.type.effect.SoundTypeRegistryModule;
+import org.lanternpowered.server.game.registry.type.effect.sound.SoundCategoryRegistryModule;
+import org.lanternpowered.server.game.registry.type.effect.sound.SoundTypeRegistryModule;
+import org.lanternpowered.server.game.registry.type.effect.sound.entity.EntitySoundTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.entity.EntityTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.entity.player.GameModeRegistryModule;
 import org.lanternpowered.server.game.registry.type.extra.AccessoryRegistryModule;
@@ -323,7 +327,6 @@ import org.spongepowered.api.entity.living.Agent;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.tab.TabListEntry;
 import org.spongepowered.api.event.cause.EventContextKey;
-import org.spongepowered.api.event.cause.EventContextKeys;
 import org.spongepowered.api.event.cause.entity.damage.DamageModifierType;
 import org.spongepowered.api.event.cause.entity.damage.DamageType;
 import org.spongepowered.api.event.cause.entity.damage.source.BlockDamageSource;
@@ -333,7 +336,6 @@ import org.spongepowered.api.event.cause.entity.damage.source.FallingBlockDamage
 import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource;
 import org.spongepowered.api.event.cause.entity.dismount.DismountType;
 import org.spongepowered.api.event.cause.entity.health.HealingType;
-import org.spongepowered.api.event.cause.entity.health.HealthModifierType;
 import org.spongepowered.api.event.cause.entity.health.source.EntityHealingSource;
 import org.spongepowered.api.event.cause.entity.health.source.HealingSource;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnType;
@@ -488,6 +490,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerBuilderSupplier(EntityHealingSource.Builder.class, LanternEntityHealingSourceBuilder::new)
                 .registerBuilderSupplier(RespawnLocation.Builder.class, RespawnLocation.Builder::new)
                 .registerBuilderSupplier(SoundType.Builder.class, LanternSoundTypeBuilder::new)
+                .registerBuilderSupplier(EntitySoundCollection.Builder.class, LanternEntitySoundCollectionBuilder::new)
                 .registerBuilderSupplier(FireworkEffect.Builder.class, LanternFireworkEffectBuilder::new)
                 .registerBuilderSupplier(InventoryArchetype.Builder.class, LanternInventoryArchetypeBuilder::new)
                 .registerBuilderSupplier(BiomeGenerationSettings.Builder.class, LanternBiomeGenerationSettingsBuilder::new)
@@ -587,6 +590,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(PotionEffectType.class, PotionEffectTypeRegistryModule.get())
                 .registerModule(SoundCategory.class, new SoundCategoryRegistryModule())
                 .registerModule(SoundType.class, new SoundTypeRegistryModule())
+                .registerModule(EntitySoundType.class, new EntitySoundTypeRegistryModule())
                 .registerModule(GameMode.class, GameModeRegistryModule.get())
                 .registerModule(EquipmentType.class, new EquipmentTypeRegistryModule())
                 .registerModule(ItemType.class, ItemRegistryModule.get())

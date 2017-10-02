@@ -32,6 +32,10 @@ import com.google.common.collect.ImmutableList;
 import org.lanternpowered.server.data.ValueCollection;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.effect.potion.LanternPotionEffectType;
+import org.lanternpowered.server.effect.sound.entity.EntitySoundCollection;
+import org.lanternpowered.server.effect.sound.entity.EntitySoundEffect;
+import org.lanternpowered.server.effect.sound.entity.EntitySoundTypes;
+import org.lanternpowered.server.entity.event.DamagedEntityEvent;
 import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.util.collect.Lists2;
@@ -256,6 +260,25 @@ public class LanternLiving extends LanternEntity implements Living {
      * @param itemStackSnapshots The item stack snapshots
      */
     protected void collectDrops(CauseStack causeStack, List<ItemStackSnapshot> itemStackSnapshots) {
+    }
+
+    @Override
+    protected void handleDamage(double health) {
+        super.handleDamage(health);
+
+        // Trigger the damage animation
+        triggerEvent(DamagedEntityEvent.of());
+
+        final EntitySoundCollection sounds = getSoundCollection();
+        // Handle the damage/death sound effect
+        Optional<EntitySoundEffect> effect = Optional.empty();
+        if (health <= 0) {
+            effect = sounds.get(EntitySoundTypes.DEATH);
+        }
+        if (!effect.isPresent()) {
+            effect = sounds.get(EntitySoundTypes.HURT);
+        }
+        effect.ifPresent(e -> e.play(this));
     }
 
     @Override

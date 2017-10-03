@@ -95,6 +95,7 @@ import org.lanternpowered.server.game.registry.type.attribute.AttributeOperation
 import org.lanternpowered.server.game.registry.type.attribute.AttributeRegistryModule;
 import org.lanternpowered.server.game.registry.type.attribute.AttributeTargetRegistryModule;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
+import org.lanternpowered.server.game.registry.type.block.BlockSoundGroupRegistryModule;
 import org.lanternpowered.server.game.registry.type.block.BlockStateRegistryModule;
 import org.lanternpowered.server.game.registry.type.block.TileEntityTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.bossbar.BossBarColorRegistryModule;
@@ -521,6 +522,7 @@ public class LanternGameRegistry implements GameRegistry {
         registerModule(LanternOperation.class, new AttributeOperationRegistryModule())
                 .registerModule(LanternAttribute.class, new AttributeRegistryModule())
                 .registerModule(new AttributeTargetRegistryModule())
+                .registerModule(new BlockSoundGroupRegistryModule())
                 .registerModule(BlockType.class, BlockRegistryModule.get())
                 .registerModule(BlockState.class, new BlockStateRegistryModule())
                 .registerModule(BossBarColor.class, new BossBarColorRegistryModule())

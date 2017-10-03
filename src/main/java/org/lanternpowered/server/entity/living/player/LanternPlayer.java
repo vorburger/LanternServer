@@ -44,7 +44,6 @@ import org.lanternpowered.server.data.io.store.item.WrittenBookItemTypeObjectSer
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.effect.AbstractViewer;
 import org.lanternpowered.server.effect.sound.LanternSoundType;
-import org.lanternpowered.server.effect.sound.entity.AbstractEntitySoundEffect;
 import org.lanternpowered.server.effect.sound.entity.DefaultLivingSoundEffect;
 import org.lanternpowered.server.effect.sound.entity.EntitySoundCollection;
 import org.lanternpowered.server.effect.sound.entity.EntitySoundPosition;
@@ -157,6 +156,10 @@ import javax.annotation.Nullable;
 @SuppressWarnings("ConstantConditions")
 public class LanternPlayer extends AbstractUser implements Player, AbstractViewer, NetworkIdHolder {
 
+    public static final EntitySoundCollection SOUND_COLLECTION = EntitySoundCollection.builder()
+            .add(EntitySoundTypes.HURT, new DefaultLivingSoundEffect(EntitySoundPosition.HEAD, SoundTypes.ENTITY_GENERIC_HURT))
+            .build();
+
     private final static AABB BOUNDING_BOX_BASE = new AABB(new Vector3d(-0.3, 0, -0.3), new Vector3d(0.3, 1.8, 0.3));
 
     private final NetworkSession session;
@@ -249,12 +252,10 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
         this.containerSession = new PlayerContainerSession(this);
         this.session = session;
         resetIdleTimeoutCounter();
+        setSoundCollection(SOUND_COLLECTION);
         setBoundingBoxBase(BOUNDING_BOX_BASE);
         // Attach this player to the proxy user and load player data
         getProxyUser().setInternalUser(this);
-        setSoundCollection(EntitySoundCollection.builder()
-                .add(EntitySoundTypes.HURT, new DefaultLivingSoundEffect(EntitySoundPosition.HEAD, SoundTypes.ENTITY_GENERIC_HURT))
-                .build());
     }
 
     public Set<LanternBossBar> getBossBars() {

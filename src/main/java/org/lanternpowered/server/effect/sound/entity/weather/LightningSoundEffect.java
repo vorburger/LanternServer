@@ -23,16 +23,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.effect.sound.entity;
+package org.lanternpowered.server.effect.sound.entity.weather;
 
-import org.spongepowered.api.CatalogType;
-import org.spongepowered.api.util.annotation.CatalogedBy;
+import com.flowpowered.math.vector.Vector3d;
+import org.lanternpowered.server.effect.sound.entity.AbstractEntitySoundEffect;
+import org.spongepowered.api.effect.sound.SoundCategories;
+import org.spongepowered.api.effect.sound.SoundTypes;
+import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.world.World;
 
-/**
- * Represents a entity sound type, this is the context
- * where a {@link EntitySoundEffect} will be played.
- */
-@CatalogedBy(EntitySoundTypes.class)
-public interface EntitySoundType extends CatalogType {
+import java.util.Random;
 
+public class LightningSoundEffect extends AbstractEntitySoundEffect {
+
+    @Override
+    protected void play(Entity entity, World world, Vector3d position, Random random) {
+        world.playSound(SoundTypes.ENTITY_LIGHTNING_THUNDER, SoundCategories.WEATHER, position,
+                10000.0, 0.8 + random.nextDouble() * 0.2);
+        world.playSound(SoundTypes.ENTITY_LIGHTNING_IMPACT, SoundCategories.WEATHER, position,
+                2.0, 0.5 + random.nextDouble() * 0.2);
+    }
 }

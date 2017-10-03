@@ -64,6 +64,11 @@ public final class EntitySoundTypes {
     public static final EntitySoundType IDLE = DummyObjectProvider.createFor(EntitySoundType.class, "IDLE");
 
     /**
+     * The {@link EntitySoundType} that is played when lightning strikes the ground.
+     */
+    public static final EntitySoundType LIGHTNING = DummyObjectProvider.createFor(EntitySoundType.class, "LIGHTNING");
+
+    /**
      * The {@link EntitySoundType} that is played when a entity falls into the water.
      */
     public static final EntitySoundType SPLASH = DummyObjectProvider.createFor(EntitySoundType.class, "SPLASH");

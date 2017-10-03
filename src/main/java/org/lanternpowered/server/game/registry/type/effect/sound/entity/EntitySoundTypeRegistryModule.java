@@ -43,6 +43,7 @@ public final class EntitySoundTypeRegistryModule extends PluginCatalogRegistryMo
         register(new LanternEntitySoundType("minecraft", "fall"));
         register(new LanternEntitySoundType("minecraft", "hurt"));
         register(new LanternEntitySoundType("minecraft", "idle"));
+        register(new LanternEntitySoundType("minecraft", "lightning"));
         register(new LanternEntitySoundType("minecraft", "splash"));
         register(new LanternEntitySoundType("minecraft", "swim"));
         register(new LanternEntitySoundType("minecraft", "villager_no"));

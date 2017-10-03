@@ -25,17 +25,21 @@
  */
 package org.lanternpowered.server.entity.weather;
 
-import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.data.key.LanternKeys;
+import org.lanternpowered.server.effect.sound.entity.EntitySoundCollection;
+import org.lanternpowered.server.effect.sound.entity.EntitySoundTypes;
+import org.lanternpowered.server.effect.sound.entity.weather.LightningSoundEffect;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.event.CauseStack;
 import org.lanternpowered.server.network.entity.EntityProtocolTypes;
-import org.spongepowered.api.effect.sound.SoundCategories;
-import org.spongepowered.api.effect.sound.SoundTypes;
 
 import java.util.UUID;
 
 public class LanternLightning extends LanternEntity implements AbstractLightning {
+
+    public static final EntitySoundCollection SOUND_COLLECTION = EntitySoundCollection.builder()
+            .add(EntitySoundTypes.LIGHTNING, new LightningSoundEffect())
+            .build();
 
     /**
      * The amount of ticks that the lightning will be alive.
@@ -46,6 +50,7 @@ public class LanternLightning extends LanternEntity implements AbstractLightning
     public LanternLightning(UUID uniqueId) {
         super(uniqueId);
         setEntityProtocolType(EntityProtocolTypes.LIGHTNING);
+        setSoundCollection(SOUND_COLLECTION);
     }
 
     @Override
@@ -73,12 +78,8 @@ public class LanternLightning extends LanternEntity implements AbstractLightning
             // Remove the entity the next pulse
             this.remove = true;
 
-            // Play the sound effects
-            final Vector3d position = getPosition();
-            getWorld().playSound(SoundTypes.ENTITY_LIGHTNING_THUNDER, SoundCategories.WEATHER, position,
-                    10000.0, 0.8 + getRandom().nextDouble() * 0.2);
-            getWorld().playSound(SoundTypes.ENTITY_LIGHTNING_IMPACT, SoundCategories.WEATHER, position,
-                    2.0, 0.5 + getRandom().nextDouble() * 0.2);
+            // Play the sound effect
+            getSoundCollection().getOrEmpty(EntitySoundTypes.LIGHTNING).play(this);
 
             // TODO: Damage entities?
             // TODO: Create fire

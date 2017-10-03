@@ -23,16 +23,5 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.effect.sound.entity;
-
-import org.spongepowered.api.CatalogType;
-import org.spongepowered.api.util.annotation.CatalogedBy;
-
-/**
- * Represents a entity sound type, this is the context
- * where a {@link EntitySoundEffect} will be played.
- */
-@CatalogedBy(EntitySoundTypes.class)
-public interface EntitySoundType extends CatalogType {
-
-}
+@org.spongepowered.api.util.annotation.NonnullByDefault
+package org.lanternpowered.server.effect.sound.entity.weather;

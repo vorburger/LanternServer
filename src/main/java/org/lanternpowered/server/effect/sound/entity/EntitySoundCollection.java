@@ -51,6 +51,18 @@ public interface EntitySoundCollection {
     Optional<EntitySoundEffect> get(EntitySoundType soundType);
 
     /**
+     * Attempts to get the {@link EntitySoundEffect} for the given
+     * {@link EntitySoundType}. {@link EntitySoundEffect#NONE} will
+     * be returned if no entry could be found.
+     *
+     * @param soundType The entity sound type
+     * @return The entity sound effect
+     */
+    default EntitySoundEffect getOrEmpty(EntitySoundType soundType) {
+        return get(soundType).orElse(EntitySoundEffect.NONE);
+    }
+
+    /**
      * A builder to construct {@link EntitySoundCollection}s.
      */
     interface Builder extends ResettableBuilder<EntitySoundCollection, Builder> {

@@ -254,7 +254,7 @@ public class NbtDataContainerInputStream implements Closeable, DataContainerInpu
                 }
                 return stringArray;
             case BOOLEAN:
-                return this.dis.readByte() != 0;
+                return this.dis.readBoolean();
             case BOOLEAN_ARRAY:
                 int bitBytes = this.dis.readInt() - 4;
                 final boolean[] booleanArray = new boolean[this.dis.readShort()];

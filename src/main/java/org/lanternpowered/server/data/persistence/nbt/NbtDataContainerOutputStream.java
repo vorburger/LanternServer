@@ -120,7 +120,7 @@ public class NbtDataContainerOutputStream implements Closeable, Flushable, DataC
                 }
                 break;
             case CHAR:
-                this.dos.writeShort((Character) object);
+                this.dos.writeChar((Character) object);
                 break;
             case CHAR_ARRAY:
                 final char[] charArray = (char[]) object;
@@ -220,7 +220,7 @@ public class NbtDataContainerOutputStream implements Closeable, Flushable, DataC
                 this.dos.write(bytes);
                 break;
             case BOOLEAN:
-                this.dos.writeByte((Boolean) object ? 1 : 0);
+                this.dos.writeBoolean((Boolean) object);
                 break;
             case BOOLEAN_ARRAY:
                 final boolean[] booleanArray = (boolean[]) object;

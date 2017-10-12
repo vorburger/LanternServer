@@ -248,8 +248,8 @@ public class NbtDataContainerInputStream implements Closeable, DataContainerInpu
                 for (int i = 0; i < bitBytes; i++) {
                     final byte value = this.dis.readByte();
                     while (j < booleanArray.length) {
-                        final int k = j++ % 8;
-                        booleanArray[j] = (value & (1 << k)) != 0;
+                        final int k = j % 8;
+                        booleanArray[j++] = (value & (1 << k)) != 0;
                     }
                 }
                 return booleanArray;
@@ -260,8 +260,8 @@ public class NbtDataContainerInputStream implements Closeable, DataContainerInpu
                 for (int i = 0; i < bitBytes; i++) {
                     final byte value = this.dis.readByte();
                     while (j < boxedBooleanArray.length) {
-                        final int k = j++ % 8;
-                        boxedBooleanArray[j] = (value & (1 << k)) != 0;
+                        final int k = j % 8;
+                        boxedBooleanArray[j++] = (value & (1 << k)) != 0;
                     }
                 }
                 return boxedBooleanArray;

@@ -64,6 +64,9 @@ enum NbtType {
     DOUBLE_ARRAY            (11, "DblAr"),
     DOUBLE_BOXED_ARRAY      (11, "DblBAr"),
     STRING_ARRAY            (7, "StrAr"),
+    CHAR                    (2, "Char"),
+    CHAR_ARRAY              (7, "CharAr"),
+    CHAR_BOXED_ARRAY        (7, "CharBAr"),
 
     UNKNOWN                 (99),
     ;

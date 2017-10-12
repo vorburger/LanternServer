@@ -171,6 +171,20 @@ public class NbtDataContainerInputStream implements Closeable, DataContainerInpu
                     boxedShortArray[i] = this.dis.readShort();
                 }
                 return boxedShortArray;
+            case CHAR:
+                return this.dis.readChar();
+            case CHAR_ARRAY:
+                final char[] charArray = new char[this.dis.readInt() / 2];
+                for (int i = 0; i < charArray.length; i++) {
+                    charArray[i] = this.dis.readChar();
+                }
+                return charArray;
+            case CHAR_BOXED_ARRAY:
+                final Character[] boxedCharArray = new Character[this.dis.readInt() / 2];
+                for (int i = 0; i < boxedCharArray.length; i++) {
+                    boxedCharArray[i] = this.dis.readChar();
+                }
+                return boxedCharArray;
             case INT:
                 return this.dis.readInt();
             case INT_ARRAY:

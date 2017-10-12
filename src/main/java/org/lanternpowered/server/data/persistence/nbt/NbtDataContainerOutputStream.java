@@ -119,6 +119,23 @@ public class NbtDataContainerOutputStream implements Closeable, Flushable, DataC
                     this.dos.writeShort(shortValue);
                 }
                 break;
+            case CHAR:
+                this.dos.writeShort((Character) object);
+                break;
+            case CHAR_ARRAY:
+                final char[] charArray = (char[]) object;
+                this.dos.writeInt(charArray.length * 2);
+                for (char charValue : charArray) {
+                    this.dos.writeChar(charValue);
+                }
+                break;
+            case CHAR_BOXED_ARRAY:
+                final Character[] boxedCharacterArray = (Character[]) object;
+                this.dos.writeInt(boxedCharacterArray.length * 2);
+                for (Character charValue : boxedCharacterArray) {
+                    this.dos.writeChar(charValue);
+                }
+                break;
             case INT:
                 this.dos.writeInt((Integer) object);
                 break;
@@ -352,6 +369,12 @@ public class NbtDataContainerOutputStream implements Closeable, Flushable, DataC
             return NbtType.STRING;
         } else if (object instanceof String[]) {
             return NbtType.STRING_ARRAY;
+        } else if (object instanceof Character) {
+            return NbtType.CHAR;
+        } else if (object instanceof Character[]) {
+            return NbtType.CHAR_BOXED_ARRAY;
+        } else if (object instanceof char[]) {
+            return NbtType.CHAR_ARRAY;
         }
         return NbtType.UNKNOWN;
     }

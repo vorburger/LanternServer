@@ -126,13 +126,12 @@ public class NbtDataContainerInputStream implements Closeable, DataContainerInpu
             final String suffix = name.substring(index + 1);
             name = name.substring(0, index);
             final NbtType nbtType1 = NbtType.bySuffix.get(suffix);
-            if (nbtType1 == null) {
-                throw new IOException("Unknown NBT Type with suffix: " + suffix);
-            }
-            if (nbtType == NbtType.LIST) {
-                listNbtType = nbtType1;
-            } else {
-                nbtType = nbtType1;
+            if (nbtType1 != null) {
+                if (nbtType == NbtType.LIST) {
+                    listNbtType = nbtType1;
+                } else {
+                    nbtType = nbtType1;
+                }
             }
         }
         return new Entry(name, nbtType, listNbtType);

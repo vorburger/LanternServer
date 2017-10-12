@@ -26,21 +26,6 @@
 package org.lanternpowered.server.data.persistence.nbt;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.lanternpowered.server.data.persistence.nbt.NbtConstants.BOOLEAN;
-import static org.lanternpowered.server.data.persistence.nbt.NbtConstants.BOOLEAN_IDENTIFER;
-import static org.lanternpowered.server.data.persistence.nbt.NbtConstants.BOOLEAN_LIST;
-import static org.lanternpowered.server.data.persistence.nbt.NbtConstants.BYTE;
-import static org.lanternpowered.server.data.persistence.nbt.NbtConstants.BYTE_ARRAY;
-import static org.lanternpowered.server.data.persistence.nbt.NbtConstants.COMPOUND;
-import static org.lanternpowered.server.data.persistence.nbt.NbtConstants.DOUBLE;
-import static org.lanternpowered.server.data.persistence.nbt.NbtConstants.END;
-import static org.lanternpowered.server.data.persistence.nbt.NbtConstants.FLOAT;
-import static org.lanternpowered.server.data.persistence.nbt.NbtConstants.INT;
-import static org.lanternpowered.server.data.persistence.nbt.NbtConstants.INT_ARRAY;
-import static org.lanternpowered.server.data.persistence.nbt.NbtConstants.LIST;
-import static org.lanternpowered.server.data.persistence.nbt.NbtConstants.LONG;
-import static org.lanternpowered.server.data.persistence.nbt.NbtConstants.SHORT;
-import static org.lanternpowered.server.data.persistence.nbt.NbtConstants.STRING;
 
 import com.google.common.collect.Lists;
 import org.lanternpowered.server.data.persistence.DataContainerInput;
@@ -49,12 +34,12 @@ import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.persistence.InvalidDataFormatException;
 
+import java.io.ByteArrayInputStream;
 import java.io.Closeable;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
-import java.util.zip.GZIPInputStream;
 
 import javax.annotation.Nullable;
 
@@ -106,28 +91,6 @@ public class NbtDataContainerInputStream implements Closeable, DataContainerInpu
                 (DataInputStream) inputStream : new DataInputStream(inputStream), maximumDepth);
     }
 
-    /**
-     * Creates a new nbt data view input stream.
-     * 
-     * @param inputStream the data input stream
-     * @param compressed whether the content is compressed
-     * @throws IOException 
-     */
-    public NbtDataContainerInputStream(InputStream inputStream, boolean compressed) throws IOException {
-        this(inputStream, compressed, Integer.MAX_VALUE);
-    }
-
-    /**
-     * Creates a new nbt data view input stream.
-     *
-     * @param inputStream the data input stream
-     * @param compressed whether the content is compressed
-     * @throws IOException
-     */
-    public NbtDataContainerInputStream(InputStream inputStream, boolean compressed, int maximumDepth) throws IOException {
-        this(compressed ? new GZIPInputStream(checkNotNull(inputStream, "inputStream")) : inputStream, maximumDepth);
-    }
-
     @Override
     public void close() throws IOException, InvalidDataFormatException {
         this.dis.close();
@@ -135,7 +98,7 @@ public class NbtDataContainerInputStream implements Closeable, DataContainerInpu
 
     @Override
     public DataContainer read() throws IOException, InvalidDataFormatException {
-        Entry entry = this.readEntry();
+        Entry entry = readEntry();
         if (entry == null) {
             throw new IOException("There is no more data to read.");
         }
@@ -143,98 +106,211 @@ public class NbtDataContainerInputStream implements Closeable, DataContainerInpu
     }
 
     private Object readObject(@Nullable DataView container, Entry entry, int depth) throws IOException, InvalidDataFormatException {
-        return this.readPayload(container, entry.type, depth);
+        return this.readPayload(container, entry.type, entry.listType, depth);
     }
 
     @Nullable
     private Entry readEntry() throws IOException {
-        byte type = this.dis.readByte();
-        if (type == END) {
+        final byte type = this.dis.readByte();
+        if (type == NbtType.END.type) {
             return null;
         }
         String name = this.dis.readUTF();
-        int index = name.lastIndexOf(BOOLEAN_IDENTIFER);
-        if (index != -1) {
-            name = name.substring(0, index);
-            type = type == LIST ? BOOLEAN_LIST : BOOLEAN;
+        final int index = name.lastIndexOf('$');
+        NbtType nbtType = NbtType.byIndex.get(type);
+        if (nbtType == null) {
+            throw new IOException("Unknown NBT Type with id: " + type);
         }
-        return new Entry(name, type);
+        NbtType listNbtType = null;
+        if (index != -1) {
+            final String suffix = name.substring(index + 1);
+            name = name.substring(0, index);
+            final NbtType nbtType1 = NbtType.bySuffix.get(suffix);
+            if (nbtType1 == null) {
+                throw new IOException("Unknown NBT Type with suffix: " + suffix);
+            }
+            if (nbtType == NbtType.LIST) {
+                listNbtType = nbtType1;
+            } else {
+                nbtType = nbtType1;
+            }
+        }
+        return new Entry(name, nbtType, listNbtType);
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
-    private Object readPayload(@Nullable DataView container, byte type, int depth) throws IOException, InvalidDataFormatException {
+    private Object readPayload(@Nullable DataView container, NbtType nbtType, @Nullable NbtType listNbtType,
+            int depth) throws IOException, InvalidDataFormatException {
         if (depth > this.maximumDepth) {
             throw new IOException("Attempted to read a data container with too high complexity,"
                     + " exceeded the maximum depth of " + this.maximumDepth);
         }
-        if (type == BYTE) {
-            return this.dis.readByte();
-        } else if (type == BYTE_ARRAY) {
-            byte[] array = new byte[this.dis.readInt()];
-            for (int i = 0; i < array.length; i++) {
-                array[i] = this.dis.readByte();
-            }
-            return array;
-        } else if (type == COMPOUND) {
-            if (container == null) {
-                container = DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED);
-            }
-            Entry entry;
-            final int depth1 = depth + 1;
-            while ((entry = this.readEntry()) != null) {
-                if (entry.type == COMPOUND) {
-                    this.readObject(container.createView(DataQuery.of(entry.name)), entry, depth1);
-                } else {
-                    container.set(DataQuery.of(entry.name), this.readObject(null, entry, depth1));
+        switch (nbtType) {
+            case BYTE:
+                return this.dis.readByte();
+            case BYTE_ARRAY:
+                final byte[] byteArray = new byte[this.dis.readInt()];
+                this.dis.read(byteArray);
+                return byteArray;
+            case BYTE_BOXED_ARRAY:
+                final Byte[] boxedByteArray = new Byte[this.dis.readInt()];
+                for (int i = 0; i < boxedByteArray.length; i++) {
+                    boxedByteArray[i] = this.dis.readByte();
                 }
-            }
-            return container;
-        } else if (type == DOUBLE) {
-            return this.dis.readDouble();
-        } else if (type == FLOAT) {
-            return this.dis.readFloat();
-        } else if (type == INT) {
-            return this.dis.readInt();
-        } else if (type == INT_ARRAY) {
-            int[] array = new int[this.dis.readInt()];
-            for (int i = 0; i < array.length; i++) {
-                array[i] = this.dis.readInt();
-            }
-            return array;
-        } else if (type == LIST || type == BOOLEAN_LIST) {
-            byte type0 = this.dis.readByte();
-            if (type == BOOLEAN_LIST) {
-                type0 = BOOLEAN;
-            }
-            int size = this.dis.readInt();
-            List list = Lists.newArrayListWithExpectedSize(size);
-            if (size == 0 || type0 == END) {
+                return boxedByteArray;
+            case SHORT:
+                return this.dis.readShort();
+            case SHORT_ARRAY:
+                final short[] shortArray = new short[this.dis.readInt() / 2];
+                for (int i = 0; i < shortArray.length; i++) {
+                    shortArray[i] = this.dis.readShort();
+                }
+                return shortArray;
+            case SHORT_BOXED_ARRAY:
+                final Short[] boxedShortArray = new Short[this.dis.readInt() / 2];
+                for (int i = 0; i < boxedShortArray.length; i++) {
+                    boxedShortArray[i] = this.dis.readShort();
+                }
+                return boxedShortArray;
+            case INT:
+                return this.dis.readInt();
+            case INT_ARRAY:
+                final int[] intArray = new int[this.dis.readInt()];
+                for (int i = 0; i < intArray.length; i++) {
+                    intArray[i] = this.dis.readInt();
+                }
+                return intArray;
+            case INT_BOXED_ARRAY:
+                final Integer[] boxedIntArray = new Integer[this.dis.readInt()];
+                for (int i = 0; i < boxedIntArray.length; i++) {
+                    boxedIntArray[i] = this.dis.readInt();
+                }
+                return boxedIntArray;
+            case LONG:
+                return this.dis.readLong();
+            case LONG_ARRAY:
+                final long[] longArray = new long[this.dis.readInt() / 2];
+                for (int i = 0; i < longArray.length; i++) {
+                    longArray[i] = this.dis.readLong();
+                }
+                return longArray;
+            case LONG_BOXED_ARRAY:
+                final Long[] boxedLongArray = new Long[this.dis.readInt() / 2];
+                for (int i = 0; i < boxedLongArray.length; i++) {
+                    boxedLongArray[i] = this.dis.readLong();
+                }
+                return boxedLongArray;
+            case FLOAT:
+                return this.dis.readFloat();
+            case FLOAT_ARRAY:
+                final float[] floatArray = new float[this.dis.readInt()];
+                for (int i = 0; i < floatArray.length; i++) {
+                    floatArray[i] = this.dis.readFloat();
+                }
+                return floatArray;
+            case FLOAT_BOXED_ARRAY:
+                final Float[] boxedFloatArray = new Float[this.dis.readInt()];
+                for (int i = 0; i < boxedFloatArray.length; i++) {
+                    boxedFloatArray[i] = this.dis.readFloat();
+                }
+                return boxedFloatArray;
+            case DOUBLE:
+                return this.dis.readDouble();
+            case DOUBLE_ARRAY:
+                final double[] doubleArray = new double[this.dis.readInt() / 2];
+                for (int i = 0; i < doubleArray.length; i++) {
+                    doubleArray[i] = this.dis.readDouble();
+                }
+                return doubleArray;
+            case DOUBLE_BOXED_ARRAY:
+                final Double[] boxedDoubleArray = new Double[this.dis.readInt() / 2];
+                for (int i = 0; i < boxedDoubleArray.length; i++) {
+                    boxedDoubleArray[i] = this.dis.readDouble();
+                }
+                return boxedDoubleArray;
+            case STRING:
+                return this.dis.readUTF();
+            case STRING_ARRAY:
+                final byte[] bytes = new byte[this.dis.readInt()];
+                this.dis.read(bytes);
+                final ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+                final DataInputStream dis = new DataInputStream(bais);
+                final String[] stringArray = new String[dis.readInt()];
+                for (int i = 0; i < stringArray.length; i++) {
+                    stringArray[i] = dis.readUTF();
+                }
+                return stringArray;
+            case BOOLEAN:
+                return this.dis.readByte() != 0;
+            case BOOLEAN_ARRAY:
+                int bitBytes = this.dis.readInt() - 4;
+                final boolean[] booleanArray = new boolean[this.dis.readShort()];
+                int j = 0;
+                for (int i = 0; i < bitBytes; i++) {
+                    final byte value = this.dis.readByte();
+                    while (j < booleanArray.length) {
+                        final int k = j++ % 8;
+                        booleanArray[j] = (value & (1 << k)) != 0;
+                    }
+                }
+                return booleanArray;
+            case BOOLEAN_BOXED_ARRAY:
+                bitBytes = this.dis.readInt() - 4;
+                final Boolean[] boxedBooleanArray = new Boolean[this.dis.readShort()];
+                j = 0;
+                for (int i = 0; i < bitBytes; i++) {
+                    final byte value = this.dis.readByte();
+                    while (j < boxedBooleanArray.length) {
+                        final int k = j++ % 8;
+                        boxedBooleanArray[j] = (value & (1 << k)) != 0;
+                    }
+                }
+                return boxedBooleanArray;
+            case LIST:
+                final byte listType = this.dis.readByte();
+                if (listNbtType == null) {
+                    listNbtType = NbtType.byIndex.get(listType);
+                    if (listNbtType == null) {
+                        throw new IOException("Unknown NBT Type with id: " + listType);
+                    }
+                }
+                final int size = this.dis.readInt();
+                final List<Object> list = Lists.newArrayListWithExpectedSize(size);
+                if (size == 0 || listNbtType == NbtType.END) {
+                    return list;
+                }
+                int depth1 = depth + 1;
+                for (int i = 0; i < size; i++) {
+                    list.add(readPayload(null, listNbtType, null, depth1));
+                }
                 return list;
-            }
-            final int depth1 = depth + 1;
-            for (int i = 0; i < size; i++) {
-                list.add(this.readPayload(null, type0, depth1));
-            }
-            return list;
-        } else if (type == LONG) {
-            return this.dis.readLong();
-        } else if (type == SHORT) {
-            return this.dis.readShort();
-        } else if (type == STRING) {
-            return this.dis.readUTF();
-        } else if (type == BOOLEAN) {
-            return this.dis.readByte() != 0;
-        } else {
-            throw new InvalidDataFormatException("Attempt to deserialize a unknown nbt tag type: " + type);
+            case COMPOUND:
+                if (container == null) {
+                    container = DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED);
+                }
+                depth1 = depth + 1;
+                Entry entry;
+                while ((entry = readEntry()) != null) {
+                    if (entry.type == NbtType.COMPOUND) {
+                        readObject(container.createView(DataQuery.of(entry.name)), entry, depth1);
+                    } else {
+                        container.set(DataQuery.of(entry.name), readObject(null, entry, depth1));
+                    }
+                }
+                return container;
+            default:
+                throw new InvalidDataFormatException("Attempt to deserialize a unknown nbt tag type: " + nbtType);
         }
     }
 
     private static class Entry {
 
         private final String name;
-        private final byte type;
+        private final NbtType type;
+        @Nullable private final NbtType listType;
 
-        public Entry(String name, byte type) {
+        public Entry(String name, NbtType type, @Nullable NbtType listType) {
+            this.listType = listType;
             this.name = name;
             this.type = type;
         }

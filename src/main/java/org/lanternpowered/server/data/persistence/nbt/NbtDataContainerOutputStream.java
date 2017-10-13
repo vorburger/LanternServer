@@ -27,12 +27,12 @@ package org.lanternpowered.server.data.persistence.nbt;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.lanternpowered.server.data.persistence.DataContainerOutput;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataSerializable;
 import org.spongepowered.api.data.DataView;
 
-import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.DataOutputStream;
 import java.io.Flushable;
@@ -107,34 +107,29 @@ public class NbtDataContainerOutputStream implements Closeable, Flushable, DataC
                 break;
             case SHORT_ARRAY:
                 final short[] shortArray = (short[]) object;
-                this.dos.writeInt(shortArray.length * 2);
+                this.dos.writeByte(NbtType.SHORT.type);
+                this.dos.writeInt(shortArray.length);
                 for (short shortValue : shortArray) {
                     this.dos.writeShort(shortValue);
                 }
                 break;
             case SHORT_BOXED_ARRAY:
                 final Short[] boxedShortArray = (Short[]) object;
-                this.dos.writeInt(boxedShortArray.length * 2);
+                this.dos.writeByte(NbtType.SHORT.type);
+                this.dos.writeInt(boxedShortArray.length);
                 for (Short shortValue : boxedShortArray) {
                     this.dos.writeShort(shortValue);
                 }
                 break;
             case CHAR:
-                this.dos.writeChar((Character) object);
+                this.dos.writeUTF(new String(new char[] { (Character) object }));
                 break;
             case CHAR_ARRAY:
-                final char[] charArray = (char[]) object;
-                this.dos.writeInt(charArray.length * 2);
-                for (char charValue : charArray) {
-                    this.dos.writeChar(charValue);
-                }
+                this.dos.writeUTF(new String((char[]) object));
                 break;
             case CHAR_BOXED_ARRAY:
                 final Character[] boxedCharacterArray = (Character[]) object;
-                this.dos.writeInt(boxedCharacterArray.length * 2);
-                for (Character charValue : boxedCharacterArray) {
-                    this.dos.writeChar(charValue);
-                }
+                this.dos.writeUTF(new String(ArrayUtils.toPrimitive(boxedCharacterArray)));
                 break;
             case INT:
                 this.dos.writeInt((Integer) object);
@@ -158,14 +153,16 @@ public class NbtDataContainerOutputStream implements Closeable, Flushable, DataC
                 break;
             case LONG_ARRAY:
                 final long[] longArray = (long[]) object;
-                this.dos.writeInt(longArray.length * 2);
+                this.dos.writeByte(NbtType.LONG.type);
+                this.dos.writeInt(longArray.length);
                 for (long longValue : longArray) {
                     this.dos.writeLong(longValue);
                 }
                 break;
             case LONG_BOXED_ARRAY:
                 final Long[] boxedLongArray = (Long[]) object;
-                this.dos.writeInt(boxedLongArray.length * 2);
+                this.dos.writeByte(NbtType.LONG.type);
+                this.dos.writeInt(boxedLongArray.length);
                 for (Long longValue : boxedLongArray) {
                     this.dos.writeLong(longValue);
                 }
@@ -175,6 +172,7 @@ public class NbtDataContainerOutputStream implements Closeable, Flushable, DataC
                 break;
             case FLOAT_ARRAY:
                 final float[] floatArray = (float[]) object;
+                this.dos.writeByte(NbtType.FLOAT.type);
                 this.dos.writeInt(floatArray.length);
                 for (float floatValue : floatArray) {
                     this.dos.writeFloat(floatValue);
@@ -182,6 +180,7 @@ public class NbtDataContainerOutputStream implements Closeable, Flushable, DataC
                 break;
             case FLOAT_BOXED_ARRAY:
                 final Float[] boxedFloatArray = (Float[]) object;
+                this.dos.writeByte(NbtType.FLOAT.type);
                 this.dos.writeInt(boxedFloatArray.length);
                 for (Float floatValue : boxedFloatArray) {
                     this.dos.writeFloat(floatValue);
@@ -192,14 +191,16 @@ public class NbtDataContainerOutputStream implements Closeable, Flushable, DataC
                 break;
             case DOUBLE_ARRAY:
                 final double[] doubleArray = (double[]) object;
-                this.dos.writeInt(doubleArray.length * 2);
+                this.dos.writeByte(NbtType.DOUBLE.type);
+                this.dos.writeInt(doubleArray.length);
                 for (double doubleValue : doubleArray) {
                     this.dos.writeDouble(doubleValue);
                 }
                 break;
             case DOUBLE_BOXED_ARRAY:
                 final Double[] boxedDoubleArray = (Double[]) object;
-                this.dos.writeInt(boxedDoubleArray.length * 2);
+                this.dos.writeByte(NbtType.DOUBLE.type);
+                this.dos.writeInt(boxedDoubleArray.length);
                 for (Double doubleValue : boxedDoubleArray) {
                     this.dos.writeDouble(doubleValue);
                 }
@@ -208,16 +209,12 @@ public class NbtDataContainerOutputStream implements Closeable, Flushable, DataC
                 this.dos.writeUTF((String) object);
                 break;
             case STRING_ARRAY:
-                final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                final DataOutputStream dos = new DataOutputStream(baos);
                 final String[] stringArray = (String[]) object;
-                dos.writeInt(stringArray.length);
+                this.dos.writeByte(NbtType.STRING.type);
+                this.dos.writeInt(stringArray.length);
                 for (String string : stringArray) {
-                    dos.writeUTF(string);
+                    this.dos.writeUTF(string);
                 }
-                final byte[] bytes = baos.toByteArray();
-                this.dos.writeInt(bytes.length);
-                this.dos.write(bytes);
                 break;
             case BOOLEAN:
                 this.dos.writeBoolean((Boolean) object);
@@ -300,7 +297,7 @@ public class NbtDataContainerOutputStream implements Closeable, Flushable, DataC
             } else {
                 nbtType = typeFor(list.get(0));
                 if (nbtType.suffix != null) {
-                    key += '$' + nbtType.suffix;
+                    key += "$List$" + nbtType.suffix;
                 }
             }
             this.dos.writeUTF(key);

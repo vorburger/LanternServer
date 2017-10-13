@@ -40,6 +40,7 @@ import com.google.common.reflect.TypeToken;
 import org.apache.commons.lang3.ArrayUtils;
 import org.lanternpowered.server.data.persistence.DataTypeSerializer;
 import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.util.EqualsHelper;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
@@ -209,6 +210,8 @@ class MemoryDataView implements DataView {
                         return Optional.of(ArrayUtils.clone((double[]) object));
                     } else if (object instanceof boolean[]) {
                         return Optional.of(ArrayUtils.clone((boolean[]) object));
+                    } else if (object instanceof char[]) {
+                        return Optional.of(ArrayUtils.clone((char[]) object));
                     } else {
                         return Optional.of(ArrayUtils.clone((Object[]) object));
                     }
@@ -231,7 +234,7 @@ class MemoryDataView implements DataView {
         checkNotNull(path, "path");
         checkNotNull(value, "value");
 
-        final LanternDataManager manager = Lantern.getGame().getDataManager();
+        final LanternDataManager manager = Lantern.getDataManager();
         final List<String> parts = path.getParts();
         final String key = parts.get(0);
         if (parts.size() > 1) {
@@ -260,8 +263,9 @@ class MemoryDataView implements DataView {
             // see above for why this is copied
             copyDataView(path, valueContainer);
         } else if (value instanceof CatalogType) {
-            return set(path, ((CatalogType) value).getId());
-        } else if ((optDataTypeSerializer = manager.getTypeSerializer(typeToken = TypeToken.of(value.getClass()))).isPresent()) {
+            this.map.put(key, ((CatalogType) value).getId());
+        } else if (manager != null && (optDataTypeSerializer = manager.getTypeSerializer(
+                typeToken = TypeToken.of(value.getClass()))).isPresent()) {
             final DataTypeSerializer serializer = optDataTypeSerializer.get();
             final Object serialized = serializer.serialize(typeToken, manager.getTypeSerializerContext(), value);
             if (serialized instanceof DataContainer) {
@@ -270,7 +274,7 @@ class MemoryDataView implements DataView {
                 // see above for why this is copied
                 copyDataView(path, container);
             } else {
-                set(path, serialized);
+                this.map.put(key, serialized);
             }
         } else if (value instanceof Collection) {
             setCollection(key, (Collection) value);
@@ -292,6 +296,8 @@ class MemoryDataView implements DataView {
                     this.map.put(key, ArrayUtils.clone((double[]) value));
                 } else if (value instanceof boolean[]) {
                     this.map.put(key, ArrayUtils.clone((boolean[]) value));
+                } else if (value instanceof char[]) {
+                    this.map.put(key, ArrayUtils.clone((char[]) value));
                 } else {
                     this.map.put(key, ArrayUtils.clone((Object[]) value));
                 }
@@ -312,7 +318,7 @@ class MemoryDataView implements DataView {
     @SuppressWarnings({"unchecked", "rawtypes"})
     private void setCollection(String key, Collection<?> value) {
         final ImmutableList.Builder<Object> builder = ImmutableList.builder();
-        final LanternDataManager manager = Lantern.getGame().getDataManager();
+        final LanternDataManager manager = Lantern.getDataManager();
 
         for (Object object : value) {
             if (object instanceof DataSerializable) {
@@ -336,7 +342,8 @@ class MemoryDataView implements DataView {
                 builder.add(ensureSerialization((Collection) object));
             } else {
                 final TypeToken<?> typeToken = TypeToken.of(object.getClass());
-                final DataTypeSerializer serializer = manager.getTypeSerializer(typeToken).orElse(null);
+                final DataTypeSerializer serializer = manager == null ? null :
+                        manager.getTypeSerializer(typeToken).orElse(null);
                 if (serializer != null) {
                     final Object result = serializer.serialize(typeToken, manager.getTypeSerializerContext(), object);
                     checkArgument(!result.equals(this), "Cannot insert self-referencing Objects!");
@@ -798,8 +805,7 @@ class MemoryDataView implements DataView {
             return false;
         }
         final MemoryDataView other = (MemoryDataView) obj;
-
-        return Objects.equal(this.map.entrySet(), other.map.entrySet())
+        return EqualsHelper.equal(this.map, other.map)
                 && Objects.equal(this.path, other.path);
     }
 

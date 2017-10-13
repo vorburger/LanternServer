@@ -28,6 +28,7 @@ package org.lanternpowered.server.data.persistence.nbt;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.Lists;
+import org.lanternpowered.server.data.MemoryDataContainer;
 import org.lanternpowered.server.data.persistence.DataContainerInput;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
@@ -358,7 +359,7 @@ public class NbtDataContainerInputStream implements Closeable, DataContainerInpu
                 return list;
             case COMPOUND:
                 if (container == null) {
-                    container = DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED);
+                    container = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED);
                 }
                 depth1 = depth + 1;
                 Entry entry;

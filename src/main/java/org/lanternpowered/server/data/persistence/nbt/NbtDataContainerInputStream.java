@@ -316,7 +316,7 @@ public class NbtDataContainerInputStream implements Closeable, DataContainerInpu
             case BOOLEAN:
                 return this.dis.readBoolean();
             case BOOLEAN_ARRAY:
-                int bitBytes = this.dis.readInt() - 4;
+                int bitBytes = this.dis.readInt() - 2;
                 final boolean[] booleanArray = new boolean[this.dis.readShort()];
                 int j = 0;
                 for (int i = 0; i < bitBytes; i++) {
@@ -328,7 +328,7 @@ public class NbtDataContainerInputStream implements Closeable, DataContainerInpu
                 }
                 return booleanArray;
             case BOOLEAN_BOXED_ARRAY:
-                bitBytes = this.dis.readInt() - 4;
+                bitBytes = this.dis.readInt() - 2;
                 final Boolean[] boxedBooleanArray = new Boolean[this.dis.readShort()];
                 j = 0;
                 for (int i = 0; i < bitBytes; i++) {

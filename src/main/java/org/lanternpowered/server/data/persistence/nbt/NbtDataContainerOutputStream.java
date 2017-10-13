@@ -225,7 +225,7 @@ public class NbtDataContainerOutputStream implements Closeable, Flushable, DataC
                 if (booleanArray.length % 8 != 0) {
                     length++;
                 }
-                this.dos.writeInt(length + 4);
+                this.dos.writeInt(length + 2);
                 this.dos.writeShort(booleanArray.length);
                 int j = 0;
                 for (int i = 0; i < length; i++) {
@@ -245,7 +245,7 @@ public class NbtDataContainerOutputStream implements Closeable, Flushable, DataC
                 if (boxedBooleanArray.length % 8 != 0) {
                     length++;
                 }
-                this.dos.writeInt(length + 4);
+                this.dos.writeInt(length + 2);
                 this.dos.writeShort(boxedBooleanArray.length);
                 j = 0;
                 for (int i = 0; i < length; i++) {

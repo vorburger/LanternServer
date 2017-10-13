@@ -87,7 +87,7 @@ public class NbtDataContainerStreamsTest {
         container.set(K, new double[] { 1, 2, 3, 4 });
         container.set(L, new float[] { 1, 2, 3, 4 });
         container.set(M, new long[] { 1, 2, 3, 4 });
-        container.set(N, new char[] { 1, 2, 3, 4 });
+        container.set(N, new char[] { 'A', 'B', 'C' });
         container.set(O, 'C');
         container.set(P, new short[] { 1, 2, 3, 4 });
         container.set(Q, true);

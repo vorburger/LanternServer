@@ -153,7 +153,6 @@ public class NbtDataContainerOutputStream implements Closeable, Flushable, DataC
                 break;
             case LONG_ARRAY:
                 final long[] longArray = (long[]) object;
-                this.dos.writeByte(NbtType.LONG.type);
                 this.dos.writeInt(longArray.length);
                 for (long longValue : longArray) {
                     this.dos.writeLong(longValue);
@@ -161,7 +160,6 @@ public class NbtDataContainerOutputStream implements Closeable, Flushable, DataC
                 break;
             case LONG_BOXED_ARRAY:
                 final Long[] boxedLongArray = (Long[]) object;
-                this.dos.writeByte(NbtType.LONG.type);
                 this.dos.writeInt(boxedLongArray.length);
                 for (Long longValue : boxedLongArray) {
                     this.dos.writeLong(longValue);

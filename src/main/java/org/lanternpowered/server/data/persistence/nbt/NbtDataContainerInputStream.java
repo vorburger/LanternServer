@@ -217,27 +217,13 @@ public class NbtDataContainerInputStream implements Closeable, DataContainerInpu
             case LONG:
                 return this.dis.readLong();
             case LONG_ARRAY:
-                type = this.dis.readByte();
-                length = this.dis.readInt();
-                if (type == NbtType.END.type) {
-                    return new long[length];
-                } else if (type != NbtType.LONG.type) {
-                    throw new IOException("Attempted to deserialize a Long Array (List) but the list type wasn't a long.");
-                }
-                final long[] longArray = new long[length];
+                final long[] longArray = new long[this.dis.readInt()];
                 for (int i = 0; i < longArray.length; i++) {
                     longArray[i] = this.dis.readLong();
                 }
                 return longArray;
             case LONG_BOXED_ARRAY:
-                type = this.dis.readByte();
-                length = this.dis.readInt();
-                if (type == NbtType.END.type) {
-                    return new Long[length];
-                } else if (type != NbtType.LONG.type) {
-                    throw new IOException("Attempted to deserialize a Long Array (List) but the list type wasn't a long.");
-                }
-                final Long[] boxedLongArray = new Long[length];
+                final Long[] boxedLongArray = new Long[this.dis.readInt()];
                 for (int i = 0; i < boxedLongArray.length; i++) {
                     boxedLongArray[i] = this.dis.readLong();
                 }

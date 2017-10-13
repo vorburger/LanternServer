@@ -47,6 +47,7 @@ enum NbtType {
     LIST                    (9),
     COMPOUND                (10),
     INT_ARRAY               (11),
+    LONG_ARRAY              (12),
 
     // Sponge and lantern types, but remaining
     // compatible with the official ones.
@@ -57,8 +58,7 @@ enum NbtType {
     SHORT_ARRAY             (9, "ShAr"),
     SHORT_BOXED_ARRAY       (9, "ShBAr"),
     INT_BOXED_ARRAY         (11, "IntBAr"),
-    LONG_ARRAY              (9, "LngAr"),
-    LONG_BOXED_ARRAY        (9, "LngBAr"),
+    LONG_BOXED_ARRAY        (12, "LngBAr"),
     FLOAT_ARRAY             (9, "FltAr"),
     FLOAT_BOXED_ARRAY       (9, "FltBAr"),
     DOUBLE_ARRAY            (9, "DblAr"),

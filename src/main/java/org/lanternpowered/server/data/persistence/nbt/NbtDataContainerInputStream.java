@@ -160,12 +160,6 @@ public class NbtDataContainerInputStream implements Closeable, DataContainerInpu
                 final byte[] byteArray = new byte[this.dis.readInt()];
                 this.dis.read(byteArray);
                 return byteArray;
-            case BYTE_BOXED_ARRAY:
-                final Byte[] boxedByteArray = new Byte[this.dis.readInt()];
-                for (int i = 0; i < boxedByteArray.length; i++) {
-                    boxedByteArray[i] = this.dis.readByte();
-                }
-                return boxedByteArray;
             case SHORT:
                 return this.dis.readShort();
             case SHORT_ARRAY:
@@ -181,25 +175,10 @@ public class NbtDataContainerInputStream implements Closeable, DataContainerInpu
                     shortArray[i] = this.dis.readShort();
                 }
                 return shortArray;
-            case SHORT_BOXED_ARRAY:
-                type = this.dis.readByte();
-                length = this.dis.readInt();
-                if (type == NbtType.END.type) {
-                    return new Short[length];
-                } else if (type != NbtType.SHORT.type) {
-                    throw new IOException("Attempted to deserialize a Short Array (List) but the list type wasn't a short.");
-                }
-                final Short[] boxedShortArray = new Short[length];
-                for (int i = 0; i < boxedShortArray.length; i++) {
-                    boxedShortArray[i] = this.dis.readShort();
-                }
-                return boxedShortArray;
             case CHAR:
                 return this.dis.readUTF().charAt(0);
             case CHAR_ARRAY:
                 return this.dis.readUTF().toCharArray();
-            case CHAR_BOXED_ARRAY:
-                return this.dis.readUTF().chars().mapToObj(c -> (char) c).toArray(Character[]::new);
             case INT:
                 return this.dis.readInt();
             case INT_ARRAY:
@@ -208,12 +187,6 @@ public class NbtDataContainerInputStream implements Closeable, DataContainerInpu
                     intArray[i] = this.dis.readInt();
                 }
                 return intArray;
-            case INT_BOXED_ARRAY:
-                final Integer[] boxedIntArray = new Integer[this.dis.readInt()];
-                for (int i = 0; i < boxedIntArray.length; i++) {
-                    boxedIntArray[i] = this.dis.readInt();
-                }
-                return boxedIntArray;
             case LONG:
                 return this.dis.readLong();
             case LONG_ARRAY:
@@ -222,12 +195,6 @@ public class NbtDataContainerInputStream implements Closeable, DataContainerInpu
                     longArray[i] = this.dis.readLong();
                 }
                 return longArray;
-            case LONG_BOXED_ARRAY:
-                final Long[] boxedLongArray = new Long[this.dis.readInt()];
-                for (int i = 0; i < boxedLongArray.length; i++) {
-                    boxedLongArray[i] = this.dis.readLong();
-                }
-                return boxedLongArray;
             case FLOAT:
                 return this.dis.readFloat();
             case FLOAT_ARRAY:
@@ -243,19 +210,6 @@ public class NbtDataContainerInputStream implements Closeable, DataContainerInpu
                     floatArray[i] = this.dis.readFloat();
                 }
                 return floatArray;
-            case FLOAT_BOXED_ARRAY:
-                type = this.dis.readByte();
-                length = this.dis.readInt();
-                if (type == NbtType.END.type) {
-                    return new Float[length];
-                } else if (type != NbtType.FLOAT.type) {
-                    throw new IOException("Attempted to deserialize a Float Array (List) but the list type wasn't a float.");
-                }
-                final Float[] boxedFloatArray = new Float[length];
-                for (int i = 0; i < boxedFloatArray.length; i++) {
-                    boxedFloatArray[i] = this.dis.readFloat();
-                }
-                return boxedFloatArray;
             case DOUBLE:
                 return this.dis.readDouble();
             case DOUBLE_ARRAY:
@@ -271,19 +225,6 @@ public class NbtDataContainerInputStream implements Closeable, DataContainerInpu
                     doubleArray[i] = this.dis.readDouble();
                 }
                 return doubleArray;
-            case DOUBLE_BOXED_ARRAY:
-                type = this.dis.readByte();
-                length = this.dis.readInt();
-                if (type == NbtType.END.type) {
-                    return new Double[length];
-                } else if (type != NbtType.DOUBLE.type) {
-                    throw new IOException("Attempted to deserialize a Double Array (List) but the list type wasn't a double.");
-                }
-                final Double[] boxedDoubleArray = new Double[length];
-                for (int i = 0; i < boxedDoubleArray.length; i++) {
-                    boxedDoubleArray[i] = this.dis.readDouble();
-                }
-                return boxedDoubleArray;
             case STRING:
                 return this.dis.readUTF();
             case STRING_ARRAY:
@@ -313,18 +254,6 @@ public class NbtDataContainerInputStream implements Closeable, DataContainerInpu
                     }
                 }
                 return booleanArray;
-            case BOOLEAN_BOXED_ARRAY:
-                bitBytes = this.dis.readInt() - 2;
-                final Boolean[] boxedBooleanArray = new Boolean[this.dis.readShort()];
-                j = 0;
-                for (int i = 0; i < bitBytes; i++) {
-                    final byte value = this.dis.readByte();
-                    while (j < boxedBooleanArray.length) {
-                        final int k = j % 8;
-                        boxedBooleanArray[j++] = (value & (1 << k)) != 0;
-                    }
-                }
-                return boxedBooleanArray;
             case LIST:
                 final byte listType = this.dis.readByte();
                 if (listNbtType == null) {
@@ -357,6 +286,20 @@ public class NbtDataContainerInputStream implements Closeable, DataContainerInpu
                     }
                 }
                 return container;
+            case COMPOUND_ARRAY:
+                type = this.dis.readByte();
+                length = this.dis.readInt();
+                if (type == NbtType.END.type) {
+                    return new String[length];
+                } else if (type != NbtType.COMPOUND.type) {
+                    throw new IOException("Attempted to deserialize a DataView Array (List) but the list type wasn't a data view.");
+                }
+                depth1 = depth + 1;
+                final DataView[] dataViewArray = new DataView[length];
+                for (int i = 0; i < dataViewArray.length; i++) {
+                    dataViewArray[i] = (DataView) readPayload(null, NbtType.COMPOUND, null, depth1);
+                }
+                return dataViewArray;
             default:
                 throw new InvalidDataFormatException("Attempt to deserialize a unknown nbt tag type: " + nbtType);
         }

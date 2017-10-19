@@ -51,22 +51,15 @@ enum NbtType {
 
     // Sponge and lantern types, but remaining
     // compatible with the official ones.
-    BOOLEAN                 (1, "Boolean"),
-    BOOLEAN_ARRAY           (7, "BoolAr"),
-    BOOLEAN_BOXED_ARRAY     (7, "BoolBAr"),
-    BYTE_BOXED_ARRAY        (7, "ByBAr"),
-    SHORT_ARRAY             (9, "ShAr"),
-    SHORT_BOXED_ARRAY       (9, "ShBAr"),
-    INT_BOXED_ARRAY         (11, "IntBAr"),
-    LONG_BOXED_ARRAY        (12, "LngBAr"),
-    FLOAT_ARRAY             (9, "FltAr"),
-    FLOAT_BOXED_ARRAY       (9, "FltBAr"),
-    DOUBLE_ARRAY            (9, "DblAr"),
-    DOUBLE_BOXED_ARRAY      (9, "DblBAr"),
-    STRING_ARRAY            (9, "StrAr"),
-    CHAR                    (8, "Char"),
-    CHAR_ARRAY              (8, "CharAr"),
-    CHAR_BOXED_ARRAY        (8, "CharBAr"),
+    BOOLEAN                 (1, "Boolean"), // Boolean was used before, so still uppercase
+    BOOLEAN_ARRAY           (7, "boolean[]"),
+    SHORT_ARRAY             (9, "short[]"),
+    FLOAT_ARRAY             (9, "float[]"),
+    DOUBLE_ARRAY            (9, "double[]"),
+    STRING_ARRAY            (9, "string[]"),
+    CHAR                    (8, "char"),
+    CHAR_ARRAY              (8, "char[]"),
+    COMPOUND_ARRAY          (9, "compound[]"),
 
     UNKNOWN                 (99),
     ;

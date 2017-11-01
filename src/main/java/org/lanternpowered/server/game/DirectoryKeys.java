@@ -46,11 +46,6 @@ public final class DirectoryKeys {
     public static final String PLUGINS = "plugins-folder";
 
     /**
-     * The libraries folder key.
-     */
-    public static final String LIBRARIES = "libraries-folder";
-
-    /**
      * The world folder key.
      */
     public static final String WORLD = "world-folder";

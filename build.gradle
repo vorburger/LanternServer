@@ -169,6 +169,8 @@ configurations.compile.resolvedConfiguration.resolvedArtifacts.each { ResolvedAr
     }
 }
 
+// TODO: Upload missing dependency, theJar and sourceJar artifacts to the lantern repository once available
+
 /////////////////////////////////////////////////
 /// Generate the jar with all the lantern and ///
 ///  sponge classes, and all their resources. ///
@@ -204,31 +206,11 @@ task theJar(type: ShadowJar) {
     //    dependencies and repositories.  ///
     /////////////////////////////////////////
 
-    def specifiedUrls = new HashSet<>()
-    def repositoryEntries = new ArrayList<>()
-    // Generate a json file with all the dependencies and repositories
-    repositories.each { repo ->
-        URL url = repo.url.toURL()
-        if (url.protocol == 'file') {
-            return
-        }
-        def s = url.toString()
-        if (specifiedUrls.contains(s)) {
-            return
-        }
-        specifiedUrls.add(s)
-
-        def properties = new HashMap<>()
-        properties['url'] = s
-
-        repositoryEntries.add(properties)
-    }
-
     def dependencyEntries = new ArrayList<>()
     dependencyArtifacts.each { ResolvedArtifact a -> dependencyEntries.add(a.moduleVersion.id.toString()) }
 
     def data = new HashMap<>()
-    data['repositories'] = repositoryEntries
+    data['repositories'] = [] // TODO: Add the lantern repository once available
     data['dependencies'] = dependencyEntries
 
     def librariesFile = new File(buildDir, 'dependencies.json')
@@ -310,7 +292,7 @@ artifacts {
 
 // Gradle version used for generating the Gradle wrapper
 task wrapper(type: Wrapper) {
-    gradleVersion = '4.2'
+    gradleVersion = '4.2.1'
 }
 
 // A custom update wrapper task, using a custom task prevents

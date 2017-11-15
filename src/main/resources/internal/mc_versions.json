@@ -694,5 +694,21 @@
     {
         "version": 340,
         "name": "1.12.2"
+    },
+    {
+        "version": 341,
+        "name": "37w43a"
+    },
+    {
+        "version": 342,
+        "name": "37w43b"
+    },
+    {
+        "version": 343,
+        "name": "37w45a"
+    },
+    {
+        "version": 344,
+        "name": "37w45b"
     }
 ]

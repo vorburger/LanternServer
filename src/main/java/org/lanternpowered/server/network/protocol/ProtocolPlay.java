@@ -59,7 +59,6 @@ import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInP
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInPlayerVehicleMovement;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInResourcePackStatus;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInSpectate;
-import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInTabComplete;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInTeleportConfirm;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInUseEntity;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutAddPotionEffect;
@@ -95,6 +94,7 @@ import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOut
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutPlayerPositionAndLook;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutPlayerRespawn;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutPlayerSpawnPosition;
+import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutRegisterCommands;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutRemovePotionEffect;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutScoreboardDisplayObjective;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutScoreboardObjective;
@@ -116,7 +116,7 @@ import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOut
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutSpawnPlayer;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutSpawnThunderbolt;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutStatistics;
-import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutTabComplete;
+import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutStopSounds;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutTabListEntries;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutTabListHeaderAndFooter;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutTeams;
@@ -156,7 +156,6 @@ import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPla
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInSignBook;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInStartElytraFlying;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInSwapHandItems;
-import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInTabComplete;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInUnregisterChannels;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInUseEntityAttack;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInUseEntityInteract;
@@ -214,7 +213,6 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayIn
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInSpectate;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInStartElytraFlying;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInSwapHandItems;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInTabComplete;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInTeleportConfirm;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInUseEntity;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutAddPotionEffect;
@@ -252,6 +250,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerRespawn;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerSpawnPosition;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutRecord;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutRegisterCommands;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutRemovePotionEffect;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutScoreboardDisplayObjective;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutScoreboardObjective;
@@ -277,7 +276,6 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnThunderbolt;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutStatistics;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutStopSounds;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTabComplete;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTabListEntries;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTabListHeaderAndFooter;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTeams;
@@ -309,8 +307,6 @@ final class ProtocolPlay extends ProtocolBase {
 
         // Register the codecs and handlers of the default messages
         inbound.bind(CodecPlayInTeleportConfirm.class, MessagePlayInTeleportConfirm.class); // TODO: Handler
-        inbound.bind(CodecPlayInTabComplete.class, MessagePlayInTabComplete.class)
-                .bindHandler(new HandlerPlayInTabComplete());
         inbound.bind(CodecPlayInChatMessage.class, MessagePlayInChatMessage.class)
                 .bindHandler(new HandlerPlayInChatMessage());
         inbound.bind(CodecPlayInClientStatus.class);
@@ -448,9 +444,9 @@ final class ProtocolPlay extends ProtocolBase {
         codecPlayOutBossBar.bind(MessagePlayOutBossBar.UpdateTitle.class);
         codecPlayOutBossBar.bind(MessagePlayOutBossBar.UpdateMisc.class);
         outbound.bind(CodecPlayOutSetDifficulty.class, MessagePlayOutSetDifficulty.class);
-        outbound.bind(CodecPlayOutTabComplete.class, MessagePlayOutTabComplete.class);
         outbound.bind(CodecPlayOutChatMessage.class, MessagePlayOutChatMessage.class);
         outbound.bind(CodecPlayOutMultiBlockChange.class, MessagePlayOutMultiBlockChange.class);
+        outbound.bind(CodecPlayOutRegisterCommands.class, MessagePlayOutRegisterCommands.class);
         outbound.bind(CodecPlayInOutConfirmWindowTransaction.class, MessagePlayInOutConfirmWindowTransaction.class);
         outbound.bind(CodecPlayInOutCloseWindow.class, MessagePlayInOutCloseWindow.class);
         outbound.bind(CodecPlayOutOpenWindow.class, MessagePlayOutOpenWindow.class);
@@ -463,7 +459,6 @@ final class ProtocolPlay extends ProtocolBase {
         codecPlayInOutCustomPayload.bind(MessagePlayInOutChannelPayload.class);
         codecPlayInOutCustomPayload.bind(MessagePlayOutOpenBook.class);
         codecPlayInOutCustomPayload.bind(MessagePlayInOutBrand.class);
-        codecPlayInOutCustomPayload.bind(MessagePlayOutStopSounds.class);
         outbound.bind(CodecPlayOutNamedSoundEffect.class, MessagePlayOutNamedSoundEffect.class);
         outbound.bind(CodecOutDisconnect.class, MessageOutDisconnect.class);
         final CodecRegistration<Message, CodecPlayOutEntityStatus> codecPlayOutEntityStatus = outbound.bind(CodecPlayOutEntityStatus.class);
@@ -548,6 +543,7 @@ final class ProtocolPlay extends ProtocolBase {
         codecPlayOutTitle.bind(MessagePlayOutTitle.SetActionbarTitle.class);
         codecPlayOutTitle.bind(MessagePlayOutTitle.SetTimes.class);
         codecPlayOutTitle.bind(MessagePlayOutTitle.SetTitle.class);
+        outbound.bind(CodecPlayOutStopSounds.class, MessagePlayOutStopSounds.class);
         outbound.bind(CodecPlayOutSoundEffect.class, MessagePlayOutSoundEffect.class);
         outbound.bind(CodecPlayOutTabListHeaderAndFooter.class, MessagePlayOutTabListHeaderAndFooter.class);
         outbound.bind(CodecPlayOutEntityCollectItem.class, MessagePlayOutEntityCollectItem.class);

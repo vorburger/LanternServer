@@ -23,24 +23,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.codec.play;
+package org.lanternpowered.server.network.vanilla.message.type.play;
 
-import io.netty.handler.codec.CodecException;
-import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.message.codec.Codec;
-import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTabComplete;
+import org.lanternpowered.server.network.message.Message;
 
-import java.util.List;
+public final class MessagePlayOutRegisterCommands implements Message {
 
-public final class CodecPlayOutTabComplete implements Codec<MessagePlayOutTabComplete> {
-
-    @Override
-    public ByteBuffer encode(CodecContext context, MessagePlayOutTabComplete message) throws CodecException {
-        final ByteBuffer buf = context.byteBufAlloc().buffer();
-        final List<String> matches = message.getMatches();
-        buf.writeVarInt(matches.size());
-        matches.forEach(buf::writeString);
-        return buf;
-    }
 }

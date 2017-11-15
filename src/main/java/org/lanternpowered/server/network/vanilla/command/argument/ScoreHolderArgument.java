@@ -23,21 +23,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.type.play;
+package org.lanternpowered.server.network.vanilla.command.argument;
 
-import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.vanilla.command.RootNode;
+public class ScoreHolderArgument extends Argument {
 
-public final class MessagePlayOutRegisterCommands implements Message {
+    private final boolean multipleEntities;
+    private final boolean unknownFlag;
 
-    private final RootNode rootNode;
-
-    public MessagePlayOutRegisterCommands(RootNode rootNode) {
-        this.rootNode = rootNode;
+    public ScoreHolderArgument(boolean multipleEntities, boolean unknownFlag) {
+        this.multipleEntities = multipleEntities;
+        this.unknownFlag = unknownFlag;
     }
 
-    public RootNode getRootNode() {
-        return this.rootNode;
+    public boolean allowMultipleEntities() {
+        return this.multipleEntities;
     }
 
+    public boolean hasUnknownFlag() {
+        return this.unknownFlag;
+    }
 }

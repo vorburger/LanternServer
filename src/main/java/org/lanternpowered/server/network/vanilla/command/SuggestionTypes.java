@@ -23,21 +23,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.type.play;
+package org.lanternpowered.server.network.vanilla.command;
 
-import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.vanilla.command.RootNode;
+public final class SuggestionTypes {
 
-public final class MessagePlayOutRegisterCommands implements Message {
+    public static final SuggestionType ASK_SERVER = SuggestionType.of("minecraft:ask_server");
 
-    private final RootNode rootNode;
+    public static final SuggestionType ALL_RECIPES = SuggestionType.of("minecraft:all_recipes");
 
-    public MessagePlayOutRegisterCommands(RootNode rootNode) {
-        this.rootNode = rootNode;
+    public static final SuggestionType AVAILABLE_SOUNDS = SuggestionType.of("minecraft:available_sounds");
+
+    public static final SuggestionType SUMMONABLE_ENTITIES = SuggestionType.of("minecraft:summonable_entities");
+
+    private SuggestionTypes() {
     }
-
-    public RootNode getRootNode() {
-        return this.rootNode;
-    }
-
 }

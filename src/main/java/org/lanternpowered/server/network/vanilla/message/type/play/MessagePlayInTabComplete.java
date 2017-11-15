@@ -26,18 +26,16 @@
 package org.lanternpowered.server.network.vanilla.message.type.play;
 
 import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.vanilla.command.RootNode;
 
-public final class MessagePlayOutRegisterCommands implements Message {
+public final class MessagePlayInTabComplete implements Message {
 
-    private final RootNode rootNode;
+    private final String input;
 
-    public MessagePlayOutRegisterCommands(RootNode rootNode) {
-        this.rootNode = rootNode;
+    public MessagePlayInTabComplete(String input) {
+        this.input = input;
     }
 
-    public RootNode getRootNode() {
-        return this.rootNode;
+    public String getInput() {
+        return this.input;
     }
-
 }

@@ -23,21 +23,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.type.play;
+package org.lanternpowered.server.network.vanilla.command;
 
-import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.vanilla.command.RootNode;
+public final class SuggestionType {
 
-public final class MessagePlayOutRegisterCommands implements Message {
-
-    private final RootNode rootNode;
-
-    public MessagePlayOutRegisterCommands(RootNode rootNode) {
-        this.rootNode = rootNode;
+    public static SuggestionType of(String id) {
+        return new SuggestionType(id);
     }
 
-    public RootNode getRootNode() {
-        return this.rootNode;
+    private final String id;
+
+    private SuggestionType(String id) {
+        this.id = id;
     }
 
+    public String getId() {
+        return this.id;
+    }
 }

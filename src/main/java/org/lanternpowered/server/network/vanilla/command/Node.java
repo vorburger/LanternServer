@@ -23,21 +23,40 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.type.play;
+package org.lanternpowered.server.network.vanilla.command;
 
-import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.vanilla.command.RootNode;
+import com.google.common.collect.ImmutableList;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutRegisterCommands;
 
-public final class MessagePlayOutRegisterCommands implements Message {
+import java.util.List;
 
-    private final RootNode rootNode;
+import javax.annotation.Nullable;
 
-    public MessagePlayOutRegisterCommands(RootNode rootNode) {
-        this.rootNode = rootNode;
+public abstract class Node {
+
+    @Nullable private final String command;
+    @Nullable private final Node redirect;
+    private final List<Node> children;
+
+    public Node(List<Node> children,
+            @Nullable Node redirect,
+            @Nullable String command) {
+        this.children = ImmutableList.copyOf(children);
+        this.redirect = redirect;
+        this.command = command;
     }
 
-    public RootNode getRootNode() {
-        return this.rootNode;
+    @Nullable
+    public String getCommand() {
+        return this.command;
     }
 
+    @Nullable
+    public Node getRedirect() {
+        return this.redirect;
+    }
+
+    public List<Node> getChildren() {
+        return this.children;
+    }
 }

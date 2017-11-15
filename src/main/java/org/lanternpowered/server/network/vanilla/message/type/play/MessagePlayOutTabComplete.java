@@ -25,19 +25,20 @@
  */
 package org.lanternpowered.server.network.vanilla.message.type.play;
 
+import com.google.common.collect.ImmutableList;
 import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.vanilla.command.RootNode;
 
-public final class MessagePlayOutRegisterCommands implements Message {
+import java.util.List;
 
-    private final RootNode rootNode;
+public final class MessagePlayOutTabComplete implements Message {
 
-    public MessagePlayOutRegisterCommands(RootNode rootNode) {
-        this.rootNode = rootNode;
+    private final List<String> matches;
+
+    public MessagePlayOutTabComplete(List<String> matches) {
+        this.matches = ImmutableList.copyOf(matches);
     }
 
-    public RootNode getRootNode() {
-        return this.rootNode;
+    public List<String> getMatches() {
+        return this.matches;
     }
-
 }

@@ -67,6 +67,8 @@ import org.lanternpowered.server.item.LanternCooldownTracker;
 import org.lanternpowered.server.network.NetworkSession;
 import org.lanternpowered.server.network.entity.NetworkIdHolder;
 import org.lanternpowered.server.network.objects.RawItemStack;
+import org.lanternpowered.server.network.vanilla.command.LiteralNode;
+import org.lanternpowered.server.network.vanilla.command.RootNode;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutBrand;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockChange;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenBook;
@@ -75,6 +77,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerPositionAndLook;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerRespawn;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutRecord;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutRegisterCommands;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSelectAdvancementTree;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetReducedDebug;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetWindowSlot;
@@ -143,6 +146,7 @@ import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.WorldBorder;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -376,6 +380,9 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
                         .tryGet(TestAdvancementTree.DIG_DIRT_CRITERION).set(4);
                 this.session.send(new MessagePlayOutSelectAdvancementTree(
                         get(LanternKeys.OPEN_ADVANCEMENT_TREE).get().map(AdvancementTree::getInternalId).orElse(null)));
+                this.session.send(new MessagePlayOutRegisterCommands(new RootNode(
+                        Collections.singletonList(new LiteralNode(Collections.emptyList(), "test", null, "test")),
+                        null, null)));
                 // TODO: Unlock all the recipes for now, mappings between the internal ids and
                 // TODO: the readable ids still has to be made
                 final int[] recipes = new int[435];

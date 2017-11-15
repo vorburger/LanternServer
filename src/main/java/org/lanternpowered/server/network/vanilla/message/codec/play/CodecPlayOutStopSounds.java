@@ -33,7 +33,7 @@ import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutStopSounds;
 import org.spongepowered.api.effect.sound.SoundCategory;
 
-public class CodecPlayOutStopSounds implements Codec<MessagePlayOutStopSounds> {
+public final class CodecPlayOutStopSounds implements Codec<MessagePlayOutStopSounds> {
 
     @Override
     public ByteBuffer encode(CodecContext context, MessagePlayOutStopSounds message) throws CodecException {

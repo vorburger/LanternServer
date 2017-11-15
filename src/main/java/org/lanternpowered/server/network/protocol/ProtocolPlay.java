@@ -59,6 +59,7 @@ import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInP
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInPlayerVehicleMovement;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInResourcePackStatus;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInSpectate;
+import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInTabComplete;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInTeleportConfirm;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInUseEntity;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutAddPotionEffect;
@@ -117,6 +118,7 @@ import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOut
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutSpawnThunderbolt;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutStatistics;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutStopSounds;
+import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutTabComplete;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutTabListEntries;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutTabListHeaderAndFooter;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutTeams;
@@ -156,6 +158,7 @@ import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPla
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInSignBook;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInStartElytraFlying;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInSwapHandItems;
+import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInTabComplete;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInUnregisterChannels;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInUseEntityAttack;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInUseEntityInteract;
@@ -213,6 +216,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayIn
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInSpectate;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInStartElytraFlying;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInSwapHandItems;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInTabComplete;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInTeleportConfirm;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInUseEntity;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutAddPotionEffect;
@@ -276,6 +280,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnThunderbolt;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutStatistics;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutStopSounds;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTabComplete;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTabListEntries;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTabListHeaderAndFooter;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTeams;
@@ -312,6 +317,8 @@ final class ProtocolPlay extends ProtocolBase {
         inbound.bind(CodecPlayInClientStatus.class);
         inbound.bind(CodecPlayInClientSettings.class, MessagePlayInClientSettings.class)
                 .bindHandler(new HandlerPlayInClientSettings());
+        inbound.bind(CodecPlayInTabComplete.class, MessagePlayInTabComplete.class)
+                .bindHandler(new HandlerPlayInTabComplete());
         inbound.bind(CodecPlayInOutConfirmWindowTransaction.class, MessagePlayInOutConfirmWindowTransaction.class); // TODO: Handler
         inbound.bind(CodecPlayInEnchantItem.class, MessagePlayInEnchantItem.class)
                 .bindHandler(new HandlerPlayInContainerSessionForwarding<>(PlayerContainerSession::handleEnchantItem));
@@ -446,6 +453,7 @@ final class ProtocolPlay extends ProtocolBase {
         outbound.bind(CodecPlayOutSetDifficulty.class, MessagePlayOutSetDifficulty.class);
         outbound.bind(CodecPlayOutChatMessage.class, MessagePlayOutChatMessage.class);
         outbound.bind(CodecPlayOutMultiBlockChange.class, MessagePlayOutMultiBlockChange.class);
+        outbound.bind(CodecPlayOutTabComplete.class, MessagePlayOutTabComplete.class);
         outbound.bind(CodecPlayOutRegisterCommands.class, MessagePlayOutRegisterCommands.class);
         outbound.bind(CodecPlayInOutConfirmWindowTransaction.class, MessagePlayInOutConfirmWindowTransaction.class);
         outbound.bind(CodecPlayInOutCloseWindow.class, MessagePlayInOutCloseWindow.class);

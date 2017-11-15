@@ -23,21 +23,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.type.play;
+package org.lanternpowered.server.network.vanilla.command.argument;
 
-import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.vanilla.command.RootNode;
+@SuppressWarnings("unchecked")
+public interface ArgumentType<A extends Argument> {
 
-public final class MessagePlayOutRegisterCommands implements Message {
-
-    private final RootNode rootNode;
-
-    public MessagePlayOutRegisterCommands(RootNode rootNode) {
-        this.rootNode = rootNode;
+    /**
+     * Creates a new {@link ArgumentType} with the given id.
+     *
+     * @param id The id
+     * @return The argument type
+     */
+    static ArgumentType<Argument> of(String id) {
+        return new SimpleArgumentType(id, SimpleArgumentCodec.INSTANCE);
     }
 
-    public RootNode getRootNode() {
-        return this.rootNode;
+    /**
+     * Creates a new {@link ArgumentType} with the given id.
+     *
+     * @param id The id
+     * @return The argument type
+     */
+    static <A extends Argument> ArgumentType<A> of(String id, ArgumentCodec<A> codec) {
+        return new SimpleArgumentType(id, codec);
     }
 
+    String getId();
+
+    ArgumentCodec<A> getCodec();
 }

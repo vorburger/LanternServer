@@ -23,21 +23,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.type.play;
+package org.lanternpowered.server.network.vanilla.command.argument;
 
-import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.vanilla.command.RootNode;
+@SuppressWarnings("unchecked")
+final class SimpleArgumentType<A extends Argument> implements ArgumentType<A> {
 
-public final class MessagePlayOutRegisterCommands implements Message {
+    private final String id;
+    private final ArgumentCodec<A> codec;
 
-    private final RootNode rootNode;
-
-    public MessagePlayOutRegisterCommands(RootNode rootNode) {
-        this.rootNode = rootNode;
+    SimpleArgumentType(String id, ArgumentCodec<A> codec) {
+        this.id = id;
+        this.codec = codec;
     }
 
-    public RootNode getRootNode() {
-        return this.rootNode;
+    @Override
+    public String getId() {
+        return this.id;
     }
 
+    @Override
+    public ArgumentCodec<A> getCodec() {
+        return this.codec;
+    }
 }

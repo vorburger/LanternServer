@@ -23,21 +23,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.type.play;
+package org.lanternpowered.server.network.vanilla.command.argument;
 
-import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.vanilla.command.RootNode;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
 
-public final class MessagePlayOutRegisterCommands implements Message {
+@FunctionalInterface
+public interface ArgumentCodec<A extends Argument> {
 
-    private final RootNode rootNode;
-
-    public MessagePlayOutRegisterCommands(RootNode rootNode) {
-        this.rootNode = rootNode;
-    }
-
-    public RootNode getRootNode() {
-        return this.rootNode;
-    }
-
+    /**
+     * Encodes extra data for the given {@link Argument}.
+     *
+     * @param buf The byte buffer
+     * @param argument The argument
+     */
+    void encode(ByteBuffer buf, A argument);
 }

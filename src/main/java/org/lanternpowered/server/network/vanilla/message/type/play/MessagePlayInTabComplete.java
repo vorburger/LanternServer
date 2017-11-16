@@ -30,12 +30,18 @@ import org.lanternpowered.server.network.message.Message;
 public final class MessagePlayInTabComplete implements Message {
 
     private final String input;
+    private final int id;
 
-    public MessagePlayInTabComplete(String input) {
+    public MessagePlayInTabComplete(String input, int id) {
         this.input = input;
+        this.id = id;
     }
 
     public String getInput() {
         return this.input;
+    }
+
+    public int getId() {
+        return this.id;
     }
 }

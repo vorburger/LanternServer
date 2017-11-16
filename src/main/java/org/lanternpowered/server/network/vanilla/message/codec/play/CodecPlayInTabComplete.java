@@ -37,6 +37,6 @@ public final class CodecPlayInTabComplete implements Codec<MessagePlayInTabCompl
     public MessagePlayInTabComplete decode(CodecContext context, ByteBuffer buf) throws CodecException {
         final int unknown = buf.readVarInt();
         final String input = buf.readString();
-        return new MessagePlayInTabComplete(input);
+        return new MessagePlayInTabComplete(input, unknown);
     }
 }

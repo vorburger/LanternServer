@@ -33,12 +33,18 @@ import java.util.List;
 public final class MessagePlayOutTabComplete implements Message {
 
     private final List<String> matches;
+    private final int id;
 
-    public MessagePlayOutTabComplete(List<String> matches) {
+    public MessagePlayOutTabComplete(List<String> matches, int id) {
         this.matches = ImmutableList.copyOf(matches);
+        this.id = id;
     }
 
     public List<String> getMatches() {
         return this.matches;
+    }
+
+    public int getId() {
+        return this.id;
     }
 }

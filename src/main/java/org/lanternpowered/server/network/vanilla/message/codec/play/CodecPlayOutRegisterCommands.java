@@ -89,6 +89,7 @@ public final class CodecPlayOutRegisterCommands implements Codec<MessagePlayOutR
             if (node instanceof ArgumentNode) {
                 final ArgumentNode argumentNode = (ArgumentNode) node;
                 final ArgumentAndType argumentAndType = argumentNode.getArgumentAndType();
+                buf.writeString(argumentNode.getName());
                 // Write the type of the argument
                 buf.writeString(argumentAndType.getType().getId());
                 // Write extra argument flags

@@ -25,29 +25,21 @@
  */
 package org.lanternpowered.server.network.vanilla.command.argument;
 
-public final class ArgumentAndType<A extends Argument> {
+public class StringArgument extends Argument {
 
-    public static <A extends Argument> ArgumentAndType<A> of(ArgumentType<A> type, A argument) {
-        return new ArgumentAndType<>(type, argument);
-    }
+    private final Type type;
 
-    public static ArgumentAndType<Argument> of(ArgumentType<Argument> type) {
-        return new ArgumentAndType<>(type, new Argument());
-    }
-
-    private final ArgumentType<A> type;
-    private final A argument;
-
-    private ArgumentAndType(ArgumentType<A> type, A argument) {
-        this.argument = argument;
+    public StringArgument(Type type) {
         this.type = type;
     }
 
-    public ArgumentType<A> getType() {
+    public Type getType() {
         return this.type;
     }
 
-    public A getArgument() {
-        return this.argument;
+    public enum Type {
+        SINGLE_WORD,
+        QUOTABLE_PHRASE,
+        GREEDY_PHRASE,
     }
 }

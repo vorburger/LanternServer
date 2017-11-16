@@ -25,10 +25,12 @@
  */
 package org.lanternpowered.server.network.vanilla.message.handler.play;
 
+import com.google.common.collect.Lists;
+import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInTabComplete;
-import org.spongepowered.api.entity.living.player.Player;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTabComplete;
 import org.spongepowered.api.text.Text;
 
 public final class HandlerPlayInTabComplete implements Handler<MessagePlayInTabComplete> {
@@ -36,8 +38,9 @@ public final class HandlerPlayInTabComplete implements Handler<MessagePlayInTabC
     @Override
     public void handle(NetworkContext context, MessagePlayInTabComplete message) {
         final String text = message.getInput();
-        final Player player = context.getSession().getPlayer();
-        player.sendMessage(Text.of("Received tab completion: " + text));
+        final LanternPlayer player = context.getSession().getPlayer();
+        player.sendMessage(Text.of("Received tab completion (" + message.getId() + "): " + text));
+        player.getConnection().send(new MessagePlayOutTabComplete(Lists.newArrayList("Avalue", "Btest", "Cwhy"), message.getId()));
 
         /*
         // The content with normalized spaces, the spaces are trimmed

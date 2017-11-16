@@ -33,15 +33,17 @@ import javax.annotation.Nullable;
 
 public final class ArgumentNode extends Node {
 
+    private final String name;
     private final ArgumentAndType argumentAndType;
     @Nullable private final SuggestionType suggestions;
 
-    public ArgumentNode(List<Node> children, ArgumentAndType argumentAndType,
+    public ArgumentNode(List<Node> children, String name, ArgumentAndType argumentAndType,
             @Nullable String command,
-            @Nullable Node redirect,@Nullable SuggestionType suggestions) {
+            @Nullable Node redirect, @Nullable SuggestionType suggestions) {
         super(children, redirect, command);
         this.argumentAndType = argumentAndType;
         this.suggestions = suggestions;
+        this.name = name;
     }
 
     @Nullable
@@ -51,5 +53,9 @@ public final class ArgumentNode extends Node {
 
     public ArgumentAndType getArgumentAndType() {
         return this.argumentAndType;
+    }
+
+    public String getName() {
+        return this.name;
     }
 }

@@ -27,6 +27,51 @@ package org.lanternpowered.server.network.vanilla.command.argument;
 
 public final class ArgumentTypes {
 
+    public static final ArgumentType<Argument> BOOL = ArgumentType.of("brigadier:bool");
+
+    public static final ArgumentType<FloatArgument> FLOAT = ArgumentType.of("brigadier:float",
+            (buf, argument) -> {
+                final Float max = argument.getMax();
+                final Float min = argument.getMin();
+                byte flags = 0;
+                if (min != null) {
+                    flags |= 0x1;
+                }
+                if (max != null) {
+                    flags |= 0x2;
+                }
+                buf.writeByte(flags);
+                if (min != null) {
+                    buf.writeFloat(min);
+                }
+                if (max != null) {
+                    buf.writeFloat(max);
+                }
+            });
+
+    public static final ArgumentType<IntArgument> INTEGER = ArgumentType.of("brigadier:integer",
+            (buf, argument) -> {
+                final Integer max = argument.getMax();
+                final Integer min = argument.getMin();
+                byte flags = 0;
+                if (min != null) {
+                    flags |= 0x1;
+                }
+                if (max != null) {
+                    flags |= 0x2;
+                }
+                buf.writeByte(flags);
+                if (min != null) {
+                    buf.writeInteger(min);
+                }
+                if (max != null) {
+                    buf.writeInteger(max);
+                }
+            });
+
+    public static final ArgumentType<StringArgument> STRING = ArgumentType.of("brigadier:string",
+            (buf, argument) -> buf.writeVarInt(argument.getType().ordinal()));
+
     public static final ArgumentType<EntityArgument> ENTITY = ArgumentType.of("minecraft:entity",
             (buf, argument) -> {
                 byte flags = 0;

@@ -67,8 +67,13 @@ import org.lanternpowered.server.item.LanternCooldownTracker;
 import org.lanternpowered.server.network.NetworkSession;
 import org.lanternpowered.server.network.entity.NetworkIdHolder;
 import org.lanternpowered.server.network.objects.RawItemStack;
+import org.lanternpowered.server.network.vanilla.command.ArgumentNode;
 import org.lanternpowered.server.network.vanilla.command.LiteralNode;
 import org.lanternpowered.server.network.vanilla.command.RootNode;
+import org.lanternpowered.server.network.vanilla.command.SuggestionTypes;
+import org.lanternpowered.server.network.vanilla.command.argument.ArgumentAndType;
+import org.lanternpowered.server.network.vanilla.command.argument.ArgumentTypes;
+import org.lanternpowered.server.network.vanilla.command.argument.StringArgument;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutBrand;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockChange;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenBook;
@@ -146,7 +151,6 @@ import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.WorldBorder;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -380,9 +384,19 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
                         .tryGet(TestAdvancementTree.DIG_DIRT_CRITERION).set(4);
                 this.session.send(new MessagePlayOutSelectAdvancementTree(
                         get(LanternKeys.OPEN_ADVANCEMENT_TREE).get().map(AdvancementTree::getInternalId).orElse(null)));
+
+                /*
                 this.session.send(new MessagePlayOutRegisterCommands(new RootNode(
                         Collections.singletonList(new LiteralNode(Collections.emptyList(), "test", null, "test")),
+                        null, null)));*/
+                final ArgumentNode argumentNode = new ArgumentNode(Collections.emptyList(), "my-argument",
+                        ArgumentAndType.of(ArgumentTypes.STRING, new StringArgument(StringArgument.Type.GREEDY_PHRASE)),
+                        null, null, SuggestionTypes.ASK_SERVER);
+                this.session.send(new MessagePlayOutRegisterCommands(new RootNode(
+                        Collections.singletonList(
+                                new LiteralNode(Collections.singletonList(argumentNode), "test", null, "test")),
                         null, null)));
+
                 // TODO: Unlock all the recipes for now, mappings between the internal ids and
                 // TODO: the readable ids still has to be made
                 final int[] recipes = new int[435];

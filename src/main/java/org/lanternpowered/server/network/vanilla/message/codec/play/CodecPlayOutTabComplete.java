@@ -38,8 +38,8 @@ public final class CodecPlayOutTabComplete implements Codec<MessagePlayOutTabCom
     @Override
     public ByteBuffer encode(CodecContext context, MessagePlayOutTabComplete message) throws CodecException {
         final ByteBuffer buf = context.byteBufAlloc().buffer();
+        buf.writeVarInt(message.getId());
         final List<String> matches = message.getMatches();
-        buf.writeVarInt(0);
         buf.writeVarInt(matches.size());
         matches.forEach(buf::writeString);
         return buf;

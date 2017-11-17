@@ -33,7 +33,7 @@ import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.command.SuggestionType;
 import org.lanternpowered.server.network.vanilla.command.argument.ArgumentAndType;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutRegisterCommands;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutDefineCommands;
 import org.lanternpowered.server.network.vanilla.command.Node;
 import org.lanternpowered.server.network.vanilla.command.RootNode;
 import org.lanternpowered.server.network.vanilla.command.ArgumentNode;
@@ -43,10 +43,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 @SuppressWarnings("unchecked")
-public final class CodecPlayOutRegisterCommands implements Codec<MessagePlayOutRegisterCommands> {
+public final class CodecPlayOutDefineCommands implements Codec<MessagePlayOutDefineCommands> {
 
     @Override
-    public ByteBuffer encode(CodecContext context, MessagePlayOutRegisterCommands message) throws CodecException {
+    public ByteBuffer encode(CodecContext context, MessagePlayOutDefineCommands message) throws CodecException {
         final ByteBuffer buf = context.byteBufAlloc().buffer();
         final RootNode rootNode = message.getRootNode();
 

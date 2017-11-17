@@ -95,7 +95,7 @@ import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOut
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutPlayerPositionAndLook;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutPlayerRespawn;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutPlayerSpawnPosition;
-import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutRegisterCommands;
+import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutDefineCommands;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutRemovePotionEffect;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutScoreboardDisplayObjective;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutScoreboardObjective;
@@ -254,7 +254,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerRespawn;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerSpawnPosition;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutRecord;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutRegisterCommands;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutDefineCommands;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutRemovePotionEffect;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutScoreboardDisplayObjective;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutScoreboardObjective;
@@ -454,7 +454,7 @@ final class ProtocolPlay extends ProtocolBase {
         outbound.bind(CodecPlayOutChatMessage.class, MessagePlayOutChatMessage.class);
         outbound.bind(CodecPlayOutMultiBlockChange.class, MessagePlayOutMultiBlockChange.class);
         outbound.bind(CodecPlayOutTabComplete.class, MessagePlayOutTabComplete.class);
-        outbound.bind(CodecPlayOutRegisterCommands.class, MessagePlayOutRegisterCommands.class);
+        outbound.bind(CodecPlayOutDefineCommands.class, MessagePlayOutDefineCommands.class);
         outbound.bind(CodecPlayInOutConfirmWindowTransaction.class, MessagePlayInOutConfirmWindowTransaction.class);
         outbound.bind(CodecPlayInOutCloseWindow.class, MessagePlayInOutCloseWindow.class);
         outbound.bind(CodecPlayOutOpenWindow.class, MessagePlayOutOpenWindow.class);

@@ -28,11 +28,11 @@ package org.lanternpowered.server.network.vanilla.message.type.play;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.vanilla.command.RootNode;
 
-public final class MessagePlayOutRegisterCommands implements Message {
+public final class MessagePlayOutDefineCommands implements Message {
 
     private final RootNode rootNode;
 
-    public MessagePlayOutRegisterCommands(RootNode rootNode) {
+    public MessagePlayOutDefineCommands(RootNode rootNode) {
         this.rootNode = rootNode;
     }
 

@@ -26,7 +26,6 @@
 package org.lanternpowered.server.network.vanilla.command;
 
 import com.google.common.collect.ImmutableList;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutRegisterCommands;
 
 import java.util.List;
 

@@ -82,7 +82,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerPositionAndLook;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerRespawn;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutRecord;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutRegisterCommands;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutDefineCommands;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSelectAdvancementTree;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetReducedDebug;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetWindowSlot;
@@ -392,7 +392,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
                 final ArgumentNode argumentNode = new ArgumentNode(Collections.emptyList(), "my-argument",
                         ArgumentAndType.of(ArgumentTypes.STRING, new StringArgument(StringArgument.Type.GREEDY_PHRASE)),
                         null, null, SuggestionTypes.ASK_SERVER);
-                this.session.send(new MessagePlayOutRegisterCommands(new RootNode(
+                this.session.send(new MessagePlayOutDefineCommands(new RootNode(
                         Collections.singletonList(
                                 new LiteralNode(Collections.singletonList(argumentNode), "test", null, "test")),
                         null, null)));

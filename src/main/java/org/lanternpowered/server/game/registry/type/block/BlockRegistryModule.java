@@ -724,9 +724,9 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         ///   Wall Torch   ///
         //////////////////////
         register(simpleBuilder()
-                .trait(LanternEnumTraits.TORCH_FACING)
+                .trait(LanternEnumTraits.HORIZONTAL_FACING)
                 .defaultState(state -> state
-                        .withTrait(LanternEnumTraits.TORCH_FACING, Direction.NORTH).get())
+                        .withTrait(LanternEnumTraits.HORIZONTAL_FACING, Direction.NORTH).get())
                 .properties(builder -> builder
                         .add(INSTANT_BROKEN))
                 .boundingBox(BoundingBoxes::wallTorch)

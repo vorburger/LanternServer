@@ -83,10 +83,8 @@ public final class LanternBlockStateMap {
         final List<List<Comparable<?>>> allowedValues = new ArrayList<>();
 
         for (BlockTrait<?> trait : list) {
-            // Sort the values
-            final List<Comparable> possibleValues = new ArrayList<>(trait.getPossibleValues());
-            possibleValues.sort(Comparator.naturalOrder());
-            allowedValues.add((List) possibleValues);
+            final List<Comparable<?>> possibleValues = new ArrayList<>(trait.getPossibleValues());
+            allowedValues.add(possibleValues);
             keys.add(((LanternBlockTrait) trait).getKey());
             builder.put(trait.getName(), trait);
         }

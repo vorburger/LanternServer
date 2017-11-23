@@ -51,5 +51,4 @@ public final class LanternBooleanTrait extends LanternBlockTrait<Boolean> implem
     public static BooleanTrait of(String name, Key<? extends Value<Boolean>> key) {
         return new LanternBooleanTrait(checkNotNullOrEmpty(name, "name"), checkNotNull(key, "key"));
     }
-
 }

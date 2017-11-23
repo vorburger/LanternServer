@@ -2,7 +2,6 @@ package org.lanternpowered.server.game.registry;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMaps;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
@@ -47,9 +46,15 @@ public final class InternalIDRegistries {
             final JsonArray jsonArray = gson.fromJson(reader, JsonArray.class);
             int j = 0;
             for (int i = 0; i < jsonArray.size(); i++) {
-                final JsonObject entry = jsonArray.get(i).getAsJsonObject();
-                blockTypeIds.put(entry.get("id").getAsString(), j);
-                j += entry.get("states").getAsInt();
+                String entry = jsonArray.get(i).getAsString();
+                int states = 1;
+                final int index = entry.indexOf('*');
+                if (index != -1) {
+                    states = Integer.parseInt(entry.substring(index + 1));
+                    entry = entry.substring(0, index);
+                }
+                blockTypeIds.put(entry, j);
+                j += states;
             }
         } catch (IOException e) {
             throw new IllegalStateException(e);

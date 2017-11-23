@@ -873,7 +873,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
             return false;
         }
 
-        final short type = BlockRegistryModule.get().getStateInternalIdAndData(block);
+        final short type = (short) BlockRegistryModule.get().getStateInternalId(block);
         final short type1;
         // Air doesn't have metadata values
         if (type >> 4 == 0 && type != 0) {
@@ -919,7 +919,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
             } else {
                 section.nonAirCount--;
             }
-            final BlockState oldState = BlockRegistryModule.get().getStateByInternalIdAndData(oldType).get();
+            final BlockState oldState = BlockRegistryModule.get().getStateByInternalId(oldType).get();
             changeData[0] = oldState;
             // The section is empty, destroy it
             if (section.nonAirCount <= 0) {
@@ -1535,7 +1535,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
 
     @Override
     public BlockState getBlock(int x, int y, int z) {
-        return BlockRegistryModule.get().getStateByInternalIdAndData(getType(x, y, z)).orElse(BlockTypes.AIR.getDefaultState());
+        return BlockRegistryModule.get().getStateByInternalId(getType(x, y, z)).orElse(BlockTypes.AIR.getDefaultState());
     }
 
     @Override

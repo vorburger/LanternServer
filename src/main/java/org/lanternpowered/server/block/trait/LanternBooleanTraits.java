@@ -52,4 +52,6 @@ public final class LanternBooleanTraits {
     public static final BooleanTrait EXPLODE = LanternBooleanTrait.of("explode", LanternKeys.EXPLODE);
 
     public static final BooleanTrait HAS_RECORD = LanternBooleanTrait.of("has_record", LanternKeys.HAS_RECORD);
+
+    public static final BooleanTrait LIT = LanternBooleanTrait.of("lit", LanternKeys.IS_LIT);
 }

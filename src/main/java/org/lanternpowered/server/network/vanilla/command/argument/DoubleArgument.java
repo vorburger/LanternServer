@@ -23,30 +23,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.item.behavior.vanilla.consumable;
-
-import org.lanternpowered.server.data.type.LanternCookedFish;
-import org.lanternpowered.server.item.PropertyProvider;
-import org.spongepowered.api.data.Property;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.type.CookedFishes;
-import org.spongepowered.api.item.ItemType;
-import org.spongepowered.api.item.inventory.ItemStack;
+package org.lanternpowered.server.network.vanilla.command.argument;
 
 import javax.annotation.Nullable;
 
-public class CookedFishForwardingPropertyProvider<P extends Property<?,?>> implements PropertyProvider<P> {
+public class DoubleArgument extends Argument {
 
-    private final Class<P> propertyType;
+    @Nullable private final Double min;
+    @Nullable private final Double max;
 
-    public CookedFishForwardingPropertyProvider(Class<P> propertyType) {
-        this.propertyType = propertyType;
+    public DoubleArgument(@Nullable Double min, @Nullable Double max) {
+        this.min = min;
+        this.max = max;
     }
 
     @Nullable
-    @Override
-    public P get(ItemType itemType, @Nullable ItemStack itemStack) {
-        final LanternCookedFish cookedFish = (LanternCookedFish) (itemStack == null ? CookedFishes.COD : itemStack.get(Keys.COOKED_FISH).get());
-        return cookedFish.getProperties().get(this.propertyType).map(provider -> provider.get(itemType, itemStack)).orElse(null);
+    public Double getMin() {
+        return this.min;
+    }
+
+    @Nullable
+    public Double getMax() {
+        return this.max;
     }
 }

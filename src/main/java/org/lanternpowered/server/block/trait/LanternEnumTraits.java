@@ -48,15 +48,8 @@ import org.spongepowered.api.util.Direction;
 public final class LanternEnumTraits {
 
     public static final EnumTrait<LanternLogAxis> LOG_AXIS =
-            LanternEnumTrait.of("axis", (Key) Keys.LOG_AXIS, LanternLogAxis.class);
-
-    public static final EnumTrait<LanternTreeType> LOG1_TYPE =
-            LanternEnumTrait.of("variant", (Key) Keys.TREE_TYPE,
-                    LanternTreeType.OAK, LanternTreeType.SPRUCE, LanternTreeType.BIRCH, LanternTreeType.JUNGLE);
-
-    public static final EnumTrait<LanternTreeType> LOG2_TYPE =
-            LanternEnumTrait.of("variant", (Key) Keys.TREE_TYPE,
-                    LanternTreeType.ACACIA, LanternTreeType.DARK_OAK);
+            LanternEnumTrait.of("axis", (Key) Keys.LOG_AXIS,
+                    LanternLogAxis.X, LanternLogAxis.Y, LanternLogAxis.Z);
 
     public static final EnumTrait<LanternTreeType> LEAVES1_TYPE =
             LanternEnumTrait.of("variant", (Key) Keys.TREE_TYPE,

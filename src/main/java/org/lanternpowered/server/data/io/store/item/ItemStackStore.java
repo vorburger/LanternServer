@@ -34,11 +34,8 @@ import org.lanternpowered.server.data.io.store.data.DataHolderStore;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.CoalTypeRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.CookedFishRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.DirtTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.DyeColorRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.FishRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.GoldenAppleRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.PlantTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.SandTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.SandstoneTypeRegistryModule;
@@ -106,6 +103,7 @@ public final class ItemStackStore extends DataHolderStore<LanternItemStack> impl
     private final Map<ItemType, ItemTypeObjectSerializer> itemTypeSerializers = new HashMap<>();
 
     {
+        /*
         final DataValueItemTypeObjectSerializer<TreeType> treeTypeSerializer =
                 new DataValueItemTypeObjectSerializer<>(Keys.TREE_TYPE, TreeTypeRegistryModule.get());
         add(BlockTypes.LOG, treeTypeSerializer);
@@ -169,14 +167,12 @@ public final class ItemStackStore extends DataHolderStore<LanternItemStack> impl
         add(ItemTypes.COAL, new DataValueItemTypeObjectSerializer<>(Keys.COAL_TYPE, CoalTypeRegistryModule.get()));
         add(ItemTypes.FIREWORK_CHARGE, new FireworkChargeItemTypeObjectSerializer());
         add(ItemTypes.FIREWORKS, new FireworksItemTypeObjectSerializer());
-        add(ItemTypes.GOLDEN_APPLE, new DataValueItemTypeObjectSerializer<>(Keys.GOLDEN_APPLE_TYPE, GoldenAppleRegistryModule.get()));
-        add(ItemTypes.FISH, new DataValueItemTypeObjectSerializer<>(Keys.FISH_TYPE, FishRegistryModule.get()));
-        add(ItemTypes.COOKED_FISH, new DataValueItemTypeObjectSerializer<>(Keys.COOKED_FISH, CookedFishRegistryModule.get()));
+        /*
         add(ItemTypes.DYE, new DataValueItemTypeObjectSerializer<>(Keys.DYE_COLOR, DyeColorRegistryModule.get(),
                 dataValue -> 15 - dataValue, internalId -> 15 - internalId));
         add(ItemTypes.BANNER, new DataValueItemTypeObjectSerializer<>(Keys.DYE_COLOR, DyeColorRegistryModule.get(),
                 dataValue -> 15 - dataValue, internalId -> 15 - internalId));
-        add(ItemTypes.SKULL, new DataValueItemTypeObjectSerializer<>(Keys.SKULL_TYPE, SkullTypeRegistryModule.get()));
+        add(ItemTypes.SKULL, new DataValueItemTypeObjectSerializer<>(Keys.SKULL_TYPE, SkullTypeRegistryModule.get()));*/
         add(ItemTypes.WRITABLE_BOOK, new WritableBookItemTypeObjectSerializer());
         add(ItemTypes.WRITTEN_BOOK, new WrittenBookItemTypeObjectSerializer());
         final PotionEffectsItemTypeObjectSerializer potionEffectsSerializer = new PotionEffectsItemTypeObjectSerializer();
@@ -270,7 +266,7 @@ public final class ItemStackStore extends DataHolderStore<LanternItemStack> impl
         object.setQuantity(dataView.getInt(QUANTITY).get());
         // All the extra data we will handle will be stored in the tag
         final DataView tag = dataView.getView(TAG).orElseGet(() -> DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED));
-        tag.set(ItemTypeObjectSerializer.DATA_VALUE, dataView.getShort(DATA).get());
+        // tag.set(ItemTypeObjectSerializer.DATA_VALUE, dataView.getShort(DATA).get()); TODO
         super.deserialize(object, tag);
     }
 
@@ -279,7 +275,7 @@ public final class ItemStackStore extends DataHolderStore<LanternItemStack> impl
         dataView.set(QUANTITY, (byte) object.getQuantity());
         final DataView tag = dataView.createView(TAG);
         super.serialize(object, tag);
-        dataView.set(DATA, tag.getShort(ItemTypeObjectSerializer.DATA_VALUE).orElse((short) 0));
+        // dataView.set(DATA, tag.getShort(ItemTypeObjectSerializer.DATA_VALUE).orElse((short) 0)); TODO
         tag.remove(ItemTypeObjectSerializer.DATA_VALUE);
         if (tag.isEmpty()) {
             dataView.remove(TAG);

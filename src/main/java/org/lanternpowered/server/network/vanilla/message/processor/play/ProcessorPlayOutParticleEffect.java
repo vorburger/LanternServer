@@ -113,7 +113,7 @@ public final class ProcessorPlayOutParticleEffect implements Processor<MessagePl
     private static int getBlockState(LanternParticleEffect effect, Optional<BlockState> defaultBlockState) {
         final Optional<BlockState> blockState = effect.getOption(ParticleOptions.BLOCK_STATE);
         if (blockState.isPresent()) {
-            return BlockRegistryModule.get().getStateInternalIdAndData(blockState.get());
+            return BlockRegistryModule.get().getStateInternalId(blockState.get());
         } else {
             final Optional<ItemStackSnapshot> optSnapshot = effect.getOption(ParticleOptions.ITEM_STACK_SNAPSHOT);
             if (optSnapshot.isPresent()) {
@@ -128,12 +128,12 @@ public final class ProcessorPlayOutParticleEffect implements Processor<MessagePl
                         snapshot.getValues().forEach(value -> builder.add((Key) value.getKey(), value.get()));
                         state = builder.build();
                     }
-                    return BlockRegistryModule.get().getStateInternalIdAndData(state);
+                    return BlockRegistryModule.get().getStateInternalId(state);
                 } else {
                     return 0;
                 }
             } else {
-                return BlockRegistryModule.get().getStateInternalIdAndData(defaultBlockState.get());
+                return BlockRegistryModule.get().getStateInternalId(defaultBlockState.get());
             }
         }
     }
@@ -181,7 +181,7 @@ public final class ProcessorPlayOutParticleEffect implements Processor<MessagePl
         if (!internalType.isPresent()) {
             if (type == ParticleTypes.FIREWORKS) {
                 // Create the fireworks data item
-                final LanternItemStack itemStack = new LanternItemStack(ItemTypes.FIREWORKS);
+                final LanternItemStack itemStack = new LanternItemStack(ItemTypes.FIREWORK_ROCKET);
                 itemStack.tryOffer(Keys.FIREWORK_EFFECTS, effect.getOptionOrDefault(ParticleOptions.FIREWORK_EFFECTS).get());
 
                 // Write the item to a parameter list

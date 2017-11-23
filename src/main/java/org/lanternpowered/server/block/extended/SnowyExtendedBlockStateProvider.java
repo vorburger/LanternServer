@@ -45,7 +45,7 @@ public class SnowyExtendedBlockStateProvider implements ExtendedBlockStateProvid
         }
         final BlockType blockType = location.getBlockRelative(Direction.UP).getBlock().getType();
         return blockState.withTrait(LanternBooleanTraits.SNOWY,
-                blockType == BlockTypes.SNOW || blockType == BlockTypes.SNOW_LAYER).get();
+                blockType == BlockTypes.SNOW_BLOCK || blockType == BlockTypes.SNOW).get();
     }
 
     @Override

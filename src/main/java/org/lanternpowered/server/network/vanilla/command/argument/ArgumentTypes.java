@@ -29,6 +29,26 @@ public final class ArgumentTypes {
 
     public static final ArgumentType<Argument> BOOL = ArgumentType.of("brigadier:bool");
 
+    public static final ArgumentType<DoubleArgument> DOUBLE = ArgumentType.of("brigadier:double",
+            (buf, argument) -> {
+                final Double max = argument.getMax();
+                final Double min = argument.getMin();
+                byte flags = 0;
+                if (min != null) {
+                    flags |= 0x1;
+                }
+                if (max != null) {
+                    flags |= 0x2;
+                }
+                buf.writeByte(flags);
+                if (min != null) {
+                    buf.writeDouble(min);
+                }
+                if (max != null) {
+                    buf.writeDouble(max);
+                }
+            });
+
     public static final ArgumentType<FloatArgument> FLOAT = ArgumentType.of("brigadier:float",
             (buf, argument) -> {
                 final Float max = argument.getMax();

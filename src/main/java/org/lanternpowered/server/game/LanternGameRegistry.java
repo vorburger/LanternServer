@@ -109,12 +109,9 @@ import org.lanternpowered.server.game.registry.type.data.ArtRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.BannerPatternShapeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.CareerRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.CoalTypeRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.CookedFishRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.DataManipulatorRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.DirtTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.DyeColorRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.FishRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.GoldenAppleRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.HandPreferenceRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.HandTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.HorseColorRegistryModule;
@@ -264,14 +261,12 @@ import org.spongepowered.api.data.type.Career;
 import org.spongepowered.api.data.type.CoalType;
 import org.spongepowered.api.data.type.ComparatorType;
 import org.spongepowered.api.data.type.ComparatorTypes;
-import org.spongepowered.api.data.type.CookedFish;
 import org.spongepowered.api.data.type.DirtType;
 import org.spongepowered.api.data.type.DisguisedBlockType;
 import org.spongepowered.api.data.type.DisguisedBlockTypes;
 import org.spongepowered.api.data.type.DoublePlantType;
 import org.spongepowered.api.data.type.DoublePlantTypes;
 import org.spongepowered.api.data.type.DyeColor;
-import org.spongepowered.api.data.type.Fish;
 import org.spongepowered.api.data.type.GoldenApple;
 import org.spongepowered.api.data.type.HandPreference;
 import org.spongepowered.api.data.type.HandType;
@@ -626,10 +621,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(EntityProtocolType.class, new EntityProtocolTypeRegistryModule())
                 .registerModule(InventoryArchetype.class, new InventoryArchetypeRegistryModule())
                 .registerModule(GuiId.class, ClientContainerRegistryModule.get())
-                .registerModule(GoldenApple.class, GoldenAppleRegistryModule.get())
                 .registerModule(CoalType.class, CoalTypeRegistryModule.get())
-                .registerModule(Fish.class, FishRegistryModule.get())
-                .registerModule(CookedFish.class, CookedFishRegistryModule.get())
                 .registerModule(DyeColor.class, DyeColorRegistryModule.get())
                 .registerModule(PickupRule.class, PickupRuleRegistryModule.get())
                 .registerModule(BannerPatternShape.class, BannerPatternShapeRegistryModule.get())

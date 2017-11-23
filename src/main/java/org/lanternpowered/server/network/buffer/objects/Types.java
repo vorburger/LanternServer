@@ -177,8 +177,7 @@ public final class Types {
                 final DataView dataView = DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED);
                 this.store.serialize((LanternItemStack) object, dataView);
                 buf.write(Types.RAW_ITEM_STACK, new RawItemStack(ItemRegistryModule.get().getInternalId(object.getType()),
-                        dataView.getShort(ItemStackStore.DATA).orElse((short) 0), object.getQuantity(),
-                        dataView.getView(ItemStackStore.TAG).orElse(null)));
+                        object.getQuantity(), dataView.getView(ItemStackStore.TAG).orElse(null)));
             }
         }
 
@@ -195,7 +194,6 @@ public final class Types {
             }
             final LanternItemStack itemStack = new LanternItemStack(itemType, rawItemStack.getAmount());
             final DataView dataView = DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED);
-            dataView.set(ItemStackStore.DATA, rawItemStack.getData());
             dataView.set(ItemStackStore.QUANTITY, rawItemStack.getAmount());
             final DataView tag = rawItemStack.getDataView();
             if (tag != null) {
@@ -218,21 +216,19 @@ public final class Types {
             } else {
                 buf.writeShort((short) object.getItemType());
                 buf.writeByte((byte) object.getAmount());
-                buf.writeShort((short) object.getData());
                 buf.writeDataView(object.getDataView());
             }
         }
 
         @Override
         public RawItemStack read(ByteBuffer buf) throws CodecException {
-            short id = buf.readShort();
+            final short id = buf.readShort();
             if (id == -1) {
                 return null;
             }
-            int amount = buf.readByte();
-            int data = buf.readShort();
-            DataView dataView = buf.readDataView();
-            return new RawItemStack(id, data, amount, dataView);
+            final int amount = buf.readByte();
+            final DataView dataView = buf.readDataView();
+            return new RawItemStack(id, amount, dataView);
         }
     });
 

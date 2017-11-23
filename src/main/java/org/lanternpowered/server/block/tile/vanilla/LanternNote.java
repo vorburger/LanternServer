@@ -79,6 +79,6 @@ public class LanternNote extends LanternTileEntity implements Note {
     @Override
     public BlockState getBlock() {
         final BlockState block = getLocation().getBlock();
-        return block.getType() == BlockTypes.NOTEBLOCK ? block : BlockTypes.NOTEBLOCK.getDefaultState();
+        return block.getType() == BlockTypes.NOTE_BLOCK ? block : BlockTypes.NOTE_BLOCK.getDefaultState();
     }
 }

@@ -226,11 +226,7 @@ public class BlockTypeBuilderImpl implements BlockTypeBuilder {
         }
         TranslationProvider translationProvider = this.translationProvider;
         if (translationProvider == null) {
-            String path = "tile." + id + ".name";
-            if (!pluginId.equals("minecraft")) {
-                path = pluginId + '.' + path;
-            }
-            translationProvider = TranslationProvider.of(tr(path));
+            translationProvider = TranslationProvider.of(tr("block." + pluginId + "." + id));
         }
         PropertyProviderCollection.Builder properties;
         if (this.propertiesBuilder != null) {
@@ -341,7 +337,9 @@ public class BlockTypeBuilderImpl implements BlockTypeBuilder {
             blockType.setDefaultBlockState(this.defaultStateProvider.apply(blockType.getDefaultState()));
         }
         if (this.itemTypeBuilder != null) {
+            final TranslationProvider translationProvider1 = translationProvider;
             final ItemType itemType = this.itemTypeBuilder.blockType(blockType)
+                    .translation((type, stack) -> translationProvider1.get(blockType.getDefaultState(), null, null))
                     .behaviors(pipeline -> {
                         // Only add the default behavior if there isn't any interaction behavior present
                         if (pipeline.pipeline(InteractWithItemBehavior.class).getBehaviors().isEmpty()) {

@@ -863,7 +863,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
         WrittenBookItemTypeObjectSerializer.writeBookData(dataView, bookView, this.locale);
 
         // Written book internal id
-        final RawItemStack rawItemStack = new RawItemStack(387, 0, 1, dataView);
+        final RawItemStack rawItemStack = new RawItemStack(387, 1, dataView);
         final int slot = this.inventory.getHotbar().getSelectedSlotIndex();
         this.session.send(new MessagePlayOutSetWindowSlot(-2, slot, rawItemStack));
         this.session.send(new MessagePlayOutOpenBook(HandTypes.MAIN_HAND));
@@ -874,7 +874,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
     public void sendBlockChange(Vector3i position, BlockState state) {
         checkNotNull(state, "state");
         checkNotNull(position, "position");
-        this.session.send(new MessagePlayOutBlockChange(position, BlockRegistryModule.get().getStateInternalIdAndData(state)));
+        this.session.send(new MessagePlayOutBlockChange(position, BlockRegistryModule.get().getStateInternalId(state)));
     }
 
     @Override
@@ -889,7 +889,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
         if (world == null) {
             return;
         }
-        this.session.send(new MessagePlayOutBlockChange(position, BlockRegistryModule.get().getStateInternalIdAndData(world.getBlock(position))));
+        this.session.send(new MessagePlayOutBlockChange(position, BlockRegistryModule.get().getStateInternalId(world.getBlock(position))));
     }
 
     @Override

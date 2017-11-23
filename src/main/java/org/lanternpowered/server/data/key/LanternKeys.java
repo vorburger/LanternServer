@@ -138,6 +138,8 @@ public final class LanternKeys {
             makeValueKey(Double.class, DataQuery.of("FieldOfViewModifier"), "lantern:field_of_view_modifier");
     public static final Key<Value<Boolean>> HAS_CHEST =
             makeValueKey(Boolean.class, DataQuery.of("HasChest"), "lantern:has_chest");
+    public static final Key<Value<Boolean>> IS_LIT =
+            makeValueKey(Boolean.class, DataQuery.of("IsLit"), "lantern:is_lit");
 
     private LanternKeys() {
     }

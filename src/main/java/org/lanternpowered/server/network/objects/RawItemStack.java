@@ -32,24 +32,18 @@ import javax.annotation.Nullable;
 public final class RawItemStack {
 
     private final int itemType;
-    private final int data;
     private final int amount;
 
     @Nullable private final DataView dataView;
 
-    public RawItemStack(int itemType, int data, int amount, @Nullable DataView dataView) {
+    public RawItemStack(int itemType, int amount, @Nullable DataView dataView) {
         this.dataView = dataView;
         this.itemType = itemType;
         this.amount = amount;
-        this.data = data;
     }
 
     public int getItemType() {
         return this.itemType;
-    }
-
-    public int getData() {
-        return this.data;
     }
 
     @Nullable

@@ -43,9 +43,9 @@ public final class FlatNetherGeneratorType extends AbstractFlatGeneratorType {
     protected FlatGeneratorSettings getDefaultSettings() {
         final List<FlatLayer> layers = new ArrayList<>(5);
         layers.add(new FlatLayer(BlockTypes.BEDROCK, 1));
-        layers.add(new FlatLayer(BlockTypes.NETHERRACK, 3));
+        //layers.add(new FlatLayer(BlockTypes.NETHERRACK, 3));
         layers.add(new FlatLayer(BlockTypes.AIR, 120));
-        layers.add(new FlatLayer(BlockTypes.NETHERRACK, 3));
+        //layers.add(new FlatLayer(BlockTypes.NETHERRACK, 3));
         layers.add(new FlatLayer(BlockTypes.BEDROCK, 1));
         return new FlatGeneratorSettings(BiomeTypes.HELL, layers);
     }

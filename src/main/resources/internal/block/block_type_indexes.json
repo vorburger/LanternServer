@@ -1,0 +1,2118 @@
+[
+  {
+    "id": "minecraft:air",
+    "states": 1
+  },
+  {
+    "id": "minecraft:stone",
+    "states": 1
+  },
+  {
+    "id": "minecraft:granite",
+    "states": 1
+  },
+  {
+    "id": "minecraft:polished_granite",
+    "states": 1
+  },
+  {
+    "id": "minecraft:diorite",
+    "states": 1
+  },
+  {
+    "id": "minecraft:polished_diorite",
+    "states": 1
+  },
+  {
+    "id": "minecraft:andesite",
+    "states": 1
+  },
+  {
+    "id": "minecraft:polished_andesite",
+    "states": 1
+  },
+  {
+    "id": "minecraft:grass_block",
+    "states": 2
+  },
+  {
+    "id": "minecraft:dirt",
+    "states": 1
+  },
+  {
+    "id": "minecraft:coarse_dirt",
+    "states": 1
+  },
+  {
+    "id": "minecraft:podzol",
+    "states": 2
+  },
+  {
+    "id": "minecraft:cobblestone",
+    "states": 1
+  },
+  {
+    "id": "minecraft:oak_planks",
+    "states": 1
+  },
+  {
+    "id": "minecraft:spruce_planks",
+    "states": 1
+  },
+  {
+    "id": "minecraft:birch_planks",
+    "states": 1
+  },
+  {
+    "id": "minecraft:jungle_planks",
+    "states": 1
+  },
+  {
+    "id": "minecraft:acacia_planks",
+    "states": 1
+  },
+  {
+    "id": "minecraft:dark_oak_planks",
+    "states": 1
+  },
+  {
+    "id": "minecraft:oak_sapling",
+    "states": 2
+  },
+  {
+    "id": "minecraft:spruce_sapling",
+    "states": 2
+  },
+  {
+    "id": "minecraft:birch_sapling",
+    "states": 2
+  },
+  {
+    "id": "minecraft:jungle_sapling",
+    "states": 2
+  },
+  {
+    "id": "minecraft:acacia_sapling",
+    "states": 2
+  },
+  {
+    "id": "minecraft:dark_oak_sapling",
+    "states": 2
+  },
+  {
+    "id": "minecraft:bedrock",
+    "states": 1
+  },
+  {
+    "id": "minecraft:flowing_water",
+    "states": 16
+  },
+  {
+    "id": "minecraft:water",
+    "states": 16
+  },
+  {
+    "id": "minecraft:flowing_lava",
+    "states": 16
+  },
+  {
+    "id": "minecraft:lava",
+    "states": 16
+  },
+  {
+    "id": "minecraft:sand",
+    "states": 1
+  },
+  {
+    "id": "minecraft:red_sand",
+    "states": 1
+  },
+  {
+    "id": "minecraft:gravel",
+    "states": 1
+  },
+  {
+    "id": "minecraft:gold_ore",
+    "states": 1
+  },
+  {
+    "id": "minecraft:iron_ore",
+    "states": 1
+  },
+  {
+    "id": "minecraft:coal_ore",
+    "states": 1
+  },
+  {
+    "id": "minecraft:oak_log",
+    "states": 3
+  },
+  {
+    "id": "minecraft:spruce_log",
+    "states": 3
+  },
+  {
+    "id": "minecraft:birch_log",
+    "states": 3
+  },
+  {
+    "id": "minecraft:jungle_log",
+    "states": 3
+  },
+  {
+    "id": "minecraft:acacia_log",
+    "states": 3
+  },
+  {
+    "id": "minecraft:dark_oak_log",
+    "states": 3
+  },
+  {
+    "id": "minecraft:oak_bark",
+    "states": 1
+  },
+  {
+    "id": "minecraft:spruce_bark",
+    "states": 1
+  },
+  {
+    "id": "minecraft:birch_bark",
+    "states": 1
+  },
+  {
+    "id": "minecraft:jungle_bark",
+    "states": 1
+  },
+  {
+    "id": "minecraft:acacia_bark",
+    "states": 1
+  },
+  {
+    "id": "minecraft:dark_oak_bark",
+    "states": 1
+  },
+  {
+    "id": "minecraft:oak_leaves",
+    "states": 4
+  },
+  {
+    "id": "minecraft:spruce_leaves",
+    "states": 4
+  },
+  {
+    "id": "minecraft:birch_leaves",
+    "states": 4
+  },
+  {
+    "id": "minecraft:jungle_leaves",
+    "states": 4
+  },
+  {
+    "id": "minecraft:acacia_leaves",
+    "states": 4
+  },
+  {
+    "id": "minecraft:dark_oak_leaves",
+    "states": 4
+  },
+  {
+    "id": "minecraft:sponge",
+    "states": 1
+  },
+  {
+    "id": "minecraft:wet_sponge",
+    "states": 1
+  },
+  {
+    "id": "minecraft:glass",
+    "states": 1
+  },
+  {
+    "id": "minecraft:lapis_ore",
+    "states": 1
+  },
+  {
+    "id": "minecraft:lapis_block",
+    "states": 1
+  },
+  {
+    "id": "minecraft:dispenser",
+    "states": 12
+  },
+  {
+    "id": "minecraft:sandstone",
+    "states": 1
+  },
+  {
+    "id": "minecraft:chiseled_sandstone",
+    "states": 1
+  },
+  {
+    "id": "minecraft:cut_sandstone",
+    "states": 1
+  },
+  {
+    "id": "minecraft:note_block",
+    "states": 500
+  },
+  {
+    "id": "minecraft:white_bed",
+    "states": 16
+  },
+  {
+    "id": "minecraft:orange_bed",
+    "states": 16
+  },
+  {
+    "id": "minecraft:magenta_bed",
+    "states": 16
+  },
+  {
+    "id": "minecraft:light_blue_bed",
+    "states": 16
+  },
+  {
+    "id": "minecraft:yellow_bed",
+    "states": 16
+  },
+  {
+    "id": "minecraft:lime_bed",
+    "states": 16
+  },
+  {
+    "id": "minecraft:pink_bed",
+    "states": 16
+  },
+  {
+    "id": "minecraft:gray_bed",
+    "states": 16
+  },
+  {
+    "id": "minecraft:light_gray_bed",
+    "states": 16
+  },
+  {
+    "id": "minecraft:cyan_bed",
+    "states": 16
+  },
+  {
+    "id": "minecraft:purple_bed",
+    "states": 16
+  },
+  {
+    "id": "minecraft:blue_bed",
+    "states": 16
+  },
+  {
+    "id": "minecraft:brown_bed",
+    "states": 16
+  },
+  {
+    "id": "minecraft:green_bed",
+    "states": 16
+  },
+  {
+    "id": "minecraft:red_bed",
+    "states": 16
+  },
+  {
+    "id": "minecraft:black_bed",
+    "states": 16
+  },
+  {
+    "id": "minecraft:powered_rail",
+    "states": 12
+  },
+  {
+    "id": "minecraft:detector_rail",
+    "states": 12
+  },
+  {
+    "id": "minecraft:sticky_piston",
+    "states": 12
+  },
+  {
+    "id": "minecraft:cobweb",
+    "states": 1
+  },
+  {
+    "id": "minecraft:grass",
+    "states": 1
+  },
+  {
+    "id": "minecraft:fern",
+    "states": 1
+  },
+  {
+    "id": "minecraft:dead_bush",
+    "states": 1
+  },
+  {
+    "id": "minecraft:piston",
+    "states": 12
+  },
+  {
+    "id": "minecraft:piston_head",
+    "states": 24
+  },
+  {
+    "id": "minecraft:white_wool",
+    "states": 1
+  },
+  {
+    "id": "minecraft:orange_wool",
+    "states": 1
+  },
+  {
+    "id": "minecraft:magenta_wool",
+    "states": 1
+  },
+  {
+    "id": "minecraft:light_blue_wool",
+    "states": 1
+  },
+  {
+    "id": "minecraft:yellow_wool",
+    "states": 1
+  },
+  {
+    "id": "minecraft:lime_wool",
+    "states": 1
+  },
+  {
+    "id": "minecraft:pink_wool",
+    "states": 1
+  },
+  {
+    "id": "minecraft:gray_wool",
+    "states": 1
+  },
+  {
+    "id": "minecraft:light_gray_wool",
+    "states": 1
+  },
+  {
+    "id": "minecraft:cyan_wool",
+    "states": 1
+  },
+  {
+    "id": "minecraft:purple_wool",
+    "states": 1
+  },
+  {
+    "id": "minecraft:blue_wool",
+    "states": 1
+  },
+  {
+    "id": "minecraft:brown_wool",
+    "states": 1
+  },
+  {
+    "id": "minecraft:green_wool",
+    "states": 1
+  },
+  {
+    "id": "minecraft:red_wool",
+    "states": 1
+  },
+  {
+    "id": "minecraft:black_wool",
+    "states": 1
+  },
+  {
+    "id": "minecraft:moving_piston",
+    "states": 12
+  },
+  {
+    "id": "minecraft:dandelion",
+    "states": 1
+  },
+  {
+    "id": "minecraft:poppy",
+    "states": 1
+  },
+  {
+    "id": "minecraft:blue_orchid",
+    "states": 1
+  },
+  {
+    "id": "minecraft:allium",
+    "states": 1
+  },
+  {
+    "id": "minecraft:azure_bluet",
+    "states": 1
+  },
+  {
+    "id": "minecraft:red_tulip",
+    "states": 1
+  },
+  {
+    "id": "minecraft:orange_tulip",
+    "states": 1
+  },
+  {
+    "id": "minecraft:white_tulip",
+    "states": 1
+  },
+  {
+    "id": "minecraft:pink_tulip",
+    "states": 1
+  },
+  {
+    "id": "minecraft:oxeye_daisy",
+    "states": 1
+  },
+  {
+    "id": "minecraft:brown_mushroom",
+    "states": 1
+  },
+  {
+    "id": "minecraft:red_mushroom",
+    "states": 1
+  },
+  {
+    "id": "minecraft:gold_block",
+    "states": 1
+  },
+  {
+    "id": "minecraft:iron_block",
+    "states": 1
+  },
+  {
+    "id": "minecraft:bricks",
+    "states": 1
+  },
+  {
+    "id": "minecraft:tnt",
+    "states": 1
+  },
+  {
+    "id": "minecraft:bookshelf",
+    "states": 1
+  },
+  {
+    "id": "minecraft:mossy_cobblestone",
+    "states": 1
+  },
+  {
+    "id": "minecraft:obsidian",
+    "states": 1
+  },
+  {
+    "id": "minecraft:torch",
+    "states": 1
+  },
+  {
+    "id": "minecraft:wall_torch",
+    "states": 4
+  },
+  {
+    "id": "minecraft:fire",
+    "states": 512
+  },
+  {
+    "id": "minecraft:mob_spawner",
+    "states": 1
+  },
+  {
+    "id": "minecraft:oak_stairs",
+    "states": 40
+  },
+  {
+    "id": "minecraft:chest",
+    "states": 12
+  },
+  {
+    "id": "minecraft:redstone_wire",
+    "states": 1296
+  },
+  {
+    "id": "minecraft:diamond_ore",
+    "states": 1
+  },
+  {
+    "id": "minecraft:diamond_block",
+    "states": 1
+  },
+  {
+    "id": "minecraft:crafting_table",
+    "states": 1
+  },
+  {
+    "id": "minecraft:wheat",
+    "states": 8
+  },
+  {
+    "id": "minecraft:farmland",
+    "states": 8
+  },
+  {
+    "id": "minecraft:furnace",
+    "states": 8
+  },
+  {
+    "id": "minecraft:sign",
+    "states": 16
+  },
+  {
+    "id": "minecraft:oak_door",
+    "states": 64
+  },
+  {
+    "id": "minecraft:ladder",
+    "states": 4
+  },
+  {
+    "id": "minecraft:rail",
+    "states": 10
+  },
+  {
+    "id": "minecraft:cobblestone_stairs",
+    "states": 40
+  },
+  {
+    "id": "minecraft:wall_sign",
+    "states": 4
+  },
+  {
+    "id": "minecraft:lever",
+    "states": 24
+  },
+  {
+    "id": "minecraft:stone_pressure_plate",
+    "states": 2
+  },
+  {
+    "id": "minecraft:iron_door",
+    "states": 64
+  },
+  {
+    "id": "minecraft:oak_pressure_plate",
+    "states": 2
+  },
+  {
+    "id": "minecraft:spruce_pressure_plate",
+    "states": 2
+  },
+  {
+    "id": "minecraft:birch_pressure_plate",
+    "states": 2
+  },
+  {
+    "id": "minecraft:jungle_pressure_plate",
+    "states": 2
+  },
+  {
+    "id": "minecraft:acacia_pressure_plate",
+    "states": 2
+  },
+  {
+    "id": "minecraft:dark_oak_pressure_plate",
+    "states": 2
+  },
+  {
+    "id": "minecraft:redstone_ore",
+    "states": 2
+  },
+  {
+    "id": "minecraft:redstone_torch",
+    "states": 2
+  },
+  {
+    "id": "minecraft:redstone_wall_torch",
+    "states": 8
+  },
+  {
+    "id": "minecraft:stone_button",
+    "states": 24
+  },
+  {
+    "id": "minecraft:snow",
+    "states": 8
+  },
+  {
+    "id": "minecraft:ice",
+    "states": 1
+  },
+  {
+    "id": "minecraft:snow_block",
+    "states": 1
+  },
+  {
+    "id": "minecraft:cactus",
+    "states": 16
+  },
+  {
+    "id": "minecraft:clay",
+    "states": 1
+  },
+  {
+    "id": "minecraft:sugar_cane",
+    "states": 16
+  },
+  {
+    "id": "minecraft:jukebox",
+    "states": 2
+  },
+  {
+    "id": "minecraft:oak_fence",
+    "states": 16
+  },
+  {
+    "id": "minecraft:pumpkin",
+    "states": 1
+  },
+  {
+    "id": "minecraft:netherrack",
+    "states": 1
+  },
+  {
+    "id": "minecraft:soul_sand",
+    "states": 1
+  },
+  {
+    "id": "minecraft:glowstone",
+    "states": 1
+  },
+  {
+    "id": "minecraft:portal",
+    "states": 2
+  },
+  {
+    "id": "minecraft:carved_pumpkin",
+    "states": 4
+  },
+  {
+    "id": "minecraft:jack_o_lantern",
+    "states": 4
+  },
+  {
+    "id": "minecraft:cake",
+    "states": 7
+  },
+  {
+    "id": "minecraft:repeater",
+    "states": 64
+  },
+  {
+    "id": "minecraft:white_stained_glass",
+    "states": 1
+  },
+  {
+    "id": "minecraft:orange_stained_glass",
+    "states": 1
+  },
+  {
+    "id": "minecraft:magenta_stained_glass",
+    "states": 1
+  },
+  {
+    "id": "minecraft:light_blue_stained_glass",
+    "states": 1
+  },
+  {
+    "id": "minecraft:yellow_stained_glass",
+    "states": 1
+  },
+  {
+    "id": "minecraft:lime_stained_glass",
+    "states": 1
+  },
+  {
+    "id": "minecraft:pink_stained_glass",
+    "states": 1
+  },
+  {
+    "id": "minecraft:gray_stained_glass",
+    "states": 1
+  },
+  {
+    "id": "minecraft:light_gray_stained_glass",
+    "states": 1
+  },
+  {
+    "id": "minecraft:cyan_stained_glass",
+    "states": 1
+  },
+  {
+    "id": "minecraft:purple_stained_glass",
+    "states": 1
+  },
+  {
+    "id": "minecraft:blue_stained_glass",
+    "states": 1
+  },
+  {
+    "id": "minecraft:brown_stained_glass",
+    "states": 1
+  },
+  {
+    "id": "minecraft:green_stained_glass",
+    "states": 1
+  },
+  {
+    "id": "minecraft:red_stained_glass",
+    "states": 1
+  },
+  {
+    "id": "minecraft:black_stained_glass",
+    "states": 1
+  },
+  {
+    "id": "minecraft:oak_trapdoor",
+    "states": 32
+  },
+  {
+    "id": "minecraft:spruce_trapdoor",
+    "states": 32
+  },
+  {
+    "id": "minecraft:birch_trapdoor",
+    "states": 32
+  },
+  {
+    "id": "minecraft:jungle_trapdoor",
+    "states": 32
+  },
+  {
+    "id": "minecraft:acacia_trapdoor",
+    "states": 32
+  },
+  {
+    "id": "minecraft:dark_oak_trapdoor",
+    "states": 32
+  },
+  {
+    "id": "minecraft:infested_stone",
+    "states": 1
+  },
+  {
+    "id": "minecraft:infested_cobblestone",
+    "states": 1
+  },
+  {
+    "id": "minecraft:infested_stone_bricks",
+    "states": 1
+  },
+  {
+    "id": "minecraft:infested_mossy_stone_bricks",
+    "states": 1
+  },
+  {
+    "id": "minecraft:infested_cracked_stone_bricks",
+    "states": 1
+  },
+  {
+    "id": "minecraft:infested_chiseled_stone_bricks",
+    "states": 1
+  },
+  {
+    "id": "minecraft:stone_bricks",
+    "states": 1
+  },
+  {
+    "id": "minecraft:mossy_stone_bricks",
+    "states": 1
+  },
+  {
+    "id": "minecraft:cracked_stone_bricks",
+    "states": 1
+  },
+  {
+    "id": "minecraft:chiseled_stone_bricks",
+    "states": 1
+  },
+  {
+    "id": "minecraft:brown_mushroom_block",
+    "states": 64
+  },
+  {
+    "id": "minecraft:red_mushroom_block",
+    "states": 64
+  },
+  {
+    "id": "minecraft:mushroom_stem",
+    "states": 64
+  },
+  {
+    "id": "minecraft:iron_bars",
+    "states": 16
+  },
+  {
+    "id": "minecraft:glass_pane",
+    "states": 16
+  },
+  {
+    "id": "minecraft:melon_block",
+    "states": 1
+  },
+  {
+    "id": "minecraft:attached_pumpkin_stem",
+    "states": 4
+  },
+  {
+    "id": "minecraft:attached_melon_stem",
+    "states": 4
+  },
+  {
+    "id": "minecraft:pumpkin_stem",
+    "states": 8
+  },
+  {
+    "id": "minecraft:melon_stem",
+    "states": 8
+  },
+  {
+    "id": "minecraft:vine",
+    "states": 32
+  },
+  {
+    "id": "minecraft:oak_fence_gate",
+    "states": 32
+  },
+  {
+    "id": "minecraft:brick_stairs",
+    "states": 40
+  },
+  {
+    "id": "minecraft:stone_brick_stairs",
+    "states": 40
+  },
+  {
+    "id": "minecraft:mycelium",
+    "states": 2
+  },
+  {
+    "id": "minecraft:lily_pad",
+    "states": 1
+  },
+  {
+    "id": "minecraft:nether_bricks",
+    "states": 1
+  },
+  {
+    "id": "minecraft:nether_brick_fence",
+    "states": 16
+  },
+  {
+    "id": "minecraft:nether_brick_stairs",
+    "states": 40
+  },
+  {
+    "id": "minecraft:nether_wart",
+    "states": 4
+  },
+  {
+    "id": "minecraft:enchanting_table",
+    "states": 1
+  },
+  {
+    "id": "minecraft:brewing_stand",
+    "states": 8
+  },
+  {
+    "id": "minecraft:cauldron",
+    "states": 4
+  },
+  {
+    "id": "minecraft:end_portal",
+    "states": 1
+  },
+  {
+    "id": "minecraft:end_portal_frame",
+    "states": 8
+  },
+  {
+    "id": "minecraft:end_stone",
+    "states": 1
+  },
+  {
+    "id": "minecraft:dragon_egg",
+    "states": 1
+  },
+  {
+    "id": "minecraft:redstone_lamp",
+    "states": 2
+  },
+  {
+    "id": "minecraft:cocoa",
+    "states": 12
+  },
+  {
+    "id": "minecraft:sandstone_stairs",
+    "states": 40
+  },
+  {
+    "id": "minecraft:emerald_ore",
+    "states": 1
+  },
+  {
+    "id": "minecraft:ender_chest",
+    "states": 4
+  },
+  {
+    "id": "minecraft:tripwire_hook",
+    "states": 16
+  },
+  {
+    "id": "minecraft:tripwire",
+    "states": 128
+  },
+  {
+    "id": "minecraft:emerald_block",
+    "states": 1
+  },
+  {
+    "id": "minecraft:spruce_stairs",
+    "states": 40
+  },
+  {
+    "id": "minecraft:birch_stairs",
+    "states": 40
+  },
+  {
+    "id": "minecraft:jungle_stairs",
+    "states": 40
+  },
+  {
+    "id": "minecraft:command_block",
+    "states": 12
+  },
+  {
+    "id": "minecraft:beacon",
+    "states": 1
+  },
+  {
+    "id": "minecraft:cobblestone_wall",
+    "states": 32
+  },
+  {
+    "id": "minecraft:mossy_cobblestone_wall",
+    "states": 32
+  },
+  {
+    "id": "minecraft:flower_pot",
+    "states": 1
+  },
+  {
+    "id": "minecraft:potted_oak_sapling",
+    "states": 1
+  },
+  {
+    "id": "minecraft:potted_spruce_sapling",
+    "states": 1
+  },
+  {
+    "id": "minecraft:potted_birch_sapling",
+    "states": 1
+  },
+  {
+    "id": "minecraft:potted_jungle_sapling",
+    "states": 1
+  },
+  {
+    "id": "minecraft:potted_acacia_sapling",
+    "states": 1
+  },
+  {
+    "id": "minecraft:potted_dark_oak_sapling",
+    "states": 1
+  },
+  {
+    "id": "minecraft:potted_fern",
+    "states": 1
+  },
+  {
+    "id": "minecraft:potted_dandelion",
+    "states": 1
+  },
+  {
+    "id": "minecraft:potted_poppy",
+    "states": 1
+  },
+  {
+    "id": "minecraft:potted_blue_orchid",
+    "states": 1
+  },
+  {
+    "id": "minecraft:potted_allium",
+    "states": 1
+  },
+  {
+    "id": "minecraft:potted_azure_bluet",
+    "states": 1
+  },
+  {
+    "id": "minecraft:potted_red_tulip",
+    "states": 1
+  },
+  {
+    "id": "minecraft:potted_orange_tulip",
+    "states": 1
+  },
+  {
+    "id": "minecraft:potted_white_tulip",
+    "states": 1
+  },
+  {
+    "id": "minecraft:potted_pink_tulip",
+    "states": 1
+  },
+  {
+    "id": "minecraft:potted_oxeye_daisy",
+    "states": 1
+  },
+  {
+    "id": "minecraft:potted_red_mushroom",
+    "states": 1
+  },
+  {
+    "id": "minecraft:potted_brown_mushroom",
+    "states": 1
+  },
+  {
+    "id": "minecraft:potted_dead_bush",
+    "states": 1
+  },
+  {
+    "id": "minecraft:potted_cactus",
+    "states": 1
+  },
+  {
+    "id": "minecraft:carrots",
+    "states": 8
+  },
+  {
+    "id": "minecraft:potatoes",
+    "states": 8
+  },
+  {
+    "id": "minecraft:oak_button",
+    "states": 24
+  },
+  {
+    "id": "minecraft:spruce_button",
+    "states": 24
+  },
+  {
+    "id": "minecraft:birch_button",
+    "states": 24
+  },
+  {
+    "id": "minecraft:jungle_button",
+    "states": 24
+  },
+  {
+    "id": "minecraft:acacia_button",
+    "states": 24
+  },
+  {
+    "id": "minecraft:dark_oak_button",
+    "states": 24
+  },
+  {
+    "id": "minecraft:skeleton_wall_skull",
+    "states": 4
+  },
+  {
+    "id": "minecraft:skeleton_skull",
+    "states": 16
+  },
+  {
+    "id": "minecraft:wither_skeleton_wall_skull",
+    "states": 4
+  },
+  {
+    "id": "minecraft:wither_skeleton_skull",
+    "states": 16
+  },
+  {
+    "id": "minecraft:zombie_wall_head",
+    "states": 4
+  },
+  {
+    "id": "minecraft:zombie_head",
+    "states": 16
+  },
+  {
+    "id": "minecraft:player_wall_head",
+    "states": 4
+  },
+  {
+    "id": "minecraft:player_head",
+    "states": 16
+  },
+  {
+    "id": "minecraft:creeper_wall_head",
+    "states": 4
+  },
+  {
+    "id": "minecraft:creeper_head",
+    "states": 16
+  },
+  {
+    "id": "minecraft:dragon_wall_head",
+    "states": 4
+  },
+  {
+    "id": "minecraft:dragon_head",
+    "states": 16
+  },
+  {
+    "id": "minecraft:anvil",
+    "states": 4
+  },
+  {
+    "id": "minecraft:chipped_anvil",
+    "states": 4
+  },
+  {
+    "id": "minecraft:damaged_anvil",
+    "states": 4
+  },
+  {
+    "id": "minecraft:trapped_chest",
+    "states": 12
+  },
+  {
+    "id": "minecraft:light_weighted_pressure_plate",
+    "states": 16
+  },
+  {
+    "id": "minecraft:heavy_weighted_pressure_plate",
+    "states": 16
+  },
+  {
+    "id": "minecraft:comparator",
+    "states": 16
+  },
+  {
+    "id": "minecraft:daylight_detector",
+    "states": 32
+  },
+  {
+    "id": "minecraft:redstone_block",
+    "states": 1
+  },
+  {
+    "id": "minecraft:nether_quartz_ore",
+    "states": 1
+  },
+  {
+    "id": "minecraft:hopper",
+    "states": 10
+  },
+  {
+    "id": "minecraft:quartz_block",
+    "states": 1
+  },
+  {
+    "id": "minecraft:chiseled_quartz_block",
+    "states": 1
+  },
+  {
+    "id": "minecraft:quartz_pillar",
+    "states": 3
+  },
+  {
+    "id": "minecraft:quartz_stairs",
+    "states": 40
+  },
+  {
+    "id": "minecraft:activator_rail",
+    "states": 12
+  },
+  {
+    "id": "minecraft:dropper",
+    "states": 12
+  },
+  {
+    "id": "minecraft:white_terracotta",
+    "states": 1
+  },
+  {
+    "id": "minecraft:orange_terracotta",
+    "states": 1
+  },
+  {
+    "id": "minecraft:magenta_terracotta",
+    "states": 1
+  },
+  {
+    "id": "minecraft:light_blue_terracotta",
+    "states": 1
+  },
+  {
+    "id": "minecraft:yellow_terracotta",
+    "states": 1
+  },
+  {
+    "id": "minecraft:lime_terracotta",
+    "states": 1
+  },
+  {
+    "id": "minecraft:pink_terracotta",
+    "states": 1
+  },
+  {
+    "id": "minecraft:gray_terracotta",
+    "states": 1
+  },
+  {
+    "id": "minecraft:light_gray_terracotta",
+    "states": 1
+  },
+  {
+    "id": "minecraft:cyan_terracotta",
+    "states": 1
+  },
+  {
+    "id": "minecraft:purple_terracotta",
+    "states": 1
+  },
+  {
+    "id": "minecraft:blue_terracotta",
+    "states": 1
+  },
+  {
+    "id": "minecraft:brown_terracotta",
+    "states": 1
+  },
+  {
+    "id": "minecraft:green_terracotta",
+    "states": 1
+  },
+  {
+    "id": "minecraft:red_terracotta",
+    "states": 1
+  },
+  {
+    "id": "minecraft:black_terracotta",
+    "states": 1
+  },
+  {
+    "id": "minecraft:white_stained_glass_pane",
+    "states": 16
+  },
+  {
+    "id": "minecraft:orange_stained_glass_pane",
+    "states": 16
+  },
+  {
+    "id": "minecraft:magenta_stained_glass_pane",
+    "states": 16
+  },
+  {
+    "id": "minecraft:light_blue_stained_glass_pane",
+    "states": 16
+  },
+  {
+    "id": "minecraft:yellow_stained_glass_pane",
+    "states": 16
+  },
+  {
+    "id": "minecraft:lime_stained_glass_pane",
+    "states": 16
+  },
+  {
+    "id": "minecraft:pink_stained_glass_pane",
+    "states": 16
+  },
+  {
+    "id": "minecraft:gray_stained_glass_pane",
+    "states": 16
+  },
+  {
+    "id": "minecraft:light_gray_stained_glass_pane",
+    "states": 16
+  },
+  {
+    "id": "minecraft:cyan_stained_glass_pane",
+    "states": 16
+  },
+  {
+    "id": "minecraft:purple_stained_glass_pane",
+    "states": 16
+  },
+  {
+    "id": "minecraft:blue_stained_glass_pane",
+    "states": 16
+  },
+  {
+    "id": "minecraft:brown_stained_glass_pane",
+    "states": 16
+  },
+  {
+    "id": "minecraft:green_stained_glass_pane",
+    "states": 16
+  },
+  {
+    "id": "minecraft:red_stained_glass_pane",
+    "states": 16
+  },
+  {
+    "id": "minecraft:black_stained_glass_pane",
+    "states": 16
+  },
+  {
+    "id": "minecraft:acacia_stairs",
+    "states": 40
+  },
+  {
+    "id": "minecraft:dark_oak_stairs",
+    "states": 40
+  },
+  {
+    "id": "minecraft:slime_block",
+    "states": 1
+  },
+  {
+    "id": "minecraft:barrier",
+    "states": 1
+  },
+  {
+    "id": "minecraft:iron_trapdoor",
+    "states": 32
+  },
+  {
+    "id": "minecraft:prismarine",
+    "states": 1
+  },
+  {
+    "id": "minecraft:prismarine_bricks",
+    "states": 1
+  },
+  {
+    "id": "minecraft:dark_prismarine",
+    "states": 1
+  },
+  {
+    "id": "minecraft:sea_lantern",
+    "states": 1
+  },
+  {
+    "id": "minecraft:hay_block",
+    "states": 3
+  },
+  {
+    "id": "minecraft:white_carpet",
+    "states": 1
+  },
+  {
+    "id": "minecraft:orange_carpet",
+    "states": 1
+  },
+  {
+    "id": "minecraft:magenta_carpet",
+    "states": 1
+  },
+  {
+    "id": "minecraft:light_blue_carpet",
+    "states": 1
+  },
+  {
+    "id": "minecraft:yellow_carpet",
+    "states": 1
+  },
+  {
+    "id": "minecraft:lime_carpet",
+    "states": 1
+  },
+  {
+    "id": "minecraft:pink_carpet",
+    "states": 1
+  },
+  {
+    "id": "minecraft:gray_carpet",
+    "states": 1
+  },
+  {
+    "id": "minecraft:light_gray_carpet",
+    "states": 1
+  },
+  {
+    "id": "minecraft:cyan_carpet",
+    "states": 1
+  },
+  {
+    "id": "minecraft:purple_carpet",
+    "states": 1
+  },
+  {
+    "id": "minecraft:blue_carpet",
+    "states": 1
+  },
+  {
+    "id": "minecraft:brown_carpet",
+    "states": 1
+  },
+  {
+    "id": "minecraft:green_carpet",
+    "states": 1
+  },
+  {
+    "id": "minecraft:red_carpet",
+    "states": 1
+  },
+  {
+    "id": "minecraft:black_carpet",
+    "states": 1
+  },
+  {
+    "id": "minecraft:hardened_clay",
+    "states": 1
+  },
+  {
+    "id": "minecraft:coal_block",
+    "states": 1
+  },
+  {
+    "id": "minecraft:packed_ice",
+    "states": 1
+  },
+  {
+    "id": "minecraft:sunflower",
+    "states": 2
+  },
+  {
+    "id": "minecraft:lilac",
+    "states": 2
+  },
+  {
+    "id": "minecraft:rose_bush",
+    "states": 2
+  },
+  {
+    "id": "minecraft:peony",
+    "states": 2
+  },
+  {
+    "id": "minecraft:tall_grass",
+    "states": 2
+  },
+  {
+    "id": "minecraft:large_fern",
+    "states": 2
+  },
+  {
+    "id": "minecraft:white_banner",
+    "states": 16
+  },
+  {
+    "id": "minecraft:orange_banner",
+    "states": 16
+  },
+  {
+    "id": "minecraft:magenta_banner",
+    "states": 16
+  },
+  {
+    "id": "minecraft:light_blue_banner",
+    "states": 16
+  },
+  {
+    "id": "minecraft:yellow_banner",
+    "states": 16
+  },
+  {
+    "id": "minecraft:lime_banner",
+    "states": 16
+  },
+  {
+    "id": "minecraft:pink_banner",
+    "states": 16
+  },
+  {
+    "id": "minecraft:gray_banner",
+    "states": 16
+  },
+  {
+    "id": "minecraft:light_gray_banner",
+    "states": 16
+  },
+  {
+    "id": "minecraft:cyan_banner",
+    "states": 16
+  },
+  {
+    "id": "minecraft:purple_banner",
+    "states": 16
+  },
+  {
+    "id": "minecraft:blue_banner",
+    "states": 16
+  },
+  {
+    "id": "minecraft:brown_banner",
+    "states": 16
+  },
+  {
+    "id": "minecraft:green_banner",
+    "states": 16
+  },
+  {
+    "id": "minecraft:red_banner",
+    "states": 16
+  },
+  {
+    "id": "minecraft:black_banner",
+    "states": 16
+  },
+  {
+    "id": "minecraft:white_wall_banner",
+    "states": 4
+  },
+  {
+    "id": "minecraft:orange_wall_banner",
+    "states": 4
+  },
+  {
+    "id": "minecraft:magenta_wall_banner",
+    "states": 4
+  },
+  {
+    "id": "minecraft:light_blue_wall_banner",
+    "states": 4
+  },
+  {
+    "id": "minecraft:yellow_wall_banner",
+    "states": 4
+  },
+  {
+    "id": "minecraft:lime_wall_banner",
+    "states": 4
+  },
+  {
+    "id": "minecraft:pink_wall_banner",
+    "states": 4
+  },
+  {
+    "id": "minecraft:gray_wall_banner",
+    "states": 4
+  },
+  {
+    "id": "minecraft:light_gray_wall_banner",
+    "states": 4
+  },
+  {
+    "id": "minecraft:cyan_wall_banner",
+    "states": 4
+  },
+  {
+    "id": "minecraft:purple_wall_banner",
+    "states": 4
+  },
+  {
+    "id": "minecraft:blue_wall_banner",
+    "states": 4
+  },
+  {
+    "id": "minecraft:brown_wall_banner",
+    "states": 4
+  },
+  {
+    "id": "minecraft:green_wall_banner",
+    "states": 4
+  },
+  {
+    "id": "minecraft:red_wall_banner",
+    "states": 4
+  },
+  {
+    "id": "minecraft:black_wall_banner",
+    "states": 4
+  },
+  {
+    "id": "minecraft:red_sandstone",
+    "states": 1
+  },
+  {
+    "id": "minecraft:chiseled_red_sandstone",
+    "states": 1
+  },
+  {
+    "id": "minecraft:cut_red_sandstone",
+    "states": 1
+  },
+  {
+    "id": "minecraft:red_sandstone_stairs",
+    "states": 40
+  },
+  {
+    "id": "minecraft:oak_slab",
+    "states": 3
+  },
+  {
+    "id": "minecraft:spruce_slab",
+    "states": 3
+  },
+  {
+    "id": "minecraft:birch_slab",
+    "states": 3
+  },
+  {
+    "id": "minecraft:jungle_slab",
+    "states": 3
+  },
+  {
+    "id": "minecraft:acacia_slab",
+    "states": 3
+  },
+  {
+    "id": "minecraft:dark_oak_slab",
+    "states": 3
+  },
+  {
+    "id": "minecraft:stone_slab",
+    "states": 3
+  },
+  {
+    "id": "minecraft:sandstone_slab",
+    "states": 3
+  },
+  {
+    "id": "minecraft:petrified_oak_slab",
+    "states": 3
+  },
+  {
+    "id": "minecraft:cobblestone_slab",
+    "states": 3
+  },
+  {
+    "id": "minecraft:brick_slab",
+    "states": 3
+  },
+  {
+    "id": "minecraft:stone_brick_slab",
+    "states": 3
+  },
+  {
+    "id": "minecraft:nether_brick_slab",
+    "states": 3
+  },
+  {
+    "id": "minecraft:quartz_slab",
+    "states": 3
+  },
+  {
+    "id": "minecraft:red_sandstone_slab",
+    "states": 3
+  },
+  {
+    "id": "minecraft:purpur_slab",
+    "states": 3
+  },
+  {
+    "id": "minecraft:smooth_stone",
+    "states": 1
+  },
+  {
+    "id": "minecraft:smooth_sandstone",
+    "states": 1
+  },
+  {
+    "id": "minecraft:smooth_quartz",
+    "states": 1
+  },
+  {
+    "id": "minecraft:smooth_red_sandstone",
+    "states": 1
+  },
+  {
+    "id": "minecraft:spruce_fence_gate",
+    "states": 32
+  },
+  {
+    "id": "minecraft:birch_fence_gate",
+    "states": 32
+  },
+  {
+    "id": "minecraft:jungle_fence_gate",
+    "states": 32
+  },
+  {
+    "id": "minecraft:dark_oak_fence_gate",
+    "states": 32
+  },
+  {
+    "id": "minecraft:acacia_fence_gate",
+    "states": 32
+  },
+  {
+    "id": "minecraft:spruce_fence",
+    "states": 16
+  },
+  {
+    "id": "minecraft:birch_fence",
+    "states": 16
+  },
+  {
+    "id": "minecraft:jungle_fence",
+    "states": 16
+  },
+  {
+    "id": "minecraft:dark_oak_fence",
+    "states": 16
+  },
+  {
+    "id": "minecraft:acacia_fence",
+    "states": 16
+  },
+  {
+    "id": "minecraft:spruce_door",
+    "states": 64
+  },
+  {
+    "id": "minecraft:birch_door",
+    "states": 64
+  },
+  {
+    "id": "minecraft:jungle_door",
+    "states": 64
+  },
+  {
+    "id": "minecraft:acacia_door",
+    "states": 64
+  },
+  {
+    "id": "minecraft:dark_oak_door",
+    "states": 64
+  },
+  {
+    "id": "minecraft:end_rod",
+    "states": 6
+  },
+  {
+    "id": "minecraft:chorus_plant",
+    "states": 64
+  },
+  {
+    "id": "minecraft:chorus_flower",
+    "states": 6
+  },
+  {
+    "id": "minecraft:purpur_block",
+    "states": 1
+  },
+  {
+    "id": "minecraft:purpur_pillar",
+    "states": 3
+  },
+  {
+    "id": "minecraft:purpur_stairs",
+    "states": 40
+  },
+  {
+    "id": "minecraft:end_stone_bricks",
+    "states": 1
+  },
+  {
+    "id": "minecraft:beetroots",
+    "states": 4
+  },
+  {
+    "id": "minecraft:grass_path",
+    "states": 1
+  },
+  {
+    "id": "minecraft:end_gateway",
+    "states": 1
+  },
+  {
+    "id": "minecraft:repeating_command_block",
+    "states": 12
+  },
+  {
+    "id": "minecraft:chain_command_block",
+    "states": 12
+  },
+  {
+    "id": "minecraft:frosted_ice",
+    "states": 4
+  },
+  {
+    "id": "minecraft:magma_block",
+    "states": 1
+  },
+  {
+    "id": "minecraft:nether_wart_block",
+    "states": 1
+  },
+  {
+    "id": "minecraft:red_nether_bricks",
+    "states": 1
+  },
+  {
+    "id": "minecraft:bone_block",
+    "states": 3
+  },
+  {
+    "id": "minecraft:structure_void",
+    "states": 1
+  },
+  {
+    "id": "minecraft:observer",
+    "states": 12
+  },
+  {
+    "id": "minecraft:white_shulker_box",
+    "states": 6
+  },
+  {
+    "id": "minecraft:orange_shulker_box",
+    "states": 6
+  },
+  {
+    "id": "minecraft:magenta_shulker_box",
+    "states": 6
+  },
+  {
+    "id": "minecraft:light_blue_shulker_box",
+    "states": 6
+  },
+  {
+    "id": "minecraft:yellow_shulker_box",
+    "states": 6
+  },
+  {
+    "id": "minecraft:lime_shulker_box",
+    "states": 6
+  },
+  {
+    "id": "minecraft:pink_shulker_box",
+    "states": 6
+  },
+  {
+    "id": "minecraft:gray_shulker_box",
+    "states": 6
+  },
+  {
+    "id": "minecraft:light_gray_shulker_box",
+    "states": 6
+  },
+  {
+    "id": "minecraft:cyan_shulker_box",
+    "states": 6
+  },
+  {
+    "id": "minecraft:purple_shulker_box",
+    "states": 6
+  },
+  {
+    "id": "minecraft:blue_shulker_box",
+    "states": 6
+  },
+  {
+    "id": "minecraft:brown_shulker_box",
+    "states": 6
+  },
+  {
+    "id": "minecraft:green_shulker_box",
+    "states": 6
+  },
+  {
+    "id": "minecraft:red_shulker_box",
+    "states": 6
+  },
+  {
+    "id": "minecraft:black_shulker_box",
+    "states": 6
+  },
+  {
+    "id": "minecraft:white_glazed_terracotta",
+    "states": 4
+  },
+  {
+    "id": "minecraft:orange_glazed_terracotta",
+    "states": 4
+  },
+  {
+    "id": "minecraft:magenta_glazed_terracotta",
+    "states": 4
+  },
+  {
+    "id": "minecraft:light_blue_glazed_terracotta",
+    "states": 4
+  },
+  {
+    "id": "minecraft:yellow_glazed_terracotta",
+    "states": 4
+  },
+  {
+    "id": "minecraft:lime_glazed_terracotta",
+    "states": 4
+  },
+  {
+    "id": "minecraft:pink_glazed_terracotta",
+    "states": 4
+  },
+  {
+    "id": "minecraft:gray_glazed_terracotta",
+    "states": 4
+  },
+  {
+    "id": "minecraft:light_gray_glazed_terracotta",
+    "states": 4
+  },
+  {
+    "id": "minecraft:cyan_glazed_terracotta",
+    "states": 4
+  },
+  {
+    "id": "minecraft:purple_glazed_terracotta",
+    "states": 4
+  },
+  {
+    "id": "minecraft:blue_glazed_terracotta",
+    "states": 4
+  },
+  {
+    "id": "minecraft:brown_glazed_terracotta",
+    "states": 4
+  },
+  {
+    "id": "minecraft:green_glazed_terracotta",
+    "states": 4
+  },
+  {
+    "id": "minecraft:red_glazed_terracotta",
+    "states": 4
+  },
+  {
+    "id": "minecraft:black_glazed_terracotta",
+    "states": 4
+  },
+  {
+    "id": "minecraft:white_concrete",
+    "states": 1
+  },
+  {
+    "id": "minecraft:orange_concrete",
+    "states": 1
+  },
+  {
+    "id": "minecraft:magenta_concrete",
+    "states": 1
+  },
+  {
+    "id": "minecraft:light_blue_concrete",
+    "states": 1
+  },
+  {
+    "id": "minecraft:yellow_concrete",
+    "states": 1
+  },
+  {
+    "id": "minecraft:lime_concrete",
+    "states": 1
+  },
+  {
+    "id": "minecraft:pink_concrete",
+    "states": 1
+  },
+  {
+    "id": "minecraft:gray_concrete",
+    "states": 1
+  },
+  {
+    "id": "minecraft:light_gray_concrete",
+    "states": 1
+  },
+  {
+    "id": "minecraft:cyan_concrete",
+    "states": 1
+  },
+  {
+    "id": "minecraft:purple_concrete",
+    "states": 1
+  },
+  {
+    "id": "minecraft:blue_concrete",
+    "states": 1
+  },
+  {
+    "id": "minecraft:brown_concrete",
+    "states": 1
+  },
+  {
+    "id": "minecraft:green_concrete",
+    "states": 1
+  },
+  {
+    "id": "minecraft:red_concrete",
+    "states": 1
+  },
+  {
+    "id": "minecraft:black_concrete",
+    "states": 1
+  },
+  {
+    "id": "minecraft:white_concrete_powder",
+    "states": 1
+  },
+  {
+    "id": "minecraft:orange_concrete_powder",
+    "states": 1
+  },
+  {
+    "id": "minecraft:magenta_concrete_powder",
+    "states": 1
+  },
+  {
+    "id": "minecraft:light_blue_concrete_powder",
+    "states": 1
+  },
+  {
+    "id": "minecraft:yellow_concrete_powder",
+    "states": 1
+  },
+  {
+    "id": "minecraft:lime_concrete_powder",
+    "states": 1
+  },
+  {
+    "id": "minecraft:pink_concrete_powder",
+    "states": 1
+  },
+  {
+    "id": "minecraft:gray_concrete_powder",
+    "states": 1
+  },
+  {
+    "id": "minecraft:light_gray_concrete_powder",
+    "states": 1
+  },
+  {
+    "id": "minecraft:cyan_concrete_powder",
+    "states": 1
+  },
+  {
+    "id": "minecraft:purple_concrete_powder",
+    "states": 1
+  },
+  {
+    "id": "minecraft:blue_concrete_powder",
+    "states": 1
+  },
+  {
+    "id": "minecraft:brown_concrete_powder",
+    "states": 1
+  },
+  {
+    "id": "minecraft:green_concrete_powder",
+    "states": 1
+  },
+  {
+    "id": "minecraft:red_concrete_powder",
+    "states": 1
+  },
+  {
+    "id": "minecraft:black_concrete_powder",
+    "states": 1
+  },
+  {
+    "id": "minecraft:structure_block",
+    "states": 4
+  }
+]

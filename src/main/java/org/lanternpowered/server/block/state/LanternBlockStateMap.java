@@ -32,7 +32,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableTable;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import org.lanternpowered.server.block.LanternBlockType;
 import org.lanternpowered.server.block.trait.LanternBlockTrait;
 import org.spongepowered.api.block.BlockState;
@@ -43,13 +42,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 public final class LanternBlockStateMap {
 
@@ -83,10 +80,13 @@ public final class LanternBlockStateMap {
         final ImmutableSet.Builder<Key<?>> keys = ImmutableSet.builder();
 
         // All the sets with all the allowed values
-        final List<Set<Comparable<?>>> allowedValues = new ArrayList<>();
+        final List<List<Comparable<?>>> allowedValues = new ArrayList<>();
 
         for (BlockTrait<?> trait : list) {
-            allowedValues.add(new HashSet<>(trait.getPossibleValues()));
+            // Sort the values
+            final List<Comparable> possibleValues = new ArrayList<>(trait.getPossibleValues());
+            possibleValues.sort(Comparator.naturalOrder());
+            allowedValues.add((List) possibleValues);
             keys.add(((LanternBlockTrait) trait).getKey());
             builder.put(trait.getName(), trait);
         }
@@ -102,7 +102,7 @@ public final class LanternBlockStateMap {
         final ImmutableList.Builder<BlockState> blockStates = ImmutableList.builder();
 
         // Do the cartesian product to get all the possible combinations
-        for (List<Comparable<?>> comparables : Sets.cartesianProduct(allowedValues)) {
+        for (List<Comparable<?>> comparables : Lists.cartesianProduct(allowedValues)) {
             final Iterator<Comparable<?>> objectsIt = comparables.iterator();
 
             final ImmutableMap.Builder<BlockTrait<?>, Comparable<?>> traitValuesBuilder = ImmutableMap.builder();

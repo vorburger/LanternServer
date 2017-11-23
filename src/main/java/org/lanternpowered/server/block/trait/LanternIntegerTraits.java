@@ -25,10 +25,9 @@
  */
 package org.lanternpowered.server.block.trait;
 
+import org.lanternpowered.server.data.key.LanternKeys;
 import org.spongepowered.api.block.trait.IntegerTrait;
-import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.util.Direction;
 
 public final class LanternIntegerTraits {
 
@@ -37,6 +36,12 @@ public final class LanternIntegerTraits {
     public static final IntegerTrait POWER = LanternIntegerTrait.ofRange("power", Keys.POWER, 0, 15);
 
     public static final IntegerTrait MOISTURE = LanternIntegerTrait.ofRange("moisture", Keys.MOISTURE, 0, 7);
+
+    // TODO: Actually use the following states properly?
+
+    public static final IntegerTrait DUMMY_NOTE = LanternIntegerTrait.ofRange("note", LanternKeys.DUMMY_NOTE, 0, 24);
+
+    public static final IntegerTrait DUMMY_INSTRUMENT = LanternIntegerTrait.ofRange("instrument", LanternKeys.DUMMY_INSTRUMENT, 0, 15);
 
     private LanternIntegerTraits() {
     }

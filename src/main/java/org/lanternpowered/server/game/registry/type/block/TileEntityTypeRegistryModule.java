@@ -82,7 +82,7 @@ public final class TileEntityTypeRegistryModule extends AdditionalPluginCatalogR
         register(LanternTileEntityType.of("minecraft", "ender_chest", LanternEnderChest::new));
         register(LanternTileEntityType.of("minecraft", "furnace", LanternFurnace::new));
         register(LanternTileEntityType.of("minecraft", "jukebox", LanternJukebox::new));
-        register(LanternTileEntityType.of("minecraft", "noteblock", LanternNote::new));
+        register(LanternTileEntityType.of("minecraft", "note_block", LanternNote::new));
         register(LanternTileEntityType.of("minecraft", "shulker_box", LanternShulkerBox::new));
     }
 
@@ -90,7 +90,7 @@ public final class TileEntityTypeRegistryModule extends AdditionalPluginCatalogR
     public Map<String, TileEntityType> provideCatalogMap() {
         final Map<String, TileEntityType> map = new HashMap<>(super.provideCatalogMap());
         // Because they had to give the mapping a different name
-        map.putIfAbsent("note", getById("minecraft:noteblock").get());
+        map.putIfAbsent("note", getById("minecraft:note_block").get());
         return map;
     }
 }

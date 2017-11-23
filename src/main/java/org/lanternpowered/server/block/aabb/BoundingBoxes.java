@@ -81,11 +81,14 @@ public class BoundingBoxes {
         private static final AABB WEST = new AABB(0.7, 0.2, 0.35, 1.0, 0.8, 0.65);
     }
 
-    public static AABB torch(BlockState blockState) {
+    public static AABB torch() {
+        return Torch.UP;
+    }
+
+
+    public static AABB wallTorch(BlockState blockState) {
         final Direction direction = blockState.get(Keys.DIRECTION).get();
         switch (direction) {
-            case UP:
-                return Torch.UP;
             case NORTH:
                 return Torch.NORTH;
             case EAST:
@@ -125,7 +128,14 @@ public class BoundingBoxes {
 
     public static AABB slab(BlockState blockState) {
         final LanternPortionType portionType = (LanternPortionType) blockState.get(Keys.PORTION_TYPE).get();
-        return portionType == LanternPortionType.TOP ? Slab.TOP : Slab.BOTTOM;
+        switch (portionType) {
+            case BOTTOM:
+                return Slab.BOTTOM;
+            case TOP:
+                return Slab.TOP;
+            default:
+                return DEFAULT;
+        }
     }
 
     private final static class Bush {

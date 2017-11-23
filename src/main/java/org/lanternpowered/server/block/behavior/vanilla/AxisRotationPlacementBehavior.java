@@ -31,17 +31,16 @@ import org.lanternpowered.server.behavior.BehaviorResult;
 import org.lanternpowered.server.behavior.ContextKeys;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.block.behavior.types.PlaceBlockBehavior;
-import org.lanternpowered.server.data.type.LanternLogAxis;
 import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.type.LogAxis;
+import org.spongepowered.api.util.Axis;
 
-public class LogAxisRotationPlacementBehavior implements PlaceBlockBehavior {
+public class AxisRotationPlacementBehavior implements PlaceBlockBehavior {
 
     @Override
     public BehaviorResult tryPlace(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
         context.getContext(ContextKeys.INTERACTION_FACE).ifPresent(face -> {
-            final LogAxis axis = LanternLogAxis.fromDirection(face.getOpposite());
-            context.transformBlockChanges((original, builder) -> builder.add(Keys.LOG_AXIS, axis));
+            final Axis axis = Axis.getClosest(face.asOffset());
+            context.transformBlockChanges((original, builder) -> builder.add(Keys.AXIS, axis));
         });
         return BehaviorResult.CONTINUE;
     }

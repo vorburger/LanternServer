@@ -31,8 +31,9 @@ import org.spongepowered.api.data.type.PortionType;
 
 public enum LanternPortionType implements PortionType, SimpleCatalogType, InternalCatalogType {
 
-    BOTTOM        ("bottom"),
     TOP           ("top"),
+    BOTTOM        ("bottom"),
+    DOUBLE        ("double")
     ;
 
     private final String identifier;

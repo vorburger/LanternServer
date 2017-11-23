@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.block.trait;
 
+import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.data.type.LanternBedPart;
 import org.lanternpowered.server.data.type.LanternDirtType;
 import org.lanternpowered.server.data.type.LanternDyeColor;
@@ -39,17 +40,17 @@ import org.lanternpowered.server.data.type.LanternShrubType;
 import org.lanternpowered.server.data.type.LanternSlabType;
 import org.lanternpowered.server.data.type.LanternStoneType;
 import org.lanternpowered.server.data.type.LanternTreeType;
+import org.lanternpowered.server.data.type.RedstoneConnectionType;
 import org.spongepowered.api.block.trait.EnumTrait;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.util.Axis;
 import org.spongepowered.api.util.Direction;
 
 @SuppressWarnings("unchecked")
 public final class LanternEnumTraits {
 
-    public static final EnumTrait<LanternLogAxis> LOG_AXIS =
-            LanternEnumTrait.of("axis", (Key) Keys.LOG_AXIS,
-                    LanternLogAxis.X, LanternLogAxis.Y, LanternLogAxis.Z);
+    public static final EnumTrait<Axis> AXIS = LanternEnumTrait.of("axis", Keys.AXIS, Axis.class);
 
     public static final EnumTrait<LanternTreeType> LEAVES1_TYPE =
             LanternEnumTrait.of("variant", (Key) Keys.TREE_TYPE,
@@ -88,7 +89,7 @@ public final class LanternEnumTraits {
                     Direction.SOUTH, Direction.WEST, Direction.NORTH, Direction.EAST);
 
     public static final EnumTrait<LanternPortionType> PORTION_TYPE =
-            LanternEnumTrait.of("half", (Key) Keys.PORTION_TYPE, LanternPortionType.class);
+            LanternEnumTrait.of("type", (Key) Keys.PORTION_TYPE, LanternPortionType.class);
 
     public static final EnumTrait<LanternSlabType> STONE_SLAB1_TYPE =
             LanternEnumTrait.of("variant", (Key) Keys.SLAB_TYPE, LanternSlabType.class, type -> type.ordinal() >= 0 && type.ordinal() < 8);
@@ -120,7 +121,19 @@ public final class LanternEnumTraits {
             LanternEnumTrait.of("type", (Key) Keys.PLANT_TYPE, LanternPlantType.class, type -> type.getInternalId() >= 16);
 
     public static final EnumTrait<Direction> TORCH_FACING =
-            LanternEnumTrait.of("facing", (Key) Keys.DIRECTION, Direction.SOUTH, Direction.WEST, Direction.NORTH, Direction.EAST, Direction.UP);
+            LanternEnumTrait.of("facing", (Key) Keys.DIRECTION, Direction.SOUTH, Direction.WEST, Direction.NORTH, Direction.EAST);
+
+    public static final EnumTrait<RedstoneConnectionType> REDSTONE_NORTH_CONNECTION =
+            LanternEnumTrait.of("north", (Key) LanternKeys.REDSTONE_NORTH_CONNECTION, RedstoneConnectionType.class);
+
+    public static final EnumTrait<RedstoneConnectionType> REDSTONE_SOUTH_CONNECTION =
+            LanternEnumTrait.of("south", (Key) LanternKeys.REDSTONE_SOUTH_CONNECTION, RedstoneConnectionType.class);
+
+    public static final EnumTrait<RedstoneConnectionType> REDSTONE_EAST_CONNECTION =
+            LanternEnumTrait.of("east", (Key) LanternKeys.REDSTONE_EAST_CONNECTION, RedstoneConnectionType.class);
+
+    public static final EnumTrait<RedstoneConnectionType> REDSTONE_WEST_CONNECTION =
+            LanternEnumTrait.of("west", (Key) LanternKeys.REDSTONE_WEST_CONNECTION, RedstoneConnectionType.class);
 
     private LanternEnumTraits() {
     }

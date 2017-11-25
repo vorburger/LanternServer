@@ -25,17 +25,121 @@
  */
 package org.lanternpowered.server.item.behavior.vanilla;
 
+import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.behavior.Behavior;
 import org.lanternpowered.server.behavior.BehaviorContext;
 import org.lanternpowered.server.behavior.BehaviorResult;
+import org.lanternpowered.server.behavior.ContextKeys;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
+import org.lanternpowered.server.block.BlockSnapshotBuilder;
+import org.lanternpowered.server.block.property.SolidSideProperty;
+import org.lanternpowered.server.block.trait.LanternEnumTraits;
+import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.item.behavior.types.InteractWithItemBehavior;
+import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.data.property.block.ReplaceableProperty;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.util.Direction;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
+import javax.annotation.Nullable;
+
+@SuppressWarnings("ConstantConditions")
 public class TorchInteractionBehavior implements InteractWithItemBehavior {
+
+    private static Direction[] getHorizontalDirections(Vector3d vector) {
+        Direction start = Direction.getClosestHorizontal(vector, Direction.Division.CARDINAL).getOpposite();
+        Direction second;
+        if (start == Direction.WEST || start == Direction.EAST) {
+            final double d = vector.getZ();
+            if (d > 0) {
+                second = Direction.NORTH;
+            } else {
+                second = Direction.SOUTH;
+            }
+        } else {
+            final double d = vector.getX();
+            if (d > 0) {
+                second = Direction.WEST;
+            } else {
+                second = Direction.EAST;
+            }
+        }
+        return new Direction[] { start, second, start.getOpposite(), second.getOpposite() };
+    }
+
+
+    @Nullable
+    private BlockSnapshotBuilder tryPlaceAt(LanternPlayer player, Location<World> location) {
+        Direction facing;
+        if (player != null) {
+            facing = player.getDirection(Direction.Division.CARDINAL).getOpposite();
+            // The up direction cannot be used
+            if (facing == Direction.DOWN) {
+                facing = player.getHorizontalDirection(Direction.Division.CARDINAL).getOpposite();
+            }
+        } else {
+            facing = Direction.UP;
+        }
+        Direction direction = null;
+        if (facing == Direction.UP && location.getExtent().getProperty(
+                location.getBlockRelative(Direction.DOWN).getBlockPosition(), Direction.UP, SolidSideProperty.class).get().getValue()) {
+            direction = Direction.UP;
+        }
+        if (direction == null) {
+            for (Direction dir : getHorizontalDirections(player.getHorizontalDirectionVector())) {
+                if (location.getExtent().getProperty(location.getBlockRelative(dir.getOpposite()).getBlockPosition(),
+                        dir, SolidSideProperty.class).get().getValue()) {
+                    direction = dir;
+                    break;
+                }
+            }
+        }
+        if (direction == null) {
+            return null;
+        }
+        return createBuilder(direction);
+    }
+
+    private BlockSnapshotBuilder createBuilder(Direction direction) {
+        final BlockSnapshotBuilder builder = BlockSnapshotBuilder.create();
+        if (direction == Direction.UP) {
+            return builder.blockState(BlockTypes.TORCH.getDefaultState());
+        } else {
+            return builder.blockState(BlockTypes.WALL_TORCH.getDefaultState()
+                    .withTrait(LanternEnumTraits.HORIZONTAL_FACING, direction).get());
+        }
+    }
 
     @Override
     public BehaviorResult tryInteract(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
-        //TODO
-        return BehaviorResult.PASS;
+        final Direction face = context.requireContext(ContextKeys.INTERACTION_FACE);
+        final LanternPlayer player = (LanternPlayer) context.getContext(ContextKeys.PLAYER).orElse(null);
+        player.sendMessage(Text.of(player.getHorizontalDirection(Direction.Division.CARDINAL)));
+        BlockSnapshotBuilder builder = null;
+        Location<World> location = context.requireContext(ContextKeys.INTERACTION_LOCATION);
+        // Check if the block can be replaced
+        if (location.getExtent().getProperty(location.getBlockPosition(), ReplaceableProperty.class).get().getValue()) {
+            builder = tryPlaceAt(player, location);
+        } else {
+            final Location<World> relLocation = location.getBlockRelative(face.getOpposite());
+            if (relLocation.getExtent().getProperty(relLocation.getBlockPosition(), ReplaceableProperty.class).get().getValue()) {
+                // Check if the clicked face is solid, if so, place the block there
+                if (face != Direction.UP && location.getExtent().getProperty(
+                        location.getBlockPosition(), face, SolidSideProperty.class).get().getValue()) {
+                    builder = createBuilder(face.getOpposite());
+                } else {
+                    // Use the first valid face
+                    builder = tryPlaceAt(player, relLocation);
+                }
+                location = relLocation;
+            }
+        }
+        if (builder != null) {
+            context.addBlockChange(builder.location(location).build());
+            return BehaviorResult.SUCCESS;
+        }
+        return BehaviorResult.FAIL;
     }
 }

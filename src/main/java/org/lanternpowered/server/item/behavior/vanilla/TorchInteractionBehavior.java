@@ -38,7 +38,6 @@ import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.item.behavior.types.InteractWithItemBehavior;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.property.block.ReplaceableProperty;
-import org.spongepowered.api.text.Text;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -116,7 +115,6 @@ public class TorchInteractionBehavior implements InteractWithItemBehavior {
     public BehaviorResult tryInteract(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
         final Direction face = context.requireContext(ContextKeys.INTERACTION_FACE);
         final LanternPlayer player = (LanternPlayer) context.getContext(ContextKeys.PLAYER).orElse(null);
-        player.sendMessage(Text.of(player.getHorizontalDirection(Direction.Division.CARDINAL)));
         BlockSnapshotBuilder builder = null;
         Location<World> location = context.requireContext(ContextKeys.INTERACTION_LOCATION);
         // Check if the block can be replaced

@@ -68,6 +68,7 @@ import org.lanternpowered.server.block.trait.LanternEnumTraits;
 import org.lanternpowered.server.block.trait.LanternIntegerTraits;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.data.type.LanternBedPart;
+import org.lanternpowered.server.data.type.LanternChestConnection;
 import org.lanternpowered.server.data.type.LanternPortionType;
 import org.lanternpowered.server.data.type.LanternRailDirection;
 import org.lanternpowered.server.data.type.RedstoneConnectionType;
@@ -1332,8 +1333,10 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
 
     private BlockTypeBuilder chestBuilder() {
         return builder()
-                .trait(LanternEnumTraits.HORIZONTAL_FACING)
-                .defaultState(state -> state.withTrait(LanternEnumTraits.HORIZONTAL_FACING, Direction.NORTH).get())
+                .traits(LanternEnumTraits.CHEST_CONNECTION, LanternEnumTraits.HORIZONTAL_FACING)
+                .defaultState(state -> state
+                        .withTrait(LanternEnumTraits.HORIZONTAL_FACING, Direction.NORTH).get()
+                        .withTrait(LanternEnumTraits.CHEST_CONNECTION, LanternChestConnection.SINGLE).get())
                 .itemType()
                 .tileEntityType(() -> TileEntityTypes.CHEST)
                 .boundingBox(BoundingBoxes::doubleChest)

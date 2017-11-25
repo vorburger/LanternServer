@@ -27,6 +27,7 @@ package org.lanternpowered.server.block.trait;
 
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.data.type.LanternBedPart;
+import org.lanternpowered.server.data.type.LanternChestConnection;
 import org.lanternpowered.server.data.type.LanternPortionType;
 import org.lanternpowered.server.data.type.LanternRailDirection;
 import org.lanternpowered.server.data.type.RedstoneConnectionType;
@@ -62,6 +63,9 @@ public final class LanternEnumTraits {
             LanternEnumTrait.of("shape", (Key) Keys.RAIL_DIRECTION, LanternRailDirection.class, type ->
                     type != LanternRailDirection.NORTH_EAST && type != LanternRailDirection.NORTH_WEST &&
                             type != LanternRailDirection.SOUTH_EAST && type != LanternRailDirection.SOUTH_WEST);
+
+    public static final EnumTrait<LanternChestConnection> CHEST_CONNECTION =
+            LanternEnumTrait.of("type", (Key) LanternKeys.CHEST_CONNECTION, LanternChestConnection.class);
 
     public static final EnumTrait<LanternRailDirection> RAIL_DIRECTION =
             LanternEnumTrait.of("shape", (Key) Keys.RAIL_DIRECTION, LanternRailDirection.class);

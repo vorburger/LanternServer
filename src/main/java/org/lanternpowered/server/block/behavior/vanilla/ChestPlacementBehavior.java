@@ -25,7 +25,6 @@
  */
 package org.lanternpowered.server.block.behavior.vanilla;
 
-import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.behavior.Behavior;
 import org.lanternpowered.server.behavior.BehaviorContext;
 import org.lanternpowered.server.behavior.BehaviorResult;
@@ -33,24 +32,53 @@ import org.lanternpowered.server.behavior.ContextKeys;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.block.BlockSnapshotBuilder;
 import org.lanternpowered.server.block.behavior.types.PlaceBlockBehavior;
+import org.lanternpowered.server.block.trait.LanternEnumTraits;
+import org.lanternpowered.server.data.key.LanternKeys;
+import org.lanternpowered.server.data.type.LanternChestConnection;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.spongepowered.api.block.BlockSnapshot;
+import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class ChestPlacementBehavior implements PlaceBlockBehavior {
 
-    private static final Direction[] HORIZONTAL_DIRECTIONS = new Direction[] { Direction.SOUTH, Direction.NORTH, Direction.EAST, Direction.WEST };
+    private static final List<Direction> EW = Arrays.asList(Direction.EAST, Direction.WEST);
+    private static final List<Direction> WE = Arrays.asList(Direction.EAST, Direction.WEST);
+    private static final List<Direction> NS = Arrays.asList(Direction.NORTH, Direction.SOUTH);
+    private static final List<Direction> SN = Arrays.asList(Direction.NORTH, Direction.SOUTH);
+
+    private static List<Direction> getConnectionDirections(Direction direction) {
+        switch (direction) {
+            case NORTH:
+                return WE;
+            case SOUTH:
+                return EW;
+            case EAST:
+                return NS;
+            case WEST:
+                return SN;
+            default:
+                throw new IllegalStateException();
+        }
+    }
 
     @Override
     public BehaviorResult tryPlace(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
         final BlockSnapshot snapshot = context.getContext(ContextKeys.BLOCK_SNAPSHOT)
                 .orElseThrow(() -> new IllegalStateException("The BlockSnapshotProviderPlaceBehavior's BlockSnapshot isn't present."));
         final Location<World> location = context.requireContext(ContextKeys.BLOCK_LOCATION);
-        final LanternPlayer player = (LanternPlayer) context.getContext(ContextKeys.PLAYER).orElse(null);
 
+        final BlockType blockType = context.requireContext(ContextKeys.BLOCK_TYPE);
+        final Direction face = context.requireContext(ContextKeys.INTERACTION_FACE);
+
+        final LanternPlayer player = (LanternPlayer) context.getContext(ContextKeys.PLAYER).orElse(null);
         // Get the direction the chest should face
         Direction facing;
         if (player != null) {
@@ -59,48 +87,74 @@ public class ChestPlacementBehavior implements PlaceBlockBehavior {
             facing = Direction.NORTH;
         }
 
-        Location<World> otherChestLoc;
-        // Check whether the chest already a double chest is,
-        // and fail if this is the case
-        for (Direction directionToCheck : HORIZONTAL_DIRECTIONS) {
-            otherChestLoc = location.getRelative(directionToCheck);
-            // We found a chest
-            if (otherChestLoc.getBlock().getType() == snapshot.getState().getType()) {
-                // Check if it isn't already double
-                for (Direction directionToCheck1 : HORIZONTAL_DIRECTIONS) {
-                    final Location<World> loc1 = otherChestLoc.getRelative(directionToCheck1);
-                    if (loc1.getBlock().getType() == snapshot.getState().getType()) {
-                        return BehaviorResult.FAIL;
-                    }
+        LanternChestConnection connection = null;
+        Direction direction = null;
+
+        boolean sneaking = false;
+        if (player != null && player.get(Keys.IS_SNEAKING).get()) {
+            sneaking = true;
+        }
+
+        System.out.println(face);
+        System.out.println(location.getBlockPosition());
+        Location<World> relLocation = location.getBlockRelative(face.getOpposite());
+        System.out.println(relLocation.getBlockPosition());
+        BlockState relState = relLocation.getBlock();
+        System.out.println("DEBUG: " + relState.getId());
+        if (relState.getType() == blockType) {
+            System.out.println("DEBUG A");
+            final LanternChestConnection relConnection = relState.getTraitValue(LanternEnumTraits.CHEST_CONNECTION).get();
+            if (relConnection != LanternChestConnection.SINGLE) {
+                System.out.println("DEBUG B");
+                final Direction relFacing = relState.getTraitValue(LanternEnumTraits.HORIZONTAL_FACING).get();
+                final List<Direction> dirs = getConnectionDirections(relFacing);
+                int index = dirs.indexOf(face);
+                if (index != -1) {
+                    connection = index == 0 ? LanternChestConnection.LEFT : LanternChestConnection.RIGHT;
+                    direction = relFacing;
+                    context.addBlockChange(BlockSnapshot.builder()
+                            .from(relLocation.createSnapshot())
+                            .add(LanternKeys.CHEST_CONNECTION, index == 0 ? LanternChestConnection.RIGHT : LanternChestConnection.LEFT)
+                            .build());
+                } else {
+                    return BehaviorResult.FAIL;
                 }
-                final Direction otherFacing = otherChestLoc.get(Keys.DIRECTION).get();
-                // The chests don't have the same facing direction, we need to fix it
-                boolean flag = directionToCheck != facing && directionToCheck.getOpposite() != facing;
-                if (!(facing == otherFacing && flag)) {
-                    // The rotation of the chests is completely wrong, fix it
-                    if (!flag) {
-                        if (player != null) {
-                            final Vector3d dir = player.getHorizontalDirectionVector();
-                            if (directionToCheck == Direction.EAST || directionToCheck == Direction.WEST) {
-                                facing = dir.getZ() >= 0 ? Direction.NORTH : Direction.SOUTH;
-                            } else {
-                                facing = dir.getX() >= 0 ? Direction.WEST : Direction.EAST;
-                            }
-                        } else {
-                            facing = directionToCheck == Direction.EAST || directionToCheck == Direction.WEST ? Direction.SOUTH : Direction.EAST;
+            } else {
+                sneaking = true;
+            }
+        }
+        if (connection == null) {
+            direction = facing;
+            if (!sneaking) {
+                final List<Direction> dirs = getConnectionDirections(direction);
+                int index = 0;
+                for (Direction relDirection : dirs) {
+                    relLocation = location.getBlockRelative(relDirection);
+                    relState = relLocation.getBlock();
+                    if (relState.getType() == blockType) {
+                        final LanternChestConnection relConnection = relState.getTraitValue(LanternEnumTraits.CHEST_CONNECTION).get();
+                        final Direction relFacing = relState.getTraitValue(LanternEnumTraits.HORIZONTAL_FACING).get();
+                        if (relFacing == facing && relConnection == LanternChestConnection.SINGLE) {
+                            connection = index == 0 ? LanternChestConnection.LEFT : LanternChestConnection.RIGHT;
+                            context.addBlockChange(BlockSnapshot.builder()
+                                    .from(relLocation.createSnapshot())
+                                    .add(LanternKeys.CHEST_CONNECTION, index == 0 ? LanternChestConnection.RIGHT : LanternChestConnection.LEFT)
+                                    .build());
+                            break;
                         }
                     }
-                    context.addBlockChange(BlockSnapshot.builder()
-                            .from(otherChestLoc.createSnapshot())
-                            .add(Keys.DIRECTION, facing)
-                            .build());
+                    index++;
                 }
-                break;
+            }
+            if (connection == null) {
+                connection = LanternChestConnection.SINGLE;
             }
         }
 
-        context.addBlockChange(BlockSnapshotBuilder.create().from(snapshot)
-                .location(location).add(Keys.DIRECTION, facing).build());
+        context.addBlockChange(BlockSnapshotBuilder.create().from(snapshot).location(location)
+                .add(Keys.DIRECTION, direction)
+                .add(LanternKeys.CHEST_CONNECTION, connection)
+                .build());
         return BehaviorResult.SUCCESS;
     }
 }

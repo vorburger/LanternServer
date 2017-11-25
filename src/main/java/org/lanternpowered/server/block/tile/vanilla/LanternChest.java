@@ -32,6 +32,8 @@ import org.lanternpowered.server.inventory.AbstractGridInventory;
 import org.lanternpowered.server.inventory.behavior.SimpleContainerShiftClickBehavior;
 import org.lanternpowered.server.inventory.vanilla.VanillaInventoryArchetypes;
 import org.lanternpowered.server.inventory.vanilla.block.ChestInventory;
+import org.lanternpowered.server.block.trait.LanternEnumTraits;
+import org.lanternpowered.server.data.type.LanternChestConnection;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.block.tileentity.TileEntity;
@@ -63,7 +65,26 @@ public class LanternChest extends LanternContainerTile<ChestInventory> implement
         }
     }
 
-    private static final Direction[] HORIZONTAL_DIRECTIONS = { Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST };
+    public static Direction getConnectedDirection(BlockState blockState) {
+        final LanternChestConnection connection = blockState.getTraitValue(LanternEnumTraits.CHEST_CONNECTION).get();
+        if (connection == LanternChestConnection.SINGLE) {
+            return Direction.NONE;
+        }
+        final Direction direction = blockState.getTraitValue(LanternEnumTraits.HORIZONTAL_FACING).get();
+        boolean left = connection == LanternChestConnection.LEFT;
+        switch (direction) {
+            case SOUTH:
+                left = !left;
+            case NORTH:
+                return left ? Direction.WEST : Direction.EAST;
+            case WEST:
+                left = !left;
+            case EAST:
+                return left ? Direction.NORTH : Direction.SOUTH;
+            default:
+                throw new IllegalStateException();
+        }
+    }
 
     private final Random random = new Random();
 
@@ -85,34 +106,34 @@ public class LanternChest extends LanternContainerTile<ChestInventory> implement
         if (!isValid()) {
             return Optional.empty();
         }
-        final Location<World> location = getLocation();
-        for (Direction directionToCheck : HORIZONTAL_DIRECTIONS) {
-            final Location<World> loc = location.getRelative(directionToCheck);
-            if (loc.getBlock().getType() != getBlock().getType()) {
-                continue;
+        final Location<World> location =  getLocation();
+        final BlockState blockState = location.getBlock();
+        final LanternChestConnection connection = blockState.getTraitValue(LanternEnumTraits.CHEST_CONNECTION).get();
+        if (connection == LanternChestConnection.SINGLE) {
+            return Optional.empty();
+        }
+        final Direction direction = getConnectedDirection(blockState);
+        final Optional<TileEntity> optTileEntity = location.getRelative(direction).getTileEntity();
+        if (optTileEntity.isPresent() && optTileEntity.get() instanceof LanternChest) {
+            final LanternChest otherChest = (LanternChest) optTileEntity.get();
+            final AbstractGridInventory.RowsViewBuilder<DoubleChestInventory> doubleChestBuilder = AbstractGridInventory.rowsViewBuilder()
+                    .shiftClickBehavior(SimpleContainerShiftClickBehavior.INSTANCE)
+                    .title(tr("container.chestDouble"))
+                    .property(new GuiIdProperty(GuiIds.CHEST))
+                    .type(DoubleChestInventory.class);
+            if (direction != Direction.WEST && direction != Direction.NORTH) {
+                doubleChestBuilder
+                        .grid(0, this.inventory)
+                        .grid(3, otherChest.inventory);
+            } else {
+                doubleChestBuilder
+                        .grid(0, otherChest.inventory)
+                        .grid(3, this.inventory);
             }
-            final Optional<TileEntity> optTileEntity = location.getRelative(directionToCheck).getTileEntity();
-            if (optTileEntity.isPresent() && optTileEntity.get() instanceof LanternChest) {
-                final LanternChest otherChest = (LanternChest) optTileEntity.get();
-                final AbstractGridInventory.RowsViewBuilder<DoubleChestInventory> doubleChestBuilder = AbstractGridInventory.rowsViewBuilder()
-                        .shiftClickBehavior(SimpleContainerShiftClickBehavior.INSTANCE)
-                        .title(tr("container.chestDouble"))
-                        .property(new GuiIdProperty(GuiIds.CHEST))
-                        .type(DoubleChestInventory.class);
-                if (directionToCheck != Direction.WEST && directionToCheck != Direction.NORTH) {
-                    doubleChestBuilder
-                            .grid(0, this.inventory)
-                            .grid(3, otherChest.inventory);
-                } else {
-                    doubleChestBuilder
-                            .grid(0, otherChest.inventory)
-                            .grid(3, this.inventory);
-                }
-                final DoubleChestInventory doubleChestInventory = doubleChestBuilder.build();
-                doubleChestInventory.addViewListener(this);
-                doubleChestInventory.addViewListener(otherChest);
-                return Optional.of(doubleChestInventory);
-            }
+            final DoubleChestInventory doubleChestInventory = doubleChestBuilder.build();
+            doubleChestInventory.addViewListener(this);
+            doubleChestInventory.addViewListener(otherChest);
+            return Optional.of(doubleChestInventory);
         }
         return Optional.empty();
     }

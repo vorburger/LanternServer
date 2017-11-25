@@ -34,6 +34,7 @@ import static org.lanternpowered.server.data.key.LanternKeyFactory.makeValueKey;
 import com.google.common.reflect.TypeToken;
 import org.lanternpowered.server.advancement.AdvancementTree;
 import org.lanternpowered.server.data.type.LanternBedPart;
+import org.lanternpowered.server.data.type.LanternChestConnection;
 import org.lanternpowered.server.data.type.LanternDoorHalf;
 import org.lanternpowered.server.data.type.RedstoneConnectionType;
 import org.lanternpowered.server.effect.potion.PotionType;
@@ -145,6 +146,8 @@ public final class LanternKeys {
             makeValueKey(Boolean.class, DataQuery.of("IsLit"), "lantern:is_lit");
     public static final Key<Value<Axis>> AXIS =
             makeValueKey(Axis.class, DataQuery.of("Axis"), "lantern:axis");
+    public static final Key<Value<LanternChestConnection>> CHEST_CONNECTION =
+            makeValueKey(LanternChestConnection.class, DataQuery.of("ChestConnection"), "lantern:chest_connection");
 
     public static final Key<Value<Integer>> DUMMY_NOTE =
             makeValueKey(Integer.class, DataQuery.of("DummyNote"), "lantern:dummy_note");

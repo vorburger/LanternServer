@@ -51,8 +51,6 @@ public class InteractWithBlockItemBehavior implements InteractWithItemBehavior {
 
     @Override
     public BehaviorResult tryInteract(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
-        final Direction blockFace1 = context.getContext(ContextKeys.INTERACTION_FACE).get();
-        System.out.println(blockFace1);
         final Optional<Location<World>> optLocation = context.getContext(ContextKeys.INTERACTION_LOCATION);
         if (!optLocation.isPresent()) {
             return BehaviorResult.CONTINUE;

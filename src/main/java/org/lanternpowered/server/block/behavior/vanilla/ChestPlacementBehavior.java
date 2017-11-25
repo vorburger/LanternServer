@@ -50,20 +50,20 @@ import java.util.List;
 public class ChestPlacementBehavior implements PlaceBlockBehavior {
 
     private static final List<Direction> EW = Arrays.asList(Direction.EAST, Direction.WEST);
-    private static final List<Direction> WE = Arrays.asList(Direction.EAST, Direction.WEST);
+    private static final List<Direction> WE = Arrays.asList(Direction.WEST, Direction.EAST);
     private static final List<Direction> NS = Arrays.asList(Direction.NORTH, Direction.SOUTH);
-    private static final List<Direction> SN = Arrays.asList(Direction.NORTH, Direction.SOUTH);
+    private static final List<Direction> SN = Arrays.asList(Direction.SOUTH, Direction.NORTH);
 
     private static List<Direction> getConnectionDirections(Direction direction) {
         switch (direction) {
             case NORTH:
-                return WE;
-            case SOUTH:
                 return EW;
+            case SOUTH:
+                return WE;
             case EAST:
-                return NS;
-            case WEST:
                 return SN;
+            case WEST:
+                return NS;
             default:
                 throw new IllegalStateException();
         }
@@ -95,29 +95,21 @@ public class ChestPlacementBehavior implements PlaceBlockBehavior {
             sneaking = true;
         }
 
-        System.out.println(face);
-        System.out.println(location.getBlockPosition());
         Location<World> relLocation = location.getBlockRelative(face.getOpposite());
-        System.out.println(relLocation.getBlockPosition());
         BlockState relState = relLocation.getBlock();
-        System.out.println("DEBUG: " + relState.getId());
         if (relState.getType() == blockType) {
-            System.out.println("DEBUG A");
             final LanternChestConnection relConnection = relState.getTraitValue(LanternEnumTraits.CHEST_CONNECTION).get();
-            if (relConnection != LanternChestConnection.SINGLE) {
-                System.out.println("DEBUG B");
+            if (relConnection == LanternChestConnection.SINGLE) {
                 final Direction relFacing = relState.getTraitValue(LanternEnumTraits.HORIZONTAL_FACING).get();
                 final List<Direction> dirs = getConnectionDirections(relFacing);
                 int index = dirs.indexOf(face);
-                if (index != -1) {
+                if (index-- != -1) {
                     connection = index == 0 ? LanternChestConnection.LEFT : LanternChestConnection.RIGHT;
                     direction = relFacing;
                     context.addBlockChange(BlockSnapshot.builder()
                             .from(relLocation.createSnapshot())
                             .add(LanternKeys.CHEST_CONNECTION, index == 0 ? LanternChestConnection.RIGHT : LanternChestConnection.LEFT)
                             .build());
-                } else {
-                    return BehaviorResult.FAIL;
                 }
             } else {
                 sneaking = true;

@@ -48,6 +48,7 @@ import org.lanternpowered.server.block.behavior.simple.SimpleBlockDropsProviderB
 import org.lanternpowered.server.block.behavior.simple.SimpleBreakBehavior;
 import org.lanternpowered.server.block.behavior.simple.SimplePlacementBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.AxisRotationPlacementBehavior;
+import org.lanternpowered.server.block.behavior.vanilla.ChestBreakBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.ChestInteractionBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.ChestPlacementBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.CraftingTableInteractionBehavior;
@@ -1347,7 +1348,8 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .add(new BlockSnapshotProviderPlaceBehavior())
                         .add(new ChestPlacementBehavior())
                         .add(new ChestInteractionBehavior())
-                        .add(new SimpleBreakBehavior()));
+                        .add(new SimpleBreakBehavior())
+                        .add(new ChestBreakBehavior()));
         // TODO: Item drops?
     }
 

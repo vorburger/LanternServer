@@ -52,7 +52,6 @@ import org.lanternpowered.server.block.provider.CachedSimpleObjectProvider;
 import org.lanternpowered.server.block.provider.ConstantObjectProvider;
 import org.lanternpowered.server.block.provider.ObjectProvider;
 import org.lanternpowered.server.block.provider.SimpleObjectProvider;
-import org.lanternpowered.server.block.tile.ITileEntityRefreshBehavior;
 import org.lanternpowered.server.block.tile.LanternTileEntity;
 import org.lanternpowered.server.data.property.AbstractDirectionRelativePropertyHolder;
 import org.lanternpowered.server.data.property.AbstractPropertyHolder;
@@ -873,7 +872,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
             return false;
         }
 
-        final short type = (short) BlockRegistryModule.get().getStateInternalId(block);
+        final short state = (short) BlockRegistryModule.get().getStateInternalId(block);
         final BlockState[] changeData = new BlockState[1];
 
         final int rx = x & 0xf;
@@ -882,37 +881,37 @@ public class LanternChunk implements AbstractExtent, Chunk {
             if (section == null) {
                 // The section is already filled with air,
                 // so we can fail fast
-                if (type == 0) {
-                    return section;
+                if (state == 0) {
+                    return null;
                 }
                 // Create a new section
                 section = new ChunkSection();
             }
             final int index = ChunkSection.index(rx, y & 0xf, rz);
-            final short oldType = section.types[index];
-            if (oldType == type) {
+            final short oldState = section.types[index];
+            if (oldState == state) {
                 return section;
             }
-            if (oldType != 0) {
-                short count = section.typesCountMap.get(oldType);
+            if (oldState != 0) {
+                short count = section.typesCountMap.get(oldState);
                 if (count > 0) {
                     if (--count <= 0) {
-                        section.typesCountMap.remove(oldType);
+                        section.typesCountMap.remove(oldState);
                     } else {
-                        section.typesCountMap.put(oldType, count);
+                        section.typesCountMap.put(oldState, count);
                     }
                 }
             }
-            if (type != 0) {
-                section.typesCountMap.put(type, (short) (section.typesCountMap.get(type) + 1));
-                if (oldType == 0) {
+            if (state != 0) {
+                section.typesCountMap.put(state, (short) (section.typesCountMap.get(state) + 1));
+                if (oldState == 0) {
                     section.nonAirCount++;
                 }
             } else {
                 section.nonAirCount--;
             }
-            final BlockState oldState = BlockRegistryModule.get().getStateByInternalId(oldType).get();
-            changeData[0] = oldState;
+            final BlockState oldBlockState = BlockRegistryModule.get().getStateByInternalId(oldState).get();
+            changeData[0] = oldBlockState;
             // The section is empty, destroy it
             if (section.nonAirCount <= 0) {
                 return null;
@@ -922,21 +921,9 @@ public class LanternChunk implements AbstractExtent, Chunk {
             boolean refresh = false;
             final Optional<TileEntityProvider> tileEntityProvider = ((LanternBlockType) block.getType()).getTileEntityProvider();
             if (tileEntity != null) {
-                if (oldType == 0 || type == 0) {
+                if (oldBlockState.getType() != block.getType()) {
+                    refresh = tileEntityProvider.isPresent();
                     remove = true;
-                } else if (tileEntity instanceof ITileEntityRefreshBehavior) {
-                    if (((ITileEntityRefreshBehavior) tileEntity).shouldRefresh(oldState, block)) {
-                        remove = true;
-                        refresh = true;
-                    }
-                } else if (oldType != type) {
-                    // The default behavior will only refresh if the
-                    // block type is changed and not the block state
-                    remove = true;
-                    refresh = true;
-                }
-                if (refresh && !tileEntityProvider.isPresent()) {
-                    refresh = false;
                 }
             } else if (tileEntityProvider.isPresent()) {
                 refresh = true;
@@ -953,7 +940,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
             } else if (remove) {
                 section.tileEntities.remove((short) index);
             }
-            section.types[index] = type;
+            section.types[index] = state;
             return section;
         });
 
@@ -961,10 +948,10 @@ public class LanternChunk implements AbstractExtent, Chunk {
         long stamp = this.heightMapLock.writeLock();
         try {
             // TODO: Check first and then use the write lock?
-            if (type != 0 && (this.heightMap[index] & 0xff) < y) {
+            if (state != 0 && (this.heightMap[index] & 0xff) < y) {
                 this.heightMap[index] = (byte) y;
                 this.heightMapUpdateFlags.clear(index);
-            } else if (type == 0 && (this.heightMap[index] & 0xff) == y) {
+            } else if (state == 0 && (this.heightMap[index] & 0xff) == y) {
                 this.heightMapUpdateFlags.set(index);
             }
         } finally {

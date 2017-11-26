@@ -61,7 +61,7 @@ public class LanternCraftingRecipeRegistryModule extends LanternRecipeRegistryMo
         PluginContainer plugin = Lantern.getMinecraftPlugin();
         register(ICraftingRecipe.shapedBuilder()
                 .aisle("x", "x")
-                .where('x', Ingredient.of(ItemTypes.AIR))
+                .where('x', Ingredient.of(ItemTypes.OAK_PLANKS))
                 .result(ItemStack.of(ItemTypes.STICK, 4))
                 .build("stick", plugin));
 

@@ -834,8 +834,8 @@ public class LanternChunk implements AbstractExtent, Chunk {
         }
     }
 
-    public short getType(Vector3i coordinates) {
-        return getType(coordinates.getX(), coordinates.getY(), coordinates.getZ());
+    public short getState(Vector3i coordinates) {
+        return getState(coordinates.getX(), coordinates.getY(), coordinates.getZ());
     }
 
     /**
@@ -846,7 +846,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
      * @param z the z coordinate
      * @return the block type
      */
-    public short getType(int x, int y, int z) {
+    public short getState(int x, int y, int z) {
         checkVolumeBounds(x, y, z);
         if (!this.loaded) {
             return 0;
@@ -874,14 +874,6 @@ public class LanternChunk implements AbstractExtent, Chunk {
         }
 
         final short type = (short) BlockRegistryModule.get().getStateInternalId(block);
-        final short type1;
-        // Air doesn't have metadata values
-        if (type >> 4 == 0 && type != 0) {
-            type1 = 0;
-        } else {
-            type1 = type;
-        }
-
         final BlockState[] changeData = new BlockState[1];
 
         final int rx = x & 0xf;
@@ -890,7 +882,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
             if (section == null) {
                 // The section is already filled with air,
                 // so we can fail fast
-                if (type1 == 0) {
+                if (type == 0) {
                     return section;
                 }
                 // Create a new section
@@ -898,7 +890,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
             }
             final int index = ChunkSection.index(rx, y & 0xf, rz);
             final short oldType = section.types[index];
-            if (oldType == type1) {
+            if (oldType == type) {
                 return section;
             }
             if (oldType != 0) {
@@ -911,8 +903,8 @@ public class LanternChunk implements AbstractExtent, Chunk {
                     }
                 }
             }
-            if (type1 != 0) {
-                section.typesCountMap.put(type1, (short) (section.typesCountMap.get(type1) + 1));
+            if (type != 0) {
+                section.typesCountMap.put(type, (short) (section.typesCountMap.get(type) + 1));
                 if (oldType == 0) {
                     section.nonAirCount++;
                 }
@@ -930,14 +922,14 @@ public class LanternChunk implements AbstractExtent, Chunk {
             boolean refresh = false;
             final Optional<TileEntityProvider> tileEntityProvider = ((LanternBlockType) block.getType()).getTileEntityProvider();
             if (tileEntity != null) {
-                if (oldType == 0 || type1 == 0) {
+                if (oldType == 0 || type == 0) {
                     remove = true;
                 } else if (tileEntity instanceof ITileEntityRefreshBehavior) {
                     if (((ITileEntityRefreshBehavior) tileEntity).shouldRefresh(oldState, block)) {
                         remove = true;
                         refresh = true;
                     }
-                } else if (oldType >> 4 != type1 >> 4) {
+                } else if (oldType != type) {
                     // The default behavior will only refresh if the
                     // block type is changed and not the block state
                     remove = true;
@@ -961,7 +953,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
             } else if (remove) {
                 section.tileEntities.remove((short) index);
             }
-            section.types[index] = type1;
+            section.types[index] = type;
             return section;
         });
 
@@ -1535,7 +1527,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
 
     @Override
     public BlockState getBlock(int x, int y, int z) {
-        return BlockRegistryModule.get().getStateByInternalId(getType(x, y, z)).orElse(BlockTypes.AIR.getDefaultState());
+        return BlockRegistryModule.get().getStateByInternalId(getState(x, y, z)).orElse(BlockTypes.AIR.getDefaultState());
     }
 
     @Override

@@ -61,8 +61,6 @@ import org.lanternpowered.server.block.behavior.vanilla.OpenableContainerInterac
 import org.lanternpowered.server.block.behavior.vanilla.OppositeFaceDirectionalPlacementBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.RotationPlacementBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.ShulkerBoxInteractionBehavior;
-import org.lanternpowered.server.block.behavior.vanilla.TorchPlacementBehavior;
-import org.lanternpowered.server.block.extended.SnowyExtendedBlockStateProvider;
 import org.lanternpowered.server.block.provider.property.PropertyProviderCollections;
 import org.lanternpowered.server.block.trait.LanternBooleanTraits;
 import org.lanternpowered.server.block.trait.LanternEnumTraits;
@@ -231,7 +229,6 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         register(simpleBuilder()
                         .itemType()
                         .trait(LanternBooleanTraits.SNOWY)
-                        .extendedStateProvider(new SnowyExtendedBlockStateProvider())
                         .defaultState(state -> state.withTrait(LanternBooleanTraits.SNOWY, false).get())
                         .properties(builder -> builder
                                 .add(hardness(0.6))
@@ -263,7 +260,6 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .traits(LanternBooleanTraits.SNOWY)
                         .defaultState(state -> state
                                 .withTrait(LanternBooleanTraits.SNOWY, false).get())
-                        .extendedStateProvider(new SnowyExtendedBlockStateProvider())
                         .properties(builder -> builder
                                 .add(hardness(0.5))
                                 .add(blastResistance(2.5)))

@@ -91,14 +91,12 @@ public final class LanternBlockState extends AbstractCatalogType implements Plug
     private final String id;
 
     // A internal id that is used for faster lookups
-    int internalId;
+    final int internalId;
 
-    // Whether this state is extended
-    boolean extended;
-
-    LanternBlockState(LanternBlockStateMap baseState, ImmutableMap<BlockTrait<?>, Comparable<?>> traitValues) {
+    LanternBlockState(LanternBlockStateMap baseState, ImmutableMap<BlockTrait<?>, Comparable<?>> traitValues, int internalId) {
         this.traitValues = traitValues;
         this.baseState = baseState;
+        this.internalId = internalId;
 
         ImmutableBiMap.Builder<Key<Value<?>>, BlockTrait<?>> builder = ImmutableBiMap.builder();
         for (BlockTrait trait : traitValues.keySet()) {
@@ -149,7 +147,9 @@ public final class LanternBlockState extends AbstractCatalogType implements Plug
 
     @Override
     public BlockState withExtendedProperties(Location<World> location) {
-        return this.baseState.getBlockType().getExtendedBlockStateProvider().get(this, checkNotNull(location, "location"), null);
+        // Extended block states are no more, got removed
+        // in 1.13, all states are now server side.
+        return this;
     }
 
     @Override
@@ -297,7 +297,7 @@ public final class LanternBlockState extends AbstractCatalogType implements Plug
         final World world = location.getExtent();
         final Vector3i pos = location.getBlockPosition();
         // TODO: Tile entity data
-        return new LanternBlockSnapshot(location, this, this,
+        return new LanternBlockSnapshot(location, this,
                 world.getCreator(pos), world.getNotifier(pos), ImmutableMap.of());
     }
 
@@ -391,10 +391,6 @@ public final class LanternBlockState extends AbstractCatalogType implements Plug
     public boolean supportsTraitValue(BlockTrait<?> blockTrait, Object value) {
         return supportsTrait(checkNotNull(blockTrait, "blockTrait")) &&
                 ((Predicate) blockTrait.getPredicate()).test(checkNotNull(value, "value"));
-    }
-
-    public boolean isExtended() {
-        return this.extended;
     }
 
     @Override

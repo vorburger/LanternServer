@@ -61,7 +61,7 @@ public final class LanternBlockStateMap {
 
         // There are no block traits
         if (!blockTraits.iterator().hasNext()) {
-            final LanternBlockState blockState = new LanternBlockState(this, ImmutableMap.of());
+            final LanternBlockState blockState = new LanternBlockState(this, ImmutableMap.of(), 0);
             blockState.propertyValueTable = ImmutableTable.of();
             this.blockStates = ImmutableList.of(blockState);
             this.blockTraits = ImmutableMap.of();
@@ -99,6 +99,8 @@ public final class LanternBlockStateMap {
         // The block states
         final ImmutableList.Builder<BlockState> blockStates = ImmutableList.builder();
 
+        int internalId = 0;
+
         // Do the cartesian product to get all the possible combinations
         for (List<Comparable<?>> comparables : Lists.cartesianProduct(allowedValues)) {
             final Iterator<Comparable<?>> objectsIt = comparables.iterator();
@@ -109,7 +111,7 @@ public final class LanternBlockStateMap {
             }
 
             final ImmutableMap<BlockTrait<?>, Comparable<?>> traitValues = traitValuesBuilder.build();
-            final LanternBlockState blockState = new LanternBlockState(this, traitValues);
+            final LanternBlockState blockState = new LanternBlockState(this, traitValues, internalId++);
             stateByValuesMap.put(traitValues, blockState);
             blockStates.add(blockState);
         }
@@ -125,13 +127,6 @@ public final class LanternBlockStateMap {
             }));
             state.propertyValueTable = tableBuilder.build();
         });
-
-        int internalId = 0;
-        for (BlockState blockState : this.blockStates) {
-            final LanternBlockState blockState1 = (LanternBlockState) blockState;
-            blockState1.extended = blockType.getExtendedBlockStateProvider().remove(blockState) != blockState;
-            blockState1.internalId = internalId++;
-        }
     }
 
     public LanternBlockType getBlockType() {

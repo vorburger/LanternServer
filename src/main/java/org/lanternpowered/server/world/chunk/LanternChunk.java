@@ -1037,7 +1037,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
         final BlockState state = getBlock(x, y, z);
         final Location<World> loc = new Location<>(this.world, x, y, z);
         // TODO: Tile entity data
-        return new LanternBlockSnapshot(loc, state, ((LanternBlockType) state.getType()).getExtendedBlockStateProvider().get(state, loc, null),
+        return new LanternBlockSnapshot(loc, state,
                 getCreator(x, y, z), getNotifier(x, y, z), ImmutableMap.of());
     }
 

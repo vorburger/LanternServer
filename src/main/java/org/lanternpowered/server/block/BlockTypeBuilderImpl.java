@@ -58,8 +58,6 @@ import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.text.translation.Translation;
 import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.util.Direction;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
 
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -72,7 +70,6 @@ import javax.annotation.Nullable;
 
 public class BlockTypeBuilderImpl implements BlockTypeBuilder {
 
-    @Nullable private ExtendedBlockStateProvider extendedBlockStateProvider;
     @Nullable private Function<BlockState, BlockState> defaultStateProvider;
     @Nullable private PropertyProviderCollection.Builder propertiesBuilder;
     @Nullable private MutableBehaviorPipeline<Behavior> behaviorPipeline;
@@ -102,13 +99,6 @@ public class BlockTypeBuilderImpl implements BlockTypeBuilder {
     public BlockTypeBuilder defaultState(Function<BlockState, BlockState> function) {
         checkNotNull(function, "function");
         this.defaultStateProvider = function;
-        return this;
-    }
-
-    @Override
-    public BlockTypeBuilder extendedStateProvider(ExtendedBlockStateProvider provider) {
-        checkNotNull(provider, "provider");
-        this.extendedBlockStateProvider = provider;
         return this;
     }
 
@@ -234,22 +224,8 @@ public class BlockTypeBuilderImpl implements BlockTypeBuilder {
         } else {
             properties = PropertyProviderCollections.DEFAULT.toBuilder();
         }
-        ExtendedBlockStateProvider extendedBlockStateProvider = this.extendedBlockStateProvider;
-        if (extendedBlockStateProvider == null) {
-            extendedBlockStateProvider = new ExtendedBlockStateProvider() {
-                @Override
-                public BlockState get(BlockState blockState, @Nullable Location<World> location, @Nullable Direction face) {
-                    return blockState;
-                }
-
-                @Override
-                public BlockState remove(BlockState blockState) {
-                    return blockState;
-                }
-            };
-        }
         final LanternBlockType blockType = new LanternBlockType(pluginId, id, this.traits,
-                translationProvider, behaviorPipeline, this.tileEntityProvider, extendedBlockStateProvider);
+                translationProvider, behaviorPipeline, this.tileEntityProvider);
         // Override the default solid cube property provider if necessary
         final PropertyProvider<SolidCubeProperty> provider = properties.build().get(SolidCubeProperty.class).orElse(null);
         ObjectProvider<AABB> boundingBoxProvider = this.boundingBoxProvider;

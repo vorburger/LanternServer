@@ -1658,6 +1658,11 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         ///////////////////////////
         register(recordBuilder(RecordTypes.WAIT)
                 .build("minecraft", "music_disc_wait"));
+        ///////////////////////
+        ///   Debug Stick   ///
+        ///////////////////////
+        register(builder()
+                .build("minecraft", "debug_stick"));
         try {
             ReflectionHelper.setField(ItemStackSnapshot.class.getField("NONE"), null,
                     new LanternItemStack(none, 0).createSnapshot());

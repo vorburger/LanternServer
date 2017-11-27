@@ -23,25 +23,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.codec.play;
+package org.lanternpowered.server.network.vanilla.recipe;
 
-import io.netty.handler.codec.CodecException;
-import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.buffer.objects.Types;
-import org.lanternpowered.server.network.message.codec.Codec;
-import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockAction;
+public final class NetworkRecipeTypes {
 
-public final class CodecPlayOutBlockAction implements Codec<MessagePlayOutBlockAction> {
+    static final String CRAFTING_SHAPED = "crafting_shaped";
+    static final String CRAFTING_SHAPELESS = "crafting_shapeless";
 
-    @Override
-    public ByteBuffer encode(CodecContext context, MessagePlayOutBlockAction message) throws CodecException {
-        final ByteBuffer buf = context.byteBufAlloc().buffer();
-        buf.write(Types.VECTOR_3_I, message.getPosition());
-        final int[] parameters = message.getParameters();
-        buf.writeByte((byte) parameters[0]);
-        buf.writeByte((byte) parameters[1]);
-        buf.writeVarInt(message.getBlockType());
-        return buf;
-    }
+    // Special cases
+    public static final String ARMOR_DYE = "crafting_special_armordye";
+    public static final String BOOK_CLONING = "crafting_special_bookcloning";
+    public static final String MAP_CLONING = "crafting_special_mapcloning";
+    public static final String MAP_EXTENDING = "crafting_special_mapextending";
+    public static final String FIREWORK_ROCKET = "crafting_special_firework_rocket";
+    public static final String FIREWORK_STAR = "crafting_special_firework_star";
+    public static final String FIREWORK_STAR_FADE = "crafting_special_firework_star_fade";
+    public static final String REPAIR_ITEM = "crafting_special_repairitem";
+    public static final String TIPPED_ARROW = "crafting_special_tippedarrow";
+    public static final String BANNER_DUPLICATE = "crafting_special_bannerduplicate";
+    public static final String BANNER_ADD_PATTERN = "crafting_special_banneraddpattern";
+    public static final String SHIELD_DECORATION = "crafting_special_shielddecoration";
+    public static final String SHULKER_BOX_COLORING = "crafting_special_shulkerboxcoloring";
 }

@@ -23,25 +23,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.codec.play;
+package org.lanternpowered.server.network.vanilla.recipe;
 
-import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.buffer.objects.Types;
-import org.lanternpowered.server.network.message.codec.Codec;
-import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockAction;
 
-public final class CodecPlayOutBlockAction implements Codec<MessagePlayOutBlockAction> {
+public final class SimpleNetworkRecipe extends NetworkRecipe {
+
+    public SimpleNetworkRecipe(String id, String type) {
+        super(id, type);
+    }
 
     @Override
-    public ByteBuffer encode(CodecContext context, MessagePlayOutBlockAction message) throws CodecException {
-        final ByteBuffer buf = context.byteBufAlloc().buffer();
-        buf.write(Types.VECTOR_3_I, message.getPosition());
-        final int[] parameters = message.getParameters();
-        buf.writeByte((byte) parameters[0]);
-        buf.writeByte((byte) parameters[1]);
-        buf.writeVarInt(message.getBlockType());
-        return buf;
+    public void write(ByteBuffer buf) {
     }
 }

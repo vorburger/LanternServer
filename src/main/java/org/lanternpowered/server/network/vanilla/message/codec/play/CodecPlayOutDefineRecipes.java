@@ -27,21 +27,25 @@ package org.lanternpowered.server.network.vanilla.message.codec.play;
 
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.buffer.objects.Types;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockAction;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutDefineRecipes;
+import org.lanternpowered.server.network.vanilla.recipe.NetworkRecipe;
 
-public final class CodecPlayOutBlockAction implements Codec<MessagePlayOutBlockAction> {
+import java.util.List;
+
+public final class CodecPlayOutDefineRecipes implements Codec<MessagePlayOutDefineRecipes> {
 
     @Override
-    public ByteBuffer encode(CodecContext context, MessagePlayOutBlockAction message) throws CodecException {
+    public ByteBuffer encode(CodecContext context, MessagePlayOutDefineRecipes message) throws CodecException {
         final ByteBuffer buf = context.byteBufAlloc().buffer();
-        buf.write(Types.VECTOR_3_I, message.getPosition());
-        final int[] parameters = message.getParameters();
-        buf.writeByte((byte) parameters[0]);
-        buf.writeByte((byte) parameters[1]);
-        buf.writeVarInt(message.getBlockType());
+        final List<NetworkRecipe> recipes = message.getRecipes();
+        buf.writeVarInt(recipes.size());
+        for (NetworkRecipe recipe : recipes) {
+            buf.writeString(recipe.getId());
+            buf.writeString(recipe.getType());
+            recipe.write(buf);
+        }
         return buf;
     }
 }

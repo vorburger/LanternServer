@@ -71,6 +71,7 @@ import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOut
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutChangeGameState;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutChatMessage;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutChunkData;
+import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutDefineRecipes;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutDestroyEntities;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutDisplayRecipe;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutEffect;
@@ -227,6 +228,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBossBar;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutChatMessage;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutChunkData;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutDefineRecipes;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutDestroyEntities;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutDisplayRecipe;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEffect;
@@ -559,5 +561,6 @@ final class ProtocolPlay extends ProtocolBase {
         outbound.bind(CodecPlayOutAdvancements.class, MessagePlayOutAdvancements.class);
         outbound.bind(); // TODO: Entity Properties
         outbound.bind(CodecPlayOutAddPotionEffect.class, MessagePlayOutAddPotionEffect.class);
+        outbound.bind(CodecPlayOutDefineRecipes.class, MessagePlayOutDefineRecipes.class);
     }
 }

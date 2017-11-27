@@ -23,25 +23,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.codec.play;
+package org.lanternpowered.server.network.vanilla.recipe;
 
-import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.buffer.objects.Types;
-import org.lanternpowered.server.network.message.codec.Codec;
-import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockAction;
 
-public final class CodecPlayOutBlockAction implements Codec<MessagePlayOutBlockAction> {
+public abstract class NetworkRecipe {
 
-    @Override
-    public ByteBuffer encode(CodecContext context, MessagePlayOutBlockAction message) throws CodecException {
-        final ByteBuffer buf = context.byteBufAlloc().buffer();
-        buf.write(Types.VECTOR_3_I, message.getPosition());
-        final int[] parameters = message.getParameters();
-        buf.writeByte((byte) parameters[0]);
-        buf.writeByte((byte) parameters[1]);
-        buf.writeVarInt(message.getBlockType());
-        return buf;
+    private final String id;
+    private final String type;
+
+    NetworkRecipe(String id, String type) {
+        this.type = type;
+        this.id = id;
     }
+
+    public String getId() {
+        return this.id;
+    }
+
+    public String getType() {
+        return this.type;
+    }
+
+    public abstract void write(ByteBuffer buf);
 }

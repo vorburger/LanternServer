@@ -23,25 +23,43 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.codec.play;
+package org.lanternpowered.server.network.vanilla.recipe;
 
-import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.buffer.objects.Types;
-import org.lanternpowered.server.network.message.codec.Codec;
-import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockAction;
+import org.spongepowered.api.item.inventory.ItemStack;
 
-public final class CodecPlayOutBlockAction implements Codec<MessagePlayOutBlockAction> {
+import java.util.List;
+
+import javax.annotation.Nullable;
+
+public final class ShapedNetworkRecipe extends GroupedNetworkRecipe {
+
+    private final ItemStack result;
+    // first index = x
+    // second index = y
+    // list is an OR operation for each ingredient
+    private final List<ItemStack>[][] ingredients;
+
+    public ShapedNetworkRecipe(String id, @Nullable String group, ItemStack result,
+            List<ItemStack>[][] ingredients) {
+        super(id, NetworkRecipeTypes.CRAFTING_SHAPED, group);
+        this.ingredients = ingredients;
+        this.result = result;
+    }
 
     @Override
-    public ByteBuffer encode(CodecContext context, MessagePlayOutBlockAction message) throws CodecException {
-        final ByteBuffer buf = context.byteBufAlloc().buffer();
-        buf.write(Types.VECTOR_3_I, message.getPosition());
-        final int[] parameters = message.getParameters();
-        buf.writeByte((byte) parameters[0]);
-        buf.writeByte((byte) parameters[1]);
-        buf.writeVarInt(message.getBlockType());
-        return buf;
+    public void write(ByteBuffer buf) {
+        buf.writeVarInt(this.ingredients.length);
+        buf.writeVarInt(this.ingredients[0].length);
+        super.write(buf);
+        for (int j = 0; j < this.ingredients[0].length; j++) {
+            for (int i = 0; i < this.ingredients.length; i++) {
+                for (ItemStack itemStack : this.ingredients[i][j]) {
+                    buf.write(Types.ITEM_STACK, itemStack);
+                }
+            }
+        }
+        buf.write(Types.ITEM_STACK, this.result);
     }
 }

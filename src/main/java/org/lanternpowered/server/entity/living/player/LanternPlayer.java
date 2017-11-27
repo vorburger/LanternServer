@@ -397,16 +397,17 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
                                 new LiteralNode(Collections.singletonList(argumentNode), "test", null, "test")),
                         null, null)));
 
+                /*
                 // TODO: Unlock all the recipes for now, mappings between the internal ids and
                 // TODO: the readable ids still has to be made
                 final int[] recipes = new int[435];
                 for (int i = 0; i < recipes.length; i++) {
                     recipes[i] = i;
-                }
+                }*/
                 this.session.send(new MessagePlayOutUnlockRecipes.Add(
                         get(LanternKeys.RECIPE_BOOK_GUI_OPEN).get(),
                         get(LanternKeys.RECIPE_BOOK_FILTER_ACTIVE).get(),
-                        new IntArrayList(recipes)));
+                        new ArrayList<>()));
             } else {
                 if (oldWorld != null && oldWorld != world) {
                     LanternDimensionType oldDimensionType = (LanternDimensionType) oldWorld.getDimension().getType();

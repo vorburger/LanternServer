@@ -149,130 +149,130 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         ///    Air      ///
         ///////////////////
         register(builder()
-                        .properties(PropertyProviderCollections.DEFAULT_GAS)
-                        .build("minecraft", "air"));
+                .properties(PropertyProviderCollections.DEFAULT_GAS)
+                .build("minecraft", "air"));
         ///////////////////
         ///    Stone    ///
         ///////////////////
         register(simpleBuilder()
-                        .itemType()
-                        .properties(builder -> builder
-                                .add(hardness(1.5))
-                                .add(blastResistance(30.0)))
-                        .build("minecraft", "stone"));
+                .itemType()
+                .properties(builder -> builder
+                        .add(hardness(1.5))
+                        .add(blastResistance(30.0)))
+                .build("minecraft", "stone"));
         //////////////////////////
         ///    Smooth Stone    ///
         //////////////////////////
         register(simpleBuilder()
-                        .itemType()
-                        .properties(builder -> builder
-                                .add(hardness(2.0))
-                                .add(blastResistance(10.0)))
-                        .build("minecraft", "smooth_stone"));
+                .itemType()
+                .properties(builder -> builder
+                        .add(hardness(2.0))
+                        .add(blastResistance(10.0)))
+                .build("minecraft", "smooth_stone"));
         /////////////////////
         ///    Granite    ///
         /////////////////////
         register(simpleBuilder()
-                        .itemType()
-                        .properties(builder -> builder
-                                .add(hardness(1.5))
-                                .add(blastResistance(30.0)))
-                        .build("minecraft", "granite"));
+                .itemType()
+                .properties(builder -> builder
+                        .add(hardness(1.5))
+                        .add(blastResistance(30.0)))
+                .build("minecraft", "granite"));
         //////////////////////////////
         ///    Polished Granite    ///
         //////////////////////////////
         register(simpleBuilder()
-                        .itemType()
-                        .properties(builder -> builder
-                                .add(hardness(1.5))
-                                .add(blastResistance(30.0)))
-                        .build("minecraft", "polished_granite"));
+                .itemType()
+                .properties(builder -> builder
+                        .add(hardness(1.5))
+                        .add(blastResistance(30.0)))
+                .build("minecraft", "polished_granite"));
         /////////////////////
         ///    Diorite    ///
         /////////////////////
         register(simpleBuilder()
-                        .itemType()
-                        .properties(builder -> builder
-                                .add(hardness(1.5))
-                                .add(blastResistance(30.0)))
-                        .build("minecraft", "diorite"));
+                .itemType()
+                .properties(builder -> builder
+                        .add(hardness(1.5))
+                        .add(blastResistance(30.0)))
+                .build("minecraft", "diorite"));
         //////////////////////////////
         ///    Polished Diorite    ///
         //////////////////////////////
         register(simpleBuilder()
-                        .itemType()
-                        .properties(builder -> builder
-                                .add(hardness(1.5))
-                                .add(blastResistance(30.0)))
-                        .build("minecraft", "polished_diorite"));
+                .itemType()
+                .properties(builder -> builder
+                        .add(hardness(1.5))
+                        .add(blastResistance(30.0)))
+                .build("minecraft", "polished_diorite"));
         //////////////////////
         ///    Andesite    ///
         //////////////////////
         register(simpleBuilder()
-                        .itemType()
-                        .properties(builder -> builder
-                                .add(hardness(1.5))
-                                .add(blastResistance(30.0)))
-                        .build("minecraft", "andesite"));
+                .itemType()
+                .properties(builder -> builder
+                        .add(hardness(1.5))
+                        .add(blastResistance(30.0)))
+                .build("minecraft", "andesite"));
         ///////////////////////////////
         ///    Polished Andesite    ///
         ///////////////////////////////
         register(simpleBuilder()
-                        .itemType()
-                        .properties(builder -> builder
-                                .add(hardness(1.5))
-                                .add(blastResistance(30.0)))
-                        .build("minecraft", "polished_andesite"));
+                .itemType()
+                .properties(builder -> builder
+                        .add(hardness(1.5))
+                        .add(blastResistance(30.0)))
+                .build("minecraft", "polished_andesite"));
         ///////////////////
         ///    Grass    ///
         ///////////////////
         register(simpleBuilder()
-                        .itemType()
-                        .trait(LanternBooleanTraits.SNOWY)
-                        .defaultState(state -> state.withTrait(LanternBooleanTraits.SNOWY, false).get())
-                        .properties(builder -> builder
-                                .add(hardness(0.6))
-                                .add(blastResistance(3.0)))
-                        .build("minecraft", "grass_block"));
+                .itemType()
+                .trait(LanternBooleanTraits.SNOWY)
+                .defaultState(state -> state.withTrait(LanternBooleanTraits.SNOWY, false).get())
+                .properties(builder -> builder
+                        .add(hardness(0.6))
+                        .add(blastResistance(3.0)))
+                .build("minecraft", "grass_block"));
         ///////////////////
         ///    Dirt     ///
         ///////////////////
         register(simpleBuilder()
-                        .itemType()
-                        .properties(builder -> builder
-                                .add(hardness(0.5))
-                                .add(blastResistance(2.5)))
-                        .build("minecraft", "dirt"));
+                .itemType()
+                .properties(builder -> builder
+                        .add(hardness(0.5))
+                        .add(blastResistance(2.5)))
+                .build("minecraft", "dirt"));
         //////////////////////////
         ///    Coarse Dirt     ///
         //////////////////////////
         register(simpleBuilder()
-                        .itemType()
-                        .properties(builder -> builder
-                                .add(hardness(0.5))
-                                .add(blastResistance(2.5)))
-                        .build("minecraft", "coarse_dirt"));
+                .itemType()
+                .properties(builder -> builder
+                        .add(hardness(0.5))
+                        .add(blastResistance(2.5)))
+                .build("minecraft", "coarse_dirt"));
         /////////////////////
         ///    Podzol     ///
         /////////////////////
         register(simpleBuilder()
-                        .itemType()
-                        .traits(LanternBooleanTraits.SNOWY)
-                        .defaultState(state -> state
-                                .withTrait(LanternBooleanTraits.SNOWY, false).get())
-                        .properties(builder -> builder
-                                .add(hardness(0.5))
-                                .add(blastResistance(2.5)))
-                        .build("minecraft", "podzol"));
+                .itemType()
+                .traits(LanternBooleanTraits.SNOWY)
+                .defaultState(state -> state
+                        .withTrait(LanternBooleanTraits.SNOWY, false).get())
+                .properties(builder -> builder
+                        .add(hardness(0.5))
+                        .add(blastResistance(2.5)))
+                .build("minecraft", "podzol"));
         ///////////////////
         /// Cobblestone ///
         ///////////////////
         register(simpleBuilder()
-                        .itemType()
-                        .properties(builder -> builder
-                                .add(hardness(2.0))
-                                .add(blastResistance(3.0)))
-                        .build("minecraft", "cobblestone"));
+                .itemType()
+                .properties(builder -> builder
+                        .add(hardness(2.0))
+                        .add(blastResistance(3.0)))
+                .build("minecraft", "cobblestone"));
         ////////////////
         ///  Planks  ///
         ////////////////
@@ -295,66 +295,66 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         ///    Bedrock   ///
         ////////////////////
         register(simpleBuilder()
-                        .itemType()
-                        .properties(builder -> builder
-                                .add(PropertyProviderCollections.UNBREAKABLE))
-                        .build("minecraft", "bedrock"));
+                .itemType()
+                .properties(builder -> builder
+                        .add(PropertyProviderCollections.UNBREAKABLE))
+                .build("minecraft", "bedrock"));
         ////////////////////
         ///     Sand     ///
         ////////////////////
         register(simpleBuilder()
-                        .itemType()
-                        .properties(builder -> builder
-                                .add(hardness(0.5))
-                                .add(blastResistance(2.5)))
-                        .build("minecraft", "sand"));
+                .itemType()
+                .properties(builder -> builder
+                        .add(hardness(0.5))
+                        .add(blastResistance(2.5)))
+                .build("minecraft", "sand"));
         ////////////////////
         ///   Red Sand   ///
         ////////////////////
         register(simpleBuilder()
-                        .itemType()
-                        .properties(builder -> builder
-                                .add(hardness(0.5))
-                                .add(blastResistance(2.5)))
-                        .build("minecraft", "red_sand"));
+                .itemType()
+                .properties(builder -> builder
+                        .add(hardness(0.5))
+                        .add(blastResistance(2.5)))
+                .build("minecraft", "red_sand"));
         // TODO: Sand physics behavior
         ////////////////////
         ///    Gravel    ///
         ////////////////////
-        register( simpleBuilder()
-                        .itemType()
-                        .properties(builder -> builder
-                                .add(hardness(0.6))
-                                .add(blastResistance(3.0)))
-                        .build("minecraft", "gravel"));
+        register(simpleBuilder()
+                .itemType()
+                .properties(builder -> builder
+                        .add(hardness(0.6))
+                        .add(blastResistance(3.0)))
+                .build("minecraft", "gravel"));
         // TODO: Gravel physics behavior
         ////////////////////
         ///   Gold Ore   ///
         ////////////////////
-        register( simpleBuilder()
-                        .itemType()
-                        .properties(builder -> builder
-                                .add(hardness(3.0))
-                                .add(blastResistance(15.0)))
-                        .build("minecraft", "gold_ore"));
+        register(simpleBuilder()
+                .itemType()
+                .properties(builder -> builder
+                        .add(hardness(3.0))
+                        .add(blastResistance(15.0)))
+                .build("minecraft", "gold_ore"));
         ////////////////////
         ///   Iron Ore   ///
         ////////////////////
-        register( simpleBuilder()
-                        .itemType()
-                        .properties(builder -> builder
-                                .add(hardness(3.0))
-                                .add(blastResistance(15.0)))
-                        .build("minecraft", "iron_ore"));
+        register(simpleBuilder()
+                .itemType()
+                .properties(builder -> builder
+                        .add(hardness(3.0))
+                        .add(blastResistance(15.0)))
+                .build("minecraft", "iron_ore"));
         ////////////////////
         ///   Coal Ore   ///
         ////////////////////
         register(simpleBuilder()
-                        .itemType()
-                        .properties(builder -> builder
-                                .add(hardness(3.0))
-                                .add(blastResistance(15.0)))
-                        .build("minecraft", "coal_ore"));
+                .itemType()
+                .properties(builder -> builder
+                        .add(hardness(3.0))
+                        .add(blastResistance(15.0)))
+                .build("minecraft", "coal_ore"));
         ///////////////////
         ///    Logs     ///
         ///////////////////
@@ -483,44 +483,43 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         ///   Powered Rail  ///
         ///////////////////////
         register(simpleBuilder()
-                        .traits(LanternEnumTraits.STRAIGHT_RAIL_DIRECTION, LanternBooleanTraits.POWERED)
-                        .defaultState(state -> state
-                                .withTrait(LanternEnumTraits.STRAIGHT_RAIL_DIRECTION, LanternRailDirection.NORTH_SOUTH).get()
-                                .withTrait(LanternBooleanTraits.POWERED, false).get())
-                        .itemType()
-                        .boundingBox(BoundingBoxes::rail)
-                        .properties(builder -> builder
-                                .add(PASSABLE)
-                                .add(hardness(0.7))
-                                .add(blastResistance(3.5)))
-                        .build("minecraft", "powered_rail"));
+                .traits(LanternEnumTraits.STRAIGHT_RAIL_DIRECTION, LanternBooleanTraits.POWERED)
+                .defaultState(state -> state
+                        .withTrait(LanternEnumTraits.STRAIGHT_RAIL_DIRECTION, LanternRailDirection.NORTH_SOUTH).get()
+                        .withTrait(LanternBooleanTraits.POWERED, false).get())
+                .itemType()
+                .boundingBox(BoundingBoxes::rail)
+                .properties(builder -> builder
+                        .add(PASSABLE)
+                        .add(hardness(0.7))
+                        .add(blastResistance(3.5)))
+                .build("minecraft", "powered_rail"));
         ////////////////////////
         ///   Detector Rail  ///
         ////////////////////////
         register(simpleBuilder()
-                        .traits(LanternEnumTraits.STRAIGHT_RAIL_DIRECTION, LanternBooleanTraits.POWERED)
-                        .defaultState(state -> state
-                                .withTrait(LanternEnumTraits.STRAIGHT_RAIL_DIRECTION, LanternRailDirection.NORTH_SOUTH).get()
-                                .withTrait(LanternBooleanTraits.POWERED, false).get())
-                        .itemType()
-                        .boundingBox(BoundingBoxes::rail)
-                        .properties(builder -> builder
-                                .add(PASSABLE)
-                                .add(hardness(0.7))
-                                .add(blastResistance(3.5)))
-                        .build("minecraft", "detector_rail")
-                );
+                .traits(LanternEnumTraits.STRAIGHT_RAIL_DIRECTION, LanternBooleanTraits.POWERED)
+                .defaultState(state -> state
+                        .withTrait(LanternEnumTraits.STRAIGHT_RAIL_DIRECTION, LanternRailDirection.NORTH_SOUTH).get()
+                        .withTrait(LanternBooleanTraits.POWERED, false).get())
+                .itemType()
+                .boundingBox(BoundingBoxes::rail)
+                .properties(builder -> builder
+                        .add(PASSABLE)
+                        .add(hardness(0.7))
+                        .add(blastResistance(3.5)))
+                .build("minecraft", "detector_rail"));
         // TODO: 29
         //////////////////
         ///   Cobweb   ///
         //////////////////
         register(simpleBuilder()
-                        .itemType()
-                        .properties(builder -> builder
-                                .add(PASSABLE)
-                                .add(hardness(4.0))
-                                .add(blastResistance(20.0)))
-                        .build("minecraft", "cobweb"));
+                .itemType()
+                .properties(builder -> builder
+                        .add(PASSABLE)
+                        .add(hardness(4.0))
+                        .add(blastResistance(20.0)))
+                .build("minecraft", "cobweb"));
         ////////////////////////
         ///   Bushes/Grass   ///
         ////////////////////////
@@ -566,49 +565,48 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         ///   Brown Mushroom   ///
         //////////////////////////
         register(simpleBuilder()
-                        .boundingBox(BoundingBoxes.bush())
-                        .properties(builder -> builder
-                                .add(INSTANT_BROKEN)
-                                .add(PASSABLE)
-                                .add(lightEmission(1)))
-                        .build("minecraft", "brown_mushroom"));
+                .boundingBox(BoundingBoxes.bush())
+                .properties(builder -> builder
+                        .add(INSTANT_BROKEN)
+                        .add(PASSABLE)
+                        .add(lightEmission(1)))
+                .build("minecraft", "brown_mushroom"));
         ////////////////////////
         ///   Red Mushroom   ///
         ////////////////////////
         register(simpleBuilder()
-                        .boundingBox(BoundingBoxes.bush())
-                        .properties(builder -> builder
-                                .add(INSTANT_BROKEN)
-                                .add(PASSABLE))
-                        .build("minecraft", "red_mushroom"));
+                .boundingBox(BoundingBoxes.bush())
+                .properties(builder -> builder
+                        .add(INSTANT_BROKEN)
+                        .add(PASSABLE))
+                .build("minecraft", "red_mushroom"));
         //////////////////////
         ///   Gold Block   ///
         //////////////////////
         register(simpleBuilder()
-                        .itemType()
-                        .properties(builder -> builder
-                                .add(hardness(3.0))
-                                .add(blastResistance(10.0)))
-                        .build("minecraft", "gold_block"));
+                .itemType()
+                .properties(builder -> builder
+                        .add(hardness(3.0))
+                        .add(blastResistance(10.0)))
+                .build("minecraft", "gold_block"));
         //////////////////////
         ///   Iron Block   ///
         //////////////////////
         register(simpleBuilder()
-                        .itemType()
-                        .properties(builder -> builder
-                                .add(hardness(5.0))
-                                .add(blastResistance(10.0)))
-                        .translation("tile.blockIron.name")
-                        .build("minecraft", "iron_block"));
+                .itemType()
+                .properties(builder -> builder
+                        .add(hardness(5.0))
+                        .add(blastResistance(10.0)))
+                .build("minecraft", "iron_block"));
         ///////////////////////////
         ///    Smooth Quartz    ///
         ///////////////////////////
         register(simpleBuilder()
-                        .itemType()
-                        .properties(builder -> builder
-                                .add(hardness(2.0))
-                                .add(blastResistance(10.0)))
-                        .build("minecraft", "smooth_quartz"));
+                .itemType()
+                .properties(builder -> builder
+                        .add(hardness(2.0))
+                        .add(blastResistance(10.0)))
+                .build("minecraft", "smooth_quartz"));
         /////////////////
         ///   Slabs   ///
         /////////////////
@@ -1077,7 +1075,6 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                 .itemType()
                 .properties(builder -> builder
                         .add(PropertyProviderCollections.UNBREAKABLE))
-                .translation("tile.barrier.name")
                 .build("minecraft", "barrier"));
         /////////////////////
         ///     Carpet    ///

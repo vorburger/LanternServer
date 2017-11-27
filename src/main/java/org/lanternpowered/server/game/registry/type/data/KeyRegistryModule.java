@@ -66,7 +66,6 @@ import org.spongepowered.api.data.type.Hinge;
 import org.spongepowered.api.data.type.HorseColor;
 import org.spongepowered.api.data.type.HorseStyle;
 import org.spongepowered.api.data.type.LlamaVariant;
-import org.spongepowered.api.data.type.LogAxis;
 import org.spongepowered.api.data.type.NotePitch;
 import org.spongepowered.api.data.type.OcelotType;
 import org.spongepowered.api.data.type.PickupRule;
@@ -301,7 +300,6 @@ public final class KeyRegistryModule extends AdditionalPluginCatalogRegistryModu
         register(makeMutableBoundedValueKey(Integer.class, of("LlamaStrength"), "sponge:llama_strength"));
         register(makeValueKey(LlamaVariant.class, of("LlamaVariant"), "sponge:llama_variant"));
         register(makeValueKey(String.class, of("LockToken"), "sponge:lock_token"));
-        register(makeValueKey(LogAxis.class, of("LogAxis"), "sponge:log_axis"));
         register(makeMutableBoundedValueKey(Integer.class, of("MaxAir"), "sponge:max_air"));
         register(makeMutableBoundedValueKey(Integer.class, of("MaxBurnTime"), "sponge:max_burn_time"));
         register(makeMutableBoundedValueKey(Integer.class, of("MaxCookTime"), "sponge:max_cook_time"));

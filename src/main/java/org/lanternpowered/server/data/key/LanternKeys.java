@@ -44,7 +44,6 @@ import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.type.HandType;
-import org.spongepowered.api.data.type.LogAxis;
 import org.spongepowered.api.data.type.SkinPart;
 import org.spongepowered.api.data.value.mutable.ListValue;
 import org.spongepowered.api.data.value.mutable.MutableBoundedValue;

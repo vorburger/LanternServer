@@ -65,7 +65,6 @@ import org.lanternpowered.server.data.type.LanternDisguisedBlockType;
 import org.lanternpowered.server.data.type.LanternDoorHalf;
 import org.lanternpowered.server.data.type.LanternDoublePlantType;
 import org.lanternpowered.server.data.type.LanternHinge;
-import org.lanternpowered.server.data.type.LanternLogAxis;
 import org.lanternpowered.server.data.type.LanternPistonType;
 import org.lanternpowered.server.data.type.LanternPortionType;
 import org.lanternpowered.server.data.type.LanternPrismarineType;
@@ -267,7 +266,6 @@ import org.spongepowered.api.data.type.DisguisedBlockTypes;
 import org.spongepowered.api.data.type.DoublePlantType;
 import org.spongepowered.api.data.type.DoublePlantTypes;
 import org.spongepowered.api.data.type.DyeColor;
-import org.spongepowered.api.data.type.GoldenApple;
 import org.spongepowered.api.data.type.HandPreference;
 import org.spongepowered.api.data.type.HandType;
 import org.spongepowered.api.data.type.Hinge;
@@ -276,8 +274,6 @@ import org.spongepowered.api.data.type.HorseColor;
 import org.spongepowered.api.data.type.HorseStyle;
 import org.spongepowered.api.data.type.InstrumentType;
 import org.spongepowered.api.data.type.LlamaVariant;
-import org.spongepowered.api.data.type.LogAxes;
-import org.spongepowered.api.data.type.LogAxis;
 import org.spongepowered.api.data.type.NotePitch;
 import org.spongepowered.api.data.type.OcelotType;
 import org.spongepowered.api.data.type.PickupRule;
@@ -554,8 +550,6 @@ public class LanternGameRegistry implements GameRegistry {
                         new EnumValueRegistryModule<Hinge>(LanternHinge.class, Hinges.class) {})
                 .registerModule(Key.class, KeyRegistryModule.get())
                 .registerModule(PortionType.class, new EnumValueRegistryModule<PortionType>(LanternPortionType.class, PortionTypes.class) {})
-                .registerModule(LogAxis.class,
-                        new EnumValueRegistryModule<LogAxis>(LanternLogAxis.class, LogAxes.class) {})
                 .registerModule(NotePitch.class, NotePitchRegistryModule.get())
                 .registerModule(OcelotType.class, new OcelotTypeRegistryModule())
                 .registerModule(LlamaVariant.class, new LlamaVariantRegistryModule())

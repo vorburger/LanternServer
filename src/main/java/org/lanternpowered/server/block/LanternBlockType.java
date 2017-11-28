@@ -41,6 +41,8 @@ import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.translation.Translation;
 import org.spongepowered.api.util.AABB;
+import org.spongepowered.api.variant.VariantQuery;
+import org.spongepowered.api.variant.VariantQueryType;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -225,5 +227,20 @@ public class LanternBlockType extends PluginCatalogType.Base implements BlockTyp
 
     void setBoundingBoxProvider(@Nullable ObjectProvider<AABB> boundingBoxProvider) {
         this.boundingBoxProvider = boundingBoxProvider;
+    }
+
+    @Override
+    public boolean matches(VariantQuery<?>... queries) {
+        return false; // TODO
+    }
+
+    @Override
+    public <T> Optional<T> getArgument(VariantQueryType<T> queryType) {
+        return Optional.empty(); // TODO
+    }
+
+    @Override
+    public <T> Optional<VariantQuery<T>> createQueryFor(VariantQueryType<T> queryType) {
+        return Optional.empty(); // TODO
     }
 }

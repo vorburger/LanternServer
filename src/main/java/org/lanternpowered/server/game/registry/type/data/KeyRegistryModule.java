@@ -74,7 +74,6 @@ import org.spongepowered.api.data.type.PlantType;
 import org.spongepowered.api.data.type.PortionType;
 import org.spongepowered.api.data.type.PrismarineType;
 import org.spongepowered.api.data.type.Profession;
-import org.spongepowered.api.data.type.QuartzType;
 import org.spongepowered.api.data.type.RabbitType;
 import org.spongepowered.api.data.type.RailDirection;
 import org.spongepowered.api.data.type.SandType;
@@ -327,7 +326,6 @@ public final class KeyRegistryModule extends AdditionalPluginCatalogRegistryModu
         register(makeValueKey(Integer.class, of("Power"), "sponge:power"));
         register(makeValueKey(Boolean.class, of("Powered"), "sponge:powered"));
         register(makeValueKey(PrismarineType.class, of("PrismarineType"), "sponge:prismarine_type"));
-        register(makeValueKey(QuartzType.class, of("QuartzType"), "sponge:quartz_type"));
         register(makeValueKey(RabbitType.class, of("RabbitType"), "sponge:rabbit_type"));
         register(makeValueKey(RailDirection.class, of("RailDirection"), "sponge:rail_direction"));
         register(makeMutableBoundedValueKey(Integer.class, of("RemainingAir"), "sponge:remaining_air"));

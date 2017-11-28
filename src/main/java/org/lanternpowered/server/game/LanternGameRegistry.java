@@ -123,7 +123,6 @@ import org.lanternpowered.server.game.registry.type.data.OcelotTypeRegistryModul
 import org.lanternpowered.server.game.registry.type.data.PickupRuleRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.PlantTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.ProfessionRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.QuartzTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.RabbitTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.RailDirectionRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.RecordTypeRegistryModule;
@@ -285,7 +284,6 @@ import org.spongepowered.api.data.type.PortionTypes;
 import org.spongepowered.api.data.type.PrismarineType;
 import org.spongepowered.api.data.type.PrismarineTypes;
 import org.spongepowered.api.data.type.Profession;
-import org.spongepowered.api.data.type.QuartzType;
 import org.spongepowered.api.data.type.RabbitType;
 import org.spongepowered.api.data.type.RailDirection;
 import org.spongepowered.api.data.type.SandType;
@@ -562,7 +560,6 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(PlantType.class, PlantTypeRegistryModule.get())
                 .registerModule(PrismarineType.class,
                         new EnumValueRegistryModule<PrismarineType>(LanternPrismarineType.class, PrismarineTypes.class) {})
-                .registerModule(QuartzType.class, QuartzTypeRegistryModule.get())
                 .registerModule(SandstoneType.class, SandstoneTypeRegistryModule.get())
                 .registerModule(SandType.class, SandTypeRegistryModule.get())
                 .registerModule(ShrubType.class, ShrubTypeRegistryModule.get())

@@ -23,35 +23,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.objects;
+package org.lanternpowered.server.item.appearance;
 
-import org.spongepowered.api.data.DataView;
+import org.spongepowered.api.item.ItemType;
 
-import javax.annotation.Nullable;
+/**
+ * Represents the appearance of an {@link ItemType}.
+ */
+public class ItemAppearance {
 
-public final class RawItemStack {
+    private final String itemTypeId;
 
-    private final int itemType;
-    private final int amount;
-
-    @Nullable private final DataView dataView;
-
-    public RawItemStack(int itemType, int amount, @Nullable DataView dataView) {
-        this.dataView = dataView;
-        this.itemType = itemType;
-        this.amount = amount;
+    /**
+     * Construct a new {@link ItemAppearance}.
+     *
+     * @param itemTypeId The vanilla/modded item type id
+     */
+    public ItemAppearance(String itemTypeId) {
+        this.itemTypeId = itemTypeId;
     }
 
-    public int getItemType() {
-        return this.itemType;
-    }
-
-    @Nullable
-    public DataView getDataView() {
-        return this.dataView;
-    }
-
-    public int getAmount() {
-        return this.amount;
+    /**
+     * Gets the vanilla/modded item type id.
+     *
+     * @return The item type id
+     */
+    public String getItemTypeId() {
+        return this.itemTypeId;
     }
 }

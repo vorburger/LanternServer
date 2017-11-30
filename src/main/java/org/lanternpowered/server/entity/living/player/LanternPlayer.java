@@ -32,7 +32,6 @@ import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.Sets;
-import it.unimi.dsi.fastutil.ints.IntArrayList;
 import org.lanternpowered.server.advancement.AdvancementTree;
 import org.lanternpowered.server.advancement.AdvancementTrees;
 import org.lanternpowered.server.advancement.AdvancementsProgress;
@@ -66,7 +65,7 @@ import org.lanternpowered.server.inventory.vanilla.VanillaInventoryArchetypes;
 import org.lanternpowered.server.item.LanternCooldownTracker;
 import org.lanternpowered.server.network.NetworkSession;
 import org.lanternpowered.server.network.entity.NetworkIdHolder;
-import org.lanternpowered.server.network.objects.RawItemStack;
+import org.lanternpowered.server.network.item.RawItemStack;
 import org.lanternpowered.server.network.vanilla.command.ArgumentNode;
 import org.lanternpowered.server.network.vanilla.command.LiteralNode;
 import org.lanternpowered.server.network.vanilla.command.RootNode;
@@ -864,7 +863,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
         WrittenBookItemTypeObjectSerializer.writeBookData(dataView, bookView, this.locale);
 
         // Written book internal id
-        final RawItemStack rawItemStack = new RawItemStack(387, 1, dataView);
+        final RawItemStack rawItemStack = new RawItemStack("minecraft:written_book", 1, dataView);
         final int slot = this.inventory.getHotbar().getSelectedSlotIndex();
         this.session.send(new MessagePlayOutSetWindowSlot(-2, slot, rawItemStack));
         this.session.send(new MessagePlayOutOpenBook(HandTypes.MAIN_HAND));

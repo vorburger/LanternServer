@@ -27,10 +27,9 @@ package org.lanternpowered.server.item;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import it.unimi.dsi.fastutil.ints.Int2LongMap;
-import it.unimi.dsi.fastutil.ints.Int2LongOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2LongMap;
+import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
 import org.lanternpowered.server.game.LanternGame;
-import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
 import org.spongepowered.api.entity.living.player.CooldownTracker;
 import org.spongepowered.api.item.ItemType;
 
@@ -39,7 +38,7 @@ import java.util.OptionalInt;
 
 public class LanternCooldownTracker implements CooldownTracker {
 
-    private final Int2LongMap map = new Int2LongOpenHashMap();
+    private final Object2LongMap<ItemType> map = new Object2LongOpenHashMap<>();
 
     {
         this.map.defaultReturnValue(-1L);
@@ -51,44 +50,41 @@ public class LanternCooldownTracker implements CooldownTracker {
         if (ticks <= 0) {
             resetCooldown(itemType);
         } else {
-            final int internalId = ItemRegistryModule.get().getInternalId(itemType);
             synchronized (this.map) {
-                this.map.put(internalId, LanternGame.currentTimeTicks() + ticks);
+                this.map.put(itemType, LanternGame.currentTimeTicks() + ticks);
             }
-            set0(internalId, ticks);
+            set0(itemType, ticks);
         }
     }
 
-    protected void set0(int internalId, int cooldown) {
+    protected void set0(ItemType itemType, int cooldown) {
     }
 
     @Override
     public void resetCooldown(ItemType itemType) {
         checkNotNull(itemType, "itemType");
-        final int internalId = ItemRegistryModule.get().getInternalId(itemType);
         final long time;
         synchronized (this.map) {
-            time = this.map.remove(internalId);
+            time = this.map.remove(itemType);
         }
         if (time == -1L || time - LanternGame.currentTimeTicks() <= 0) {
             return;
         }
-        remove0(internalId);
+        remove0(itemType);
     }
 
-    protected void remove0(int internalId) {
+    protected void remove0(ItemType itemType) {
     }
 
     @Override
     public OptionalInt getCooldown(ItemType itemType) {
         checkNotNull(itemType, "itemType");
-        final int internalId = ItemRegistryModule.get().getInternalId(itemType);
-        synchronized (this.map) {
-            final long time = this.map.get(internalId);
+       synchronized (this.map) {
+            final long time = this.map.get(itemType);
             if (time != -1L) {
                 final long current = LanternGame.currentTimeTicks();
                 if (time <= current) {
-                    this.map.remove(internalId);
+                    this.map.remove(itemType);
                 } else {
                     return OptionalInt.of((int) (time - current));
                 }
@@ -100,13 +96,12 @@ public class LanternCooldownTracker implements CooldownTracker {
     @Override
     public boolean hasCooldown(ItemType itemType) {
         checkNotNull(itemType, "itemType");
-        final int internalId = ItemRegistryModule.get().getInternalId(itemType);
         synchronized (this.map) {
-            final long time = this.map.get(internalId);
+            final long time = this.map.get(itemType);
             if (time != -1L) {
                 final long current = LanternGame.currentTimeTicks();
                 if (time <= current) {
-                    this.map.remove(internalId);
+                    this.map.remove(itemType);
                 } else {
                     return true;
                 }

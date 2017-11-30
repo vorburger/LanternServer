@@ -23,30 +23,5 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.game.registry.type.item;
-
-import org.spongepowered.api.item.ItemType;
-import org.spongepowered.api.registry.CatalogRegistryModule;
-
-import java.util.Optional;
-
-public interface ItemRegistry extends CatalogRegistryModule<ItemType> {
-
-    /**
-     * Gets the internal id of the item type. Will return -1
-     * if there wasn't a id found.
-     *
-     * @param itemType the item type
-     * @return the internal id
-     */
-    int getInternalId(ItemType itemType);
-
-    /**
-     * Gets the item type by using the specified internal id.
-     *
-     * @param internalId the internal id
-     * @return the item type if found, otherwise {@link Optional#empty()}
-     */
-    Optional<ItemType> getTypeByInternalId(int internalId);
-
-}
+@org.spongepowered.api.util.annotation.NonnullByDefault
+package org.lanternpowered.server.network.item;

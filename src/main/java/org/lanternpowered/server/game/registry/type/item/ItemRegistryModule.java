@@ -25,8 +25,6 @@
  */
 package org.lanternpowered.server.game.registry.type.item;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 import static org.lanternpowered.server.item.PropertyProviders.alwaysConsumable;
 import static org.lanternpowered.server.item.PropertyProviders.applicableEffects;
 import static org.lanternpowered.server.item.PropertyProviders.armorType;
@@ -42,16 +40,10 @@ import static org.lanternpowered.server.item.PropertyProviders.useLimit;
 import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
 
 import com.google.common.collect.ImmutableList;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import org.lanternpowered.server.data.key.LanternKeys;
-import org.lanternpowered.server.data.type.LanternDyeColor;
 import org.lanternpowered.server.effect.potion.PotionType;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
-import org.lanternpowered.server.game.registry.InternalIDRegistries;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.ArmorTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.RecordTypeRegistryModule;
@@ -62,18 +54,17 @@ import org.lanternpowered.server.inventory.LanternItemStack;
 import org.lanternpowered.server.item.ItemTypeBuilder;
 import org.lanternpowered.server.item.ItemTypeBuilderImpl;
 import org.lanternpowered.server.item.LanternItemType;
-import org.lanternpowered.server.item.TranslationProvider;
 import org.lanternpowered.server.item.behavior.vanilla.ArmorQuickEquipInteractionBehavior;
 import org.lanternpowered.server.item.behavior.vanilla.ConsumableInteractionBehavior;
 import org.lanternpowered.server.item.behavior.vanilla.OpenHeldBookBehavior;
 import org.lanternpowered.server.item.behavior.vanilla.ShieldInteractionBehavior;
 import org.lanternpowered.server.item.behavior.vanilla.consumable.MilkConsumer;
 import org.lanternpowered.server.item.behavior.vanilla.consumable.PotionEffectsProvider;
+import org.lanternpowered.server.network.item.NetworkItemTypeRegistry;
 import org.lanternpowered.server.util.ReflectionHelper;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.ArmorType;
 import org.spongepowered.api.data.type.ArmorTypes;
-import org.spongepowered.api.data.type.DyeColor;
 import org.spongepowered.api.data.type.ToolType;
 import org.spongepowered.api.data.type.ToolTypes;
 import org.spongepowered.api.effect.potion.PotionEffect;
@@ -89,7 +80,6 @@ import org.spongepowered.api.registry.util.RegistrationDependency;
 import org.spongepowered.api.text.translation.Translation;
 
 import java.util.Collections;
-import java.util.Optional;
 import java.util.function.Function;
 
 @RegistrationDependency({
@@ -101,7 +91,7 @@ import java.util.function.Function;
         RecordTypeRegistryModule.class,
         EquipmentTypeRegistryModule.class,
 })
-public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryModule<ItemType> implements ItemRegistry {
+public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryModule<ItemType> {
 
     private static class Holder {
 
@@ -112,42 +102,14 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         return Holder.INSTANCE;
     }
 
-    private final Int2ObjectMap<ItemType> itemTypeByInternalId = new Int2ObjectOpenHashMap<>();
-    private final Object2IntMap<ItemType> internalIdByItemType = new Object2IntOpenHashMap<>();
-
     private ItemRegistryModule() {
         super(ItemTypes.class);
-        this.internalIdByItemType.defaultReturnValue(-1);
     }
 
     public void register(ItemType itemType) {
-        final int internalId = InternalIDRegistries.ITEM_TYPE_IDS.getInt(itemType.getId());
-        checkState(internalId != -1, "No internal id could be found for the item id: " + itemType.getId());
         super.register(itemType);
-        this.internalIdByItemType.put(itemType, internalId);
-        this.itemTypeByInternalId.put(internalId, itemType);
+        NetworkItemTypeRegistry.register(itemType);
         Lantern.getGame().getPropertyRegistry().registerItemPropertyStores(((LanternItemType) itemType).getPropertyProviderCollection());
-    }
-
-    @Override
-    public int getInternalId(ItemType itemType) {
-        checkNotNull(itemType, "itemType");
-        return this.internalIdByItemType.getInt(itemType);
-    }
-
-    @Override
-    public Optional<ItemType> getTypeByInternalId(int internalId) {
-        return Optional.ofNullable(this.itemTypeByInternalId.get(internalId));
-    }
-
-    @Override
-    public Optional<ItemType> getById(String id) {
-        if ("minecraft:cooked_fished".equals(id)) {
-            id = "minecraft:cooked_fish";
-        } else if ("minecraft:totem".equals(id)) {
-            id = "minecraft:totem_of_undying";
-        }
-        return super.getById(id);
     }
 
     @Override
@@ -1695,11 +1657,6 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
                 .properties(builder -> builder
                         .add(recordType(recordType)))
                 .translation(tr("item.record.name"));
-    }
-
-    private TranslationProvider coloredTranslation(String pattern, DyeColor defaultColor) {
-        return (itemType, itemStack) -> tr(String.format(pattern,
-                ((LanternDyeColor) (itemStack == null ? defaultColor : itemStack.get(Keys.DYE_COLOR).get())).getTranslationPart()));
     }
 
     private ItemTypeBuilder durableBuilder(int useLimit) {

@@ -23,30 +23,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.entity.living.player;
+package org.lanternpowered.server.network.item;
 
-import org.lanternpowered.server.item.LanternCooldownTracker;
-import org.lanternpowered.server.network.item.NetworkItemTypeRegistry;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetCooldown;
-import org.spongepowered.api.item.ItemType;
+import org.spongepowered.api.data.DataView;
 
-public class PlayerCooldownTracker extends LanternCooldownTracker {
+import javax.annotation.Nullable;
 
-    private final LanternPlayer player;
+public final class RawItemStack {
 
-    PlayerCooldownTracker(LanternPlayer player) {
-        this.player = player;
+    private final String itemType;
+    private final int amount;
+
+    @Nullable private final DataView dataView;
+
+    public RawItemStack(String itemType, int amount, @Nullable DataView dataView) {
+        this.dataView = dataView;
+        this.itemType = itemType;
+        this.amount = amount;
     }
 
-    @Override
-    public void set0(ItemType itemType, int cooldown) {
-        final int internalId = NetworkItemTypeRegistry.getNetworkId(itemType);
-        this.player.getConnection().send(new MessagePlayOutSetCooldown(internalId, cooldown));
+    public String getType() {
+        return this.itemType;
     }
 
-    @Override
-    protected void remove0(ItemType itemType) {
-        final int internalId = NetworkItemTypeRegistry.getNetworkId(itemType);
-        this.player.getConnection().send(new MessagePlayOutSetCooldown(internalId, 0));
+    @Nullable
+    public DataView getDataView() {
+        return this.dataView;
+    }
+
+    public int getAmount() {
+        return this.amount;
     }
 }

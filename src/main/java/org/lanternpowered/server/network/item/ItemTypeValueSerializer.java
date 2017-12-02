@@ -23,22 +23,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.codec.play;
+package org.lanternpowered.server.network.item;
 
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.buffer.objects.Types;
-import org.lanternpowered.server.network.message.codec.Codec;
-import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetCooldown;
+import org.lanternpowered.server.network.buffer.objects.ValueSerializer;
+import org.spongepowered.api.item.ItemType;
 
-public final class CodecPlayOutSetCooldown implements Codec<MessagePlayOutSetCooldown> {
+public final class ItemTypeValueSerializer implements ValueSerializer<ItemType> {
 
     @Override
-    public ByteBuffer encode(CodecContext context, MessagePlayOutSetCooldown message) throws CodecException {
-        final ByteBuffer buf = context.byteBufAlloc().buffer();
-        buf.write(Types.ITEM_TYPE, message.getItemType());
-        buf.writeVarInt(message.getCooldownTicks());
-        return buf;
+    public void write(ByteBuffer buf, ItemType object) throws CodecException {
+        buf.writeVarInt(NetworkItemTypeRegistry.itemTypeToInternalAndNetworkId.get(object)[1]);
+    }
+
+    @Override
+    public ItemType read(ByteBuffer buf) throws CodecException {
+        return NetworkItemTypeRegistry.networkIdToItemType.get(buf.readVarInt());
     }
 }

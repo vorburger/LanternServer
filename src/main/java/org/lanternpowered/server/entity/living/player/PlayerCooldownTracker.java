@@ -26,7 +26,6 @@
 package org.lanternpowered.server.entity.living.player;
 
 import org.lanternpowered.server.item.LanternCooldownTracker;
-import org.lanternpowered.server.network.item.NetworkItemTypeRegistry;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetCooldown;
 import org.spongepowered.api.item.ItemType;
 
@@ -40,13 +39,11 @@ public class PlayerCooldownTracker extends LanternCooldownTracker {
 
     @Override
     public void set0(ItemType itemType, int cooldown) {
-        final int internalId = NetworkItemTypeRegistry.getNetworkId(itemType);
-        this.player.getConnection().send(new MessagePlayOutSetCooldown(internalId, cooldown));
+        this.player.getConnection().send(new MessagePlayOutSetCooldown(itemType, cooldown));
     }
 
     @Override
     protected void remove0(ItemType itemType) {
-        final int internalId = NetworkItemTypeRegistry.getNetworkId(itemType);
-        this.player.getConnection().send(new MessagePlayOutSetCooldown(internalId, 0));
+        this.player.getConnection().send(new MessagePlayOutSetCooldown(itemType, 0));
     }
 }

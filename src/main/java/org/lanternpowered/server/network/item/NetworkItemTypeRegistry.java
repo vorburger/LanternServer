@@ -77,10 +77,6 @@ public final class NetworkItemTypeRegistry {
         networkIdToNormal = Int2ObjectMaps.unmodifiable(networkToNormal);
     }
 
-    public static int getNetworkId(ItemType itemType) {
-        return itemTypeToInternalAndNetworkId.get(itemType)[1];
-    }
-
     public static void register(ItemType itemType) {
         final LanternItemType itemType1 = (LanternItemType) itemType;
         if (internalIdToItemType.containsValue(itemType1)) {

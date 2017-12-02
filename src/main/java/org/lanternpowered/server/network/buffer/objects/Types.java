@@ -35,11 +35,13 @@ import io.netty.handler.codec.DecoderException;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.item.ItemStackValueSerializer;
+import org.lanternpowered.server.network.item.ItemTypeValueSerializer;
 import org.lanternpowered.server.network.item.RawItemStackValueSerializer;
 import org.lanternpowered.server.network.objects.LocalizedText;
 import org.lanternpowered.server.network.item.RawItemStack;
 import org.lanternpowered.server.text.gson.JsonTextSerializer;
 import org.lanternpowered.server.text.gson.JsonTextTranslatableSerializer;
+import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
 
@@ -152,6 +154,11 @@ public final class Types {
             return "{\"text\":\"\",\"extra\":" + json + "}";
         }
     }
+
+    /**
+     * A serializer for {@link ItemType} objects.
+     */
+    public static final Type<ItemType> ITEM_TYPE = Type.create(ItemType.class, new ItemTypeValueSerializer());
 
     /**
      * A serializer for {@link ItemStack} objects,

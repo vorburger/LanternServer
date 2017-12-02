@@ -23,12 +23,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.game.registry.type.block;
+package org.lanternpowered.server.block.trait;
 
-import org.spongepowered.api.block.BlockState;
+public interface KeyTraitValueTransformer<T extends Comparable<T>, V> {
 
-@FunctionalInterface
-public interface BlockState2DataFunction {
+    V toKeyValue(T traitValue);
 
-    byte apply(BlockState state);
+    T toTraitValue(V keyValue);
 }

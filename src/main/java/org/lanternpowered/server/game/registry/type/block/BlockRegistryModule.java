@@ -68,13 +68,13 @@ import org.lanternpowered.server.block.trait.LanternIntegerTraits;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.data.type.LanternBedPart;
 import org.lanternpowered.server.data.type.LanternChestConnection;
+import org.lanternpowered.server.data.type.LanternInstrumentType;
 import org.lanternpowered.server.data.type.LanternPortionType;
 import org.lanternpowered.server.data.type.LanternRailDirection;
 import org.lanternpowered.server.data.type.RedstoneConnectionType;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
 import org.lanternpowered.server.game.registry.InternalIDRegistries;
-import org.lanternpowered.server.game.registry.type.data.InstrumentTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.KeyRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.inventory.equipment.EquipmentTypeRegistryModule;
@@ -94,8 +94,7 @@ import java.util.Optional;
 
 @RegistrationDependency({
         KeyRegistryModule.class,
-        EquipmentTypeRegistryModule.class,
-        InstrumentTypeRegistryModule.class,
+        EquipmentTypeRegistryModule.class
 })
 public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryModule<BlockType> implements BlockRegistry {
 
@@ -447,16 +446,15 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         ///   Note Block  ///
         /////////////////////
         register(simpleBuilder()
-                .traits(LanternIntegerTraits.DUMMY_INSTRUMENT, LanternIntegerTraits.DUMMY_NOTE, LanternBooleanTraits.POWERED)
+                .traits(LanternEnumTraits.INSTRUMENT, LanternIntegerTraits.NOTE, LanternBooleanTraits.POWERED)
                 .defaultState(state -> state
-                        .withTrait(LanternIntegerTraits.DUMMY_INSTRUMENT, 0).get()
-                        .withTrait(LanternIntegerTraits.DUMMY_NOTE, 0).get()
+                        .withTrait(LanternEnumTraits.INSTRUMENT, LanternInstrumentType.HARP).get()
+                        .withTrait(LanternIntegerTraits.NOTE, 0).get()
                         .withTrait(LanternBooleanTraits.POWERED, false).get())
                 .itemType()
                 .properties(builder -> builder
                         .add(hardness(0.8))
                         .add(blastResistance(4.0)))
-                .tileEntityType(() -> TileEntityTypes.NOTE)
                 .behaviors(pipeline -> pipeline
                                 .add(new NoteBlockInteractionBehavior()))
                 .build("minecraft", "note_block"));

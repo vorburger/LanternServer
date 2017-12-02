@@ -38,10 +38,10 @@ import java.util.Arrays;
 import java.util.function.Predicate;
 
 @SuppressWarnings("unchecked")
-public final class LanternEnumTrait<E extends Enum<E>> extends LanternBlockTrait<E> implements EnumTrait<E> {
+public final class LanternEnumTrait<E extends Enum<E>> extends LanternBlockTrait<E, E> implements EnumTrait<E> {
 
     private LanternEnumTrait(String name, Class<E> valueClass, Key<? extends Value<E>> key, ImmutableList<E> possibleValues) {
-        super(name, key, valueClass, possibleValues);
+        super(name, key, valueClass, possibleValues, null);
     }
 
     /**

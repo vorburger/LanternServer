@@ -34,15 +34,31 @@ import org.spongepowered.api.data.value.mutable.Value;
 
 import java.util.function.Predicate;
 
-@SuppressWarnings({"unchecked","rawtypes"})
-public class LanternBlockTrait<T extends Comparable<T>> implements BlockTrait<T> {
+import javax.annotation.Nullable;
 
-    private final Key<? extends Value<T>> key;
+@SuppressWarnings({"unchecked","rawtypes"})
+public class LanternBlockTrait<T extends Comparable<T>, V> implements BlockTrait<T> {
+
+    private final static KeyTraitValueTransformer DEFAULT_TRANSFORMER = new KeyTraitValueTransformer() {
+        @Override
+        public Object toKeyValue(Comparable traitValue) {
+            return traitValue;
+        }
+        @Override
+        public Comparable toTraitValue(Object keyValue) {
+            return (Comparable) keyValue;
+        }
+    };
+
+    private final Key<? extends Value<V>> key;
     private final ImmutableCollection<T> possibleValues;
     private final Class<T> valueClass;
     private final String name;
+    private final KeyTraitValueTransformer<T, V> keyTraitValueTransformer;
 
-    LanternBlockTrait(String name, Key<? extends Value<T>> key, Class<T> valueClass, ImmutableCollection<T> possibleValues) {
+    LanternBlockTrait(String name, Key<? extends Value<V>> key, Class<T> valueClass, ImmutableCollection<T> possibleValues,
+            @Nullable KeyTraitValueTransformer<T, V> keyTraitValueTransformer) {
+        this.keyTraitValueTransformer = keyTraitValueTransformer == null ? DEFAULT_TRANSFORMER : keyTraitValueTransformer;
         this.possibleValues = possibleValues;
         this.valueClass = valueClass;
         this.name = name;
@@ -54,8 +70,12 @@ public class LanternBlockTrait<T extends Comparable<T>> implements BlockTrait<T>
      * 
      * @return the block trait key
      */
-    public Key<? extends Value<T>> getKey() {
+    public Key<? extends Value<V>> getKey() {
         return this.key;
+    }
+
+    public KeyTraitValueTransformer<T, V> getKeyTraitValueTransformer() {
+        return this.keyTraitValueTransformer;
     }
 
     @Override

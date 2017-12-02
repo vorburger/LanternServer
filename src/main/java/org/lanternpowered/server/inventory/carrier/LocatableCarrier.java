@@ -52,6 +52,5 @@ public class LocatableCarrier<T extends AbstractInventory & CarriedInventory<Abs
     @Override
     protected MoreObjects.ToStringHelper toStringHelper() {
         return super.toStringHelper()
-                .add("location", this.location);
-    }
+                .add("location", this.location); }
 }

@@ -28,6 +28,7 @@ package org.lanternpowered.server.block.trait;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.data.type.LanternBedPart;
 import org.lanternpowered.server.data.type.LanternChestConnection;
+import org.lanternpowered.server.data.type.LanternInstrumentType;
 import org.lanternpowered.server.data.type.LanternPortionType;
 import org.lanternpowered.server.data.type.LanternRailDirection;
 import org.lanternpowered.server.data.type.RedstoneConnectionType;
@@ -81,6 +82,9 @@ public final class LanternEnumTraits {
 
     public static final EnumTrait<RedstoneConnectionType> REDSTONE_WEST_CONNECTION =
             LanternEnumTrait.of("west", (Key) LanternKeys.REDSTONE_WEST_CONNECTION, RedstoneConnectionType.class);
+
+    public static final EnumTrait<LanternInstrumentType> INSTRUMENT =
+            LanternEnumTrait.of("instrument", (Key) LanternKeys.INSTRUMENT_TYPE, LanternInstrumentType.class);
 
     private LanternEnumTraits() {
     }

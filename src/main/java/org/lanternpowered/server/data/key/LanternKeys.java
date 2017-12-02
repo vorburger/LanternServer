@@ -44,6 +44,7 @@ import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.type.HandType;
+import org.spongepowered.api.data.type.InstrumentType;
 import org.spongepowered.api.data.type.SkinPart;
 import org.spongepowered.api.data.value.mutable.ListValue;
 import org.spongepowered.api.data.value.mutable.MutableBoundedValue;
@@ -148,10 +149,10 @@ public final class LanternKeys {
     public static final Key<Value<LanternChestConnection>> CHEST_CONNECTION =
             makeValueKey(LanternChestConnection.class, DataQuery.of("ChestConnection"), "lantern:chest_connection");
 
-    public static final Key<Value<Integer>> DUMMY_NOTE =
-            makeValueKey(Integer.class, DataQuery.of("DummyNote"), "lantern:dummy_note");
-    public static final Key<Value<Integer>> DUMMY_INSTRUMENT =
-            makeValueKey(Integer.class, DataQuery.of("DummyInstrument"), "lantern:dummy_instrument");
+    public static final Key<Value<Integer>> NOTE =
+            makeValueKey(Integer.class, DataQuery.of("Note"), "lantern:note");
+    public static final Key<Value<InstrumentType>> INSTRUMENT_TYPE =
+            makeValueKey(InstrumentType.class, DataQuery.of("InstrumentType"), "lantern:instrument_type");
 
     public static final Key<Value<RedstoneConnectionType>> REDSTONE_NORTH_CONNECTION =
             makeValueKey(RedstoneConnectionType.class, DataQuery.of("RedstoneNorthConnection"), "lantern:redstone_north_connection");

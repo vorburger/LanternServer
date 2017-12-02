@@ -65,6 +65,7 @@ import org.lanternpowered.server.data.type.LanternDisguisedBlockType;
 import org.lanternpowered.server.data.type.LanternDoorHalf;
 import org.lanternpowered.server.data.type.LanternDoublePlantType;
 import org.lanternpowered.server.data.type.LanternHinge;
+import org.lanternpowered.server.data.type.LanternInstrumentType;
 import org.lanternpowered.server.data.type.LanternPistonType;
 import org.lanternpowered.server.data.type.LanternPortionType;
 import org.lanternpowered.server.data.type.LanternPrismarineType;
@@ -115,7 +116,6 @@ import org.lanternpowered.server.game.registry.type.data.HandPreferenceRegistryM
 import org.lanternpowered.server.game.registry.type.data.HandTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.HorseColorRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.HorseStyleRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.InstrumentTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.KeyRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.LlamaVariantRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.NotePitchRegistryModule;
@@ -272,6 +272,7 @@ import org.spongepowered.api.data.type.Hinges;
 import org.spongepowered.api.data.type.HorseColor;
 import org.spongepowered.api.data.type.HorseStyle;
 import org.spongepowered.api.data.type.InstrumentType;
+import org.spongepowered.api.data.type.InstrumentTypes;
 import org.spongepowered.api.data.type.LlamaVariant;
 import org.spongepowered.api.data.type.NotePitch;
 import org.spongepowered.api.data.type.OcelotType;
@@ -543,7 +544,8 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(HandPreference.class, new HandPreferenceRegistryModule())
                 .registerModule(HorseColor.class, new HorseColorRegistryModule())
                 .registerModule(HorseStyle.class, new HorseStyleRegistryModule())
-                .registerModule(InstrumentType.class, new InstrumentTypeRegistryModule())
+                .registerModule(InstrumentType.class,
+                        new EnumValueRegistryModule<InstrumentType>(LanternInstrumentType.class, InstrumentTypes.class) {})
                 .registerModule(Hinge.class,
                         new EnumValueRegistryModule<Hinge>(LanternHinge.class, Hinges.class) {})
                 .registerModule(Key.class, KeyRegistryModule.get())

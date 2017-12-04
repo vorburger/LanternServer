@@ -30,15 +30,13 @@ import org.lanternpowered.server.behavior.BehaviorContext;
 import org.lanternpowered.server.behavior.BehaviorResult;
 import org.lanternpowered.server.behavior.ContextKeys;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
-import org.lanternpowered.server.block.LanternBlockSnapshot;
 import org.lanternpowered.server.block.action.vanilla.NoteAction;
 import org.lanternpowered.server.block.behavior.types.InteractWithBlockBehavior;
-import org.lanternpowered.server.block.property.InstrumentProperty;
 import org.lanternpowered.server.block.trait.LanternIntegerTraits;
-import org.lanternpowered.server.data.type.LanternInstrumentType;
 import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.data.property.block.InstrumentProperty;
 import org.spongepowered.api.data.type.InstrumentType;
 import org.spongepowered.api.data.type.InstrumentTypes;
 import org.spongepowered.api.effect.sound.SoundCategories;
@@ -64,7 +62,7 @@ public class NoteBlockInteractionBehavior implements InteractWithBlockBehavior {
                 state.getType(), new NoteAction(instrumentType, notePitch));
         // Calculate the pitch value based on the note pitch
         final double pitch = Math.pow(2.0, ((double) notePitch - 12.0) / 12.0);
-        location.getExtent().playSound(((LanternInstrumentType) instrumentType).getSound(), SoundCategories.BLOCK,
+        location.getExtent().playSound(instrumentType.getSound(), SoundCategories.BLOCK,
                 location.getPosition().add(0.5, 0.5, 0.5), 3.0, pitch);
         context.addBlockChange(BlockSnapshot.builder()
                 .from(location)

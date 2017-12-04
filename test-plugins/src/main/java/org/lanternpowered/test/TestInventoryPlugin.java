@@ -71,9 +71,7 @@ public class TestInventoryPlugin {
                             .withCarrier((Carrier) src)
                             .build(this);
                     System.out.println(inventory.getClass().getName());
-                    final ItemStack itemStack = ItemStack.of(ItemTypes.LOG, 64);
-                    itemStack.offer(Keys.TREE_TYPE, TreeTypes.JUNGLE);
-                    inventory.offer(itemStack);
+                    inventory.offer(ItemStack.of(ItemTypes.JUNGLE_LOG, 64));
                     ((Player) src).openInventory(inventory);
                     return CommandResult.success();
                 })

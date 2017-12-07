@@ -67,7 +67,7 @@ public final class InternalPluginsInfo {
     public static final class Minecraft {
 
         public static final String IDENTIFIER = "minecraft";
-        public static final String VERSION = "17w49a";
+        public static final String VERSION = "17w49b";
 
         private Minecraft() {
         }

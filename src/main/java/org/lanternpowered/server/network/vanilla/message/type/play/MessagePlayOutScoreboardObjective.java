@@ -26,6 +26,7 @@
 package org.lanternpowered.server.network.vanilla.message.type.play;
 
 import org.lanternpowered.server.network.message.Message;
+import org.spongepowered.api.scoreboard.objective.displaymode.ObjectiveDisplayMode;
 
 public abstract class MessagePlayOutScoreboardObjective implements Message {
 
@@ -46,17 +47,37 @@ public abstract class MessagePlayOutScoreboardObjective implements Message {
         }
     }
 
-    public static final class Create extends MessagePlayOutScoreboardObjective {
+    public static final class Create extends CreateOrUpdate {
+
+        public Create(String objectiveName, String displayName, ObjectiveDisplayMode displayMode) {
+            super(objectiveName, displayName, displayMode);
+        }
+    }
+
+    public static final class Update extends CreateOrUpdate {
+
+        public Update(String objectiveName, String displayName, ObjectiveDisplayMode type) {
+            super(objectiveName, displayName, type);
+        }
+    }
+
+    public static abstract class CreateOrUpdate extends MessagePlayOutScoreboardObjective {
 
         private final String displayName;
+        private final ObjectiveDisplayMode displayMode;
 
-        public Create(String objectiveName, String displayName) {
+        CreateOrUpdate(String objectiveName, String displayName, ObjectiveDisplayMode displayMode) {
             super(objectiveName);
             this.displayName = displayName;
+            this.displayMode = displayMode;
         }
 
         public String getDisplayName() {
             return this.displayName;
+        }
+
+        public ObjectiveDisplayMode getDisplayMode() {
+            return this.displayMode;
         }
     }
 }

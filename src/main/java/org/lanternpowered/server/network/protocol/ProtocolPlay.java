@@ -530,6 +530,7 @@ final class ProtocolPlay extends ProtocolBase {
         final CodecRegistration<MessagePlayOutScoreboardObjective, CodecPlayOutScoreboardObjective> codecPlayOutScoreboardObjective = outbound.bind(
                 CodecPlayOutScoreboardObjective.class);
         codecPlayOutScoreboardObjective.bind(MessagePlayOutScoreboardObjective.Create.class);
+        codecPlayOutScoreboardObjective.bind(MessagePlayOutScoreboardObjective.Update.class);
         codecPlayOutScoreboardObjective.bind(MessagePlayOutScoreboardObjective.Remove.class);
         outbound.bind(CodecPlayOutSetEntityPassengers.class, MessagePlayOutSetEntityPassengers.class);
         final CodecRegistration<MessagePlayOutTeams, CodecPlayOutTeams> codecPlayOutTeams = outbound.bind(

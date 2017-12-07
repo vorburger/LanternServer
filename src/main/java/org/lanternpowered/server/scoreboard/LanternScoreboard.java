@@ -128,7 +128,7 @@ public class LanternScoreboard implements Scoreboard {
     private List<Message> createObjectiveInitMessages(Objective objective) {
         final List<Message> messages = new ArrayList<>();
         messages.add(new MessagePlayOutScoreboardObjective.Create(
-                objective.getName(), ((LanternObjective) objective).getLegacyDisplayName()));
+                objective.getName(), ((LanternObjective) objective).getLegacyDisplayName(), objective.getDisplayMode()));
         for (Score score : ((LanternObjective) objective).scores.values()) {
             messages.add(new MessagePlayOutScoreboardScore.CreateOrUpdate(objective.getName(),
                     LanternTexts.toLegacy(score.getName()), score.getScore()));

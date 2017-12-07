@@ -30,6 +30,7 @@ import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutScoreboardObjective;
+import org.lanternpowered.server.scoreboard.LanternObjectiveDisplayMode;
 
 public final class CodecPlayOutScoreboardObjective implements Codec<MessagePlayOutScoreboardObjective> {
 
@@ -37,10 +38,13 @@ public final class CodecPlayOutScoreboardObjective implements Codec<MessagePlayO
     public ByteBuffer encode(CodecContext context, MessagePlayOutScoreboardObjective message) throws CodecException {
         final ByteBuffer buf = context.byteBufAlloc().buffer();
         buf.writeString(message.getObjectiveName());
-        final boolean create = message instanceof MessagePlayOutScoreboardObjective.Create;
-        buf.writeByte((byte) (create ? 0 : 1));
-        if (create) {
-            buf.writeString(((MessagePlayOutScoreboardObjective.Create) message).getDisplayName());
+        if (message instanceof MessagePlayOutScoreboardObjective.CreateOrUpdate) {
+            buf.writeByte((byte) (message instanceof MessagePlayOutScoreboardObjective.Create ? 0 : 2));
+            final MessagePlayOutScoreboardObjective.CreateOrUpdate message0 = (MessagePlayOutScoreboardObjective.CreateOrUpdate) message;
+            buf.writeString(message0.getDisplayName());
+            buf.writeVarInt(((LanternObjectiveDisplayMode) message0.getDisplayMode()).getInternalId());
+        } else {
+            buf.writeByte((byte) 1);
         }
         return buf;
     }

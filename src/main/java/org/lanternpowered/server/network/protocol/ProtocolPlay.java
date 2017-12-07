@@ -530,7 +530,6 @@ final class ProtocolPlay extends ProtocolBase {
         final CodecRegistration<MessagePlayOutScoreboardObjective, CodecPlayOutScoreboardObjective> codecPlayOutScoreboardObjective = outbound.bind(
                 CodecPlayOutScoreboardObjective.class);
         codecPlayOutScoreboardObjective.bind(MessagePlayOutScoreboardObjective.Create.class);
-        codecPlayOutScoreboardObjective.bind(MessagePlayOutScoreboardObjective.Update.class);
         codecPlayOutScoreboardObjective.bind(MessagePlayOutScoreboardObjective.Remove.class);
         outbound.bind(CodecPlayOutSetEntityPassengers.class, MessagePlayOutSetEntityPassengers.class);
         final CodecRegistration<MessagePlayOutTeams, CodecPlayOutTeams> codecPlayOutTeams = outbound.bind(
@@ -562,5 +561,6 @@ final class ProtocolPlay extends ProtocolBase {
         outbound.bind(); // TODO: Entity Properties
         outbound.bind(CodecPlayOutAddPotionEffect.class, MessagePlayOutAddPotionEffect.class);
         outbound.bind(CodecPlayOutDefineRecipes.class, MessagePlayOutDefineRecipes.class);
+        outbound.bind(); // Tags message, do we need it? what does the client need the tags for? recipes?
     }
 }

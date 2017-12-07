@@ -35,15 +35,12 @@ public final class CodecPlayOutScoreboardObjective implements Codec<MessagePlayO
 
     @Override
     public ByteBuffer encode(CodecContext context, MessagePlayOutScoreboardObjective message) throws CodecException {
-        ByteBuffer buf = context.byteBufAlloc().buffer();
+        final ByteBuffer buf = context.byteBufAlloc().buffer();
         buf.writeString(message.getObjectiveName());
-        if (message instanceof MessagePlayOutScoreboardObjective.CreateOrUpdate) {
-            buf.writeByte((byte) (message instanceof MessagePlayOutScoreboardObjective.Create ? 0 : 2));
-            MessagePlayOutScoreboardObjective.CreateOrUpdate message0 = (MessagePlayOutScoreboardObjective.CreateOrUpdate) message;
-            buf.writeString(message0.getDisplayName());
-            buf.writeString(message0.getDisplayMode().getId());
-        } else {
-            buf.writeByte((byte) 1);
+        final boolean create = message instanceof MessagePlayOutScoreboardObjective.Create;
+        buf.writeByte((byte) (create ? 0 : 1));
+        if (create) {
+            buf.writeString(((MessagePlayOutScoreboardObjective.Create) message).getDisplayName());
         }
         return buf;
     }

@@ -103,8 +103,8 @@ public class LanternObjective implements Objective {
 
     private void sendObjectiveUpdate() {
         if (!this.scoreboards.isEmpty()) {
-            final List<Message> message = Collections.singletonList(new MessagePlayOutScoreboardObjective.Update(
-                    this.name, this.legacyDisplayName, this.displayMode));
+            final List<Message> message = Collections.singletonList(new MessagePlayOutScoreboardObjective.Create(
+                    this.name, this.legacyDisplayName));
             for (Scoreboard scoreboard : this.scoreboards) {
                 ((LanternScoreboard) scoreboard).sendToPlayers(() -> message);
             }

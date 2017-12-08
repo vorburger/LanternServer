@@ -34,8 +34,6 @@ import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.data.Property;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.text.translation.Translation;
-import org.spongepowered.api.variant.VariantQuery;
-import org.spongepowered.api.variant.VariantQueryType;
 
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -90,21 +88,6 @@ public class LanternItemType extends PluginCatalogType.Base implements ItemType 
     @Override
     public <T extends Property<?, ?>> Optional<T> getDefaultProperty(Class<T> propertyClass) {
         return this.propertyProviderCollection.get(propertyClass).map(propertyProvider -> propertyProvider.get(this, null));
-    }
-
-    @Override
-    public boolean matches(VariantQuery<?>... queries) {
-        return false; // TODO
-    }
-
-    @Override
-    public <T> Optional<T> getArgument(VariantQueryType<T> queryType) {
-        return Optional.empty(); // TODO
-    }
-
-    @Override
-    public <T> Optional<VariantQuery<T>> createQueryFor(VariantQueryType<T> queryType) {
-        return Optional.empty(); // TODO
     }
 
     public MutableBehaviorPipeline<Behavior> getPipeline() {

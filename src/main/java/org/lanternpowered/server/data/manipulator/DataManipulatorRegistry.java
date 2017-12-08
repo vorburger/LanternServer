@@ -70,7 +70,6 @@ import org.spongepowered.api.data.manipulator.immutable.ImmutablePotionEffectDat
 import org.spongepowered.api.data.manipulator.immutable.ImmutableRepresentedItemData;
 import org.spongepowered.api.data.manipulator.immutable.ImmutableRepresentedPlayerData;
 import org.spongepowered.api.data.manipulator.immutable.ImmutableRotationalData;
-import org.spongepowered.api.data.manipulator.immutable.ImmutableSkullData;
 import org.spongepowered.api.data.manipulator.immutable.ImmutableTargetedLocationData;
 import org.spongepowered.api.data.manipulator.immutable.ImmutableVariantData;
 import org.spongepowered.api.data.manipulator.immutable.ImmutableWetData;
@@ -207,13 +206,12 @@ import org.spongepowered.api.data.manipulator.immutable.item.ImmutableSpawnableD
 import org.spongepowered.api.data.manipulator.immutable.item.ImmutableStoredEnchantmentData;
 import org.spongepowered.api.data.manipulator.immutable.tileentity.ImmutableBannerData;
 import org.spongepowered.api.data.manipulator.immutable.tileentity.ImmutableBeaconData;
-import org.spongepowered.api.data.manipulator.immutable.tileentity.ImmutableBedData;
 import org.spongepowered.api.data.manipulator.immutable.tileentity.ImmutableBrewingStandData;
 import org.spongepowered.api.data.manipulator.immutable.tileentity.ImmutableCooldownData;
 import org.spongepowered.api.data.manipulator.immutable.tileentity.ImmutableEndGatewayData;
 import org.spongepowered.api.data.manipulator.immutable.tileentity.ImmutableFurnaceData;
 import org.spongepowered.api.data.manipulator.immutable.tileentity.ImmutableLockableData;
-import org.spongepowered.api.data.manipulator.immutable.tileentity.ImmutableNoteData;
+import org.spongepowered.api.data.manipulator.immutable.block.ImmutableNoteData;
 import org.spongepowered.api.data.manipulator.immutable.tileentity.ImmutableSignData;
 import org.spongepowered.api.data.manipulator.immutable.tileentity.ImmutableStructureData;
 import org.spongepowered.api.data.manipulator.mutable.ColoredData;
@@ -227,7 +225,6 @@ import org.spongepowered.api.data.manipulator.mutable.PotionEffectData;
 import org.spongepowered.api.data.manipulator.mutable.RepresentedItemData;
 import org.spongepowered.api.data.manipulator.mutable.RepresentedPlayerData;
 import org.spongepowered.api.data.manipulator.mutable.RotationalData;
-import org.spongepowered.api.data.manipulator.mutable.SkullData;
 import org.spongepowered.api.data.manipulator.mutable.TargetedLocationData;
 import org.spongepowered.api.data.manipulator.mutable.VariantData;
 import org.spongepowered.api.data.manipulator.mutable.WetData;
@@ -364,13 +361,12 @@ import org.spongepowered.api.data.manipulator.mutable.item.SpawnableData;
 import org.spongepowered.api.data.manipulator.mutable.item.StoredEnchantmentData;
 import org.spongepowered.api.data.manipulator.mutable.tileentity.BannerData;
 import org.spongepowered.api.data.manipulator.mutable.tileentity.BeaconData;
-import org.spongepowered.api.data.manipulator.mutable.tileentity.BedData;
 import org.spongepowered.api.data.manipulator.mutable.tileentity.BrewingStandData;
 import org.spongepowered.api.data.manipulator.mutable.tileentity.CooldownData;
 import org.spongepowered.api.data.manipulator.mutable.tileentity.EndGatewayData;
 import org.spongepowered.api.data.manipulator.mutable.tileentity.FurnaceData;
 import org.spongepowered.api.data.manipulator.mutable.tileentity.LockableData;
-import org.spongepowered.api.data.manipulator.mutable.tileentity.NoteData;
+import org.spongepowered.api.data.manipulator.mutable.block.NoteData;
 import org.spongepowered.api.data.manipulator.mutable.tileentity.SignData;
 import org.spongepowered.api.data.manipulator.mutable.tileentity.StructureData;
 import org.spongepowered.api.data.type.Arts;
@@ -487,7 +483,6 @@ public class DataManipulatorRegistry {
         /// variant containers
         registerVariant(DyeableData.class, ImmutableDyeableData.class, Keys.DYE_COLOR, DyeColors.WHITE);
         registerVariant(RotationalData.class, ImmutableRotationalData.class, Keys.ROTATION, Rotations.LEFT);
-        registerVariant(SkullData.class, ImmutableSkullData.class, Keys.SKULL_TYPE, SkullTypes.SKELETON);
 
         /// list containers
         registerList(FireworkEffectData.class, ImmutableFireworkEffectData.class, Keys.FIREWORK_EFFECTS);
@@ -888,8 +883,6 @@ public class DataManipulatorRegistry {
                     c.register(Keys.BEACON_PRIMARY_EFFECT, Optional.empty());
                     c.register(Keys.BEACON_SECONDARY_EFFECT, Optional.empty());
                 });
-        register(BedData.class, ImmutableBedData.class,
-                c -> c.register(Keys.DYE_COLOR, DyeColors.WHITE));
         register(BrewingStandData.class, ImmutableBrewingStandData.class,
                 c -> c.register(Keys.REMAINING_BREW_TIME, 0, 0, Integer.MAX_VALUE));
         register(CooldownData.class, ImmutableCooldownData.class,

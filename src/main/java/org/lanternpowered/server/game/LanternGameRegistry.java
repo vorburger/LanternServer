@@ -68,7 +68,6 @@ import org.lanternpowered.server.data.type.LanternHinge;
 import org.lanternpowered.server.data.type.LanternInstrumentType;
 import org.lanternpowered.server.data.type.LanternPistonType;
 import org.lanternpowered.server.data.type.LanternPortionType;
-import org.lanternpowered.server.data.type.LanternPrismarineType;
 import org.lanternpowered.server.data.type.LanternWallType;
 import org.lanternpowered.server.data.value.LanternValueFactory;
 import org.lanternpowered.server.effect.particle.LanternParticleEffectBuilder;
@@ -132,7 +131,6 @@ import org.lanternpowered.server.game.registry.type.data.ShrubTypeRegistryModule
 import org.lanternpowered.server.game.registry.type.data.SkinPartRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.SkullTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.SlabTypeRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.StoneTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.ToolTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.TreeTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.persistence.DataFormatRegistryModule;
@@ -282,8 +280,6 @@ import org.spongepowered.api.data.type.PistonTypes;
 import org.spongepowered.api.data.type.PlantType;
 import org.spongepowered.api.data.type.PortionType;
 import org.spongepowered.api.data.type.PortionTypes;
-import org.spongepowered.api.data.type.PrismarineType;
-import org.spongepowered.api.data.type.PrismarineTypes;
 import org.spongepowered.api.data.type.Profession;
 import org.spongepowered.api.data.type.RabbitType;
 import org.spongepowered.api.data.type.RailDirection;
@@ -293,7 +289,6 @@ import org.spongepowered.api.data.type.ShrubType;
 import org.spongepowered.api.data.type.SkinPart;
 import org.spongepowered.api.data.type.SkullType;
 import org.spongepowered.api.data.type.SlabType;
-import org.spongepowered.api.data.type.StoneType;
 import org.spongepowered.api.data.type.ToolType;
 import org.spongepowered.api.data.type.TreeType;
 import org.spongepowered.api.data.type.WallType;
@@ -560,12 +555,9 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(PistonType.class,
                         new EnumValueRegistryModule<PistonType>(LanternPistonType.class, PistonTypes.class) {})
                 .registerModule(PlantType.class, PlantTypeRegistryModule.get())
-                .registerModule(PrismarineType.class,
-                        new EnumValueRegistryModule<PrismarineType>(LanternPrismarineType.class, PrismarineTypes.class) {})
                 .registerModule(SandstoneType.class, SandstoneTypeRegistryModule.get())
                 .registerModule(SandType.class, SandTypeRegistryModule.get())
                 .registerModule(ShrubType.class, ShrubTypeRegistryModule.get())
-                .registerModule(StoneType.class, StoneTypeRegistryModule.get())
                 .registerModule(SlabType.class, SlabTypeRegistryModule.get())
                 .registerModule(TreeType.class, TreeTypeRegistryModule.get())
                 .registerModule(WallType.class,

@@ -23,22 +23,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.game.registry.type.data;
+package org.lanternpowered.server.data.type;
 
-import org.lanternpowered.server.data.type.LanternDirtType;
-import org.lanternpowered.server.game.registry.InternalEnumValueRegistryModule;
-import org.spongepowered.api.data.type.DirtType;
-import org.spongepowered.api.data.type.DirtTypes;
+import org.lanternpowered.server.catalog.SimpleCatalogType;
+import org.spongepowered.api.data.type.SlabPortion;
 
-public class DirtTypeRegistryModule extends InternalEnumValueRegistryModule<DirtType> {
+public enum LanternSlabPortion implements SlabPortion, SimpleCatalogType {
 
-    private static final DirtTypeRegistryModule INSTANCE = new DirtTypeRegistryModule();
+    TOP           ("top"),
+    BOTTOM        ("bottom"),
+    DOUBLE        ("full"),
+    ;
 
-    public static DirtTypeRegistryModule get() {
-        return INSTANCE;
+    private final String identifier;
+
+    LanternSlabPortion(String identifier) {
+        this.identifier = identifier;
     }
 
-    private DirtTypeRegistryModule() {
-        super(LanternDirtType.class, DirtTypes.class);
+    @Override
+    public String getId() {
+        return this.identifier;
     }
 }

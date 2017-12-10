@@ -25,40 +25,24 @@
  */
 package org.lanternpowered.server.data.type;
 
-import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
-
-import org.lanternpowered.server.catalog.InternalCatalogType;
 import org.lanternpowered.server.catalog.SimpleCatalogType;
-import org.spongepowered.api.data.type.PistonType;
-import org.spongepowered.api.text.translation.Translation;
+import org.spongepowered.api.data.type.ChestAttachmentType;
 
-public enum LanternPistonType implements PistonType, SimpleCatalogType, InternalCatalogType {
+public enum LanternChestAttachment implements SimpleCatalogType, ChestAttachmentType {
 
-    NORMAL          ("normal", "pistonBase"),
-    STICKY          ("sticky", "pistonStickyBase"),
+    SINGLE      ("full"),
+    LEFT        ("left"),
+    RIGHT       ("right"),
     ;
 
-    private final String identifier;
-    private final Translation translation;
+    private final String id;
 
-    LanternPistonType(String identifier, String translationPart) {
-        this.translation = tr("tile." + translationPart + ".name");
-        this.identifier = identifier;
-    }
-
-    @Override
-    public Translation getTranslation() {
-        return this.translation;
+    LanternChestAttachment(String id) {
+        this.id = id;
     }
 
     @Override
     public String getId() {
-        return this.identifier;
+        return this.id;
     }
-
-    @Override
-    public int getInternalId() {
-        return ordinal();
-    }
-
 }

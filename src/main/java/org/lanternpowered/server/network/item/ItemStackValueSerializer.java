@@ -97,7 +97,12 @@ public class ItemStackValueSerializer implements ValueSerializer<ItemStack> {
         if (itemType == null) {
             itemType = NetworkItemTypeRegistry.networkIdToItemType.get(networkId);
             if (itemType == null) {
-                throw new DecoderException("Received ItemStack with unknown network id: " + networkId);
+                // We know the id, but it's not implemented yet
+                if (NetworkItemTypeRegistry.networkIdToNormal.containsKey(networkId)) {
+                    return null;
+                } else {
+                    throw new DecoderException("Received ItemStack with unknown network id: " + networkId);
+                }
             }
         }
         final LanternItemStack itemStack = new LanternItemStack(itemType, amount);

@@ -33,10 +33,10 @@ import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.block.behavior.types.BreakBlockBehavior;
 import org.lanternpowered.server.block.tile.vanilla.LanternChest;
 import org.lanternpowered.server.block.trait.LanternEnumTraits;
-import org.lanternpowered.server.data.key.LanternKeys;
-import org.lanternpowered.server.data.type.LanternChestConnection;
+import org.lanternpowered.server.data.type.LanternChestAttachment;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -54,13 +54,13 @@ public class ChestBreakBehavior implements BreakBlockBehavior {
             if (relState.getType() == state.getType() &&
                     relState.getTraitValue(LanternEnumTraits.HORIZONTAL_FACING).get() ==
                     state.getTraitValue(LanternEnumTraits.HORIZONTAL_FACING).get()) {
-                final LanternChestConnection relConnection = relState.getTraitValue(LanternEnumTraits.CHEST_CONNECTION).get();
-                final LanternChestConnection connection = state.getTraitValue(LanternEnumTraits.CHEST_CONNECTION).get();
-                if ((relConnection == LanternChestConnection.LEFT && connection == LanternChestConnection.RIGHT) ||
-                        (relConnection == LanternChestConnection.RIGHT && connection == LanternChestConnection.LEFT)) {
+                final LanternChestAttachment relConnection = relState.getTraitValue(LanternEnumTraits.CHEST_ATTACHMENT).get();
+                final LanternChestAttachment connection = state.getTraitValue(LanternEnumTraits.CHEST_ATTACHMENT).get();
+                if ((relConnection == LanternChestAttachment.LEFT && connection == LanternChestAttachment.RIGHT) ||
+                        (relConnection == LanternChestAttachment.RIGHT && connection == LanternChestAttachment.LEFT)) {
                     context.addBlockChange(BlockSnapshot.builder()
                             .from(location)
-                            .add(LanternKeys.CHEST_CONNECTION, LanternChestConnection.SINGLE)
+                            .add(Keys.CHEST_ATTACHMENT, LanternChestAttachment.SINGLE)
                             .build());
                 }
             }

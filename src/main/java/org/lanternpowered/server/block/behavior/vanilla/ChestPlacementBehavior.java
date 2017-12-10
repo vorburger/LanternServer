@@ -33,8 +33,7 @@ import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.block.BlockSnapshotBuilder;
 import org.lanternpowered.server.block.behavior.types.PlaceBlockBehavior;
 import org.lanternpowered.server.block.trait.LanternEnumTraits;
-import org.lanternpowered.server.data.key.LanternKeys;
-import org.lanternpowered.server.data.type.LanternChestConnection;
+import org.lanternpowered.server.data.type.LanternChestAttachment;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
@@ -87,7 +86,7 @@ public class ChestPlacementBehavior implements PlaceBlockBehavior {
             facing = Direction.NORTH;
         }
 
-        LanternChestConnection connection = null;
+        LanternChestAttachment connection = null;
         Direction direction = null;
 
         boolean sneaking = false;
@@ -98,17 +97,17 @@ public class ChestPlacementBehavior implements PlaceBlockBehavior {
         Location<World> relLocation = location.getBlockRelative(face.getOpposite());
         BlockState relState = relLocation.getBlock();
         if (relState.getType() == blockType) {
-            final LanternChestConnection relConnection = relState.getTraitValue(LanternEnumTraits.CHEST_CONNECTION).get();
-            if (relConnection == LanternChestConnection.SINGLE) {
+            final LanternChestAttachment relConnection = relState.getTraitValue(LanternEnumTraits.CHEST_ATTACHMENT).get();
+            if (relConnection == LanternChestAttachment.SINGLE) {
                 final Direction relFacing = relState.getTraitValue(LanternEnumTraits.HORIZONTAL_FACING).get();
                 final List<Direction> dirs = getConnectionDirections(relFacing);
                 int index = dirs.indexOf(face);
                 if (index-- != -1) {
-                    connection = index == 0 ? LanternChestConnection.LEFT : LanternChestConnection.RIGHT;
+                    connection = index == 0 ? LanternChestAttachment.LEFT : LanternChestAttachment.RIGHT;
                     direction = relFacing;
                     context.addBlockChange(BlockSnapshot.builder()
                             .from(relLocation.createSnapshot())
-                            .add(LanternKeys.CHEST_CONNECTION, index == 0 ? LanternChestConnection.RIGHT : LanternChestConnection.LEFT)
+                            .add(Keys.CHEST_ATTACHMENT, index == 0 ? LanternChestAttachment.RIGHT : LanternChestAttachment.LEFT)
                             .build());
                 }
             } else {
@@ -124,13 +123,13 @@ public class ChestPlacementBehavior implements PlaceBlockBehavior {
                     relLocation = location.getBlockRelative(relDirection);
                     relState = relLocation.getBlock();
                     if (relState.getType() == blockType) {
-                        final LanternChestConnection relConnection = relState.getTraitValue(LanternEnumTraits.CHEST_CONNECTION).get();
+                        final LanternChestAttachment relConnection = relState.getTraitValue(LanternEnumTraits.CHEST_ATTACHMENT).get();
                         final Direction relFacing = relState.getTraitValue(LanternEnumTraits.HORIZONTAL_FACING).get();
-                        if (relFacing == facing && relConnection == LanternChestConnection.SINGLE) {
-                            connection = index == 0 ? LanternChestConnection.LEFT : LanternChestConnection.RIGHT;
+                        if (relFacing == facing && relConnection == LanternChestAttachment.SINGLE) {
+                            connection = index == 0 ? LanternChestAttachment.LEFT : LanternChestAttachment.RIGHT;
                             context.addBlockChange(BlockSnapshot.builder()
                                     .from(relLocation.createSnapshot())
-                                    .add(LanternKeys.CHEST_CONNECTION, index == 0 ? LanternChestConnection.RIGHT : LanternChestConnection.LEFT)
+                                    .add(Keys.CHEST_ATTACHMENT, index == 0 ? LanternChestAttachment.RIGHT : LanternChestAttachment.LEFT)
                                     .build());
                             break;
                         }
@@ -139,13 +138,13 @@ public class ChestPlacementBehavior implements PlaceBlockBehavior {
                 }
             }
             if (connection == null) {
-                connection = LanternChestConnection.SINGLE;
+                connection = LanternChestAttachment.SINGLE;
             }
         }
 
         context.addBlockChange(BlockSnapshotBuilder.create().from(snapshot).location(location)
                 .add(Keys.DIRECTION, direction)
-                .add(LanternKeys.CHEST_CONNECTION, connection)
+                .add(Keys.CHEST_ATTACHMENT, connection)
                 .build());
         return BehaviorResult.SUCCESS;
     }

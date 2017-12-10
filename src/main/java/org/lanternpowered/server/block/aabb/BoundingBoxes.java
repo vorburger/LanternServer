@@ -27,8 +27,8 @@ package org.lanternpowered.server.block.aabb;
 
 import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.block.tile.vanilla.LanternChest;
-import org.lanternpowered.server.data.type.LanternPortionType;
 import org.lanternpowered.server.data.type.LanternRailDirection;
+import org.lanternpowered.server.data.type.LanternSlabPortion;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.util.AABB;
@@ -124,7 +124,7 @@ public class BoundingBoxes {
     }
 
     public static AABB slab(BlockState blockState) {
-        final LanternPortionType portionType = (LanternPortionType) blockState.get(Keys.PORTION_TYPE).get();
+        final LanternSlabPortion portionType = (LanternSlabPortion) blockState.get(Keys.SLAB_PORTION).get();
         switch (portionType) {
             case BOTTOM:
                 return Slab.BOTTOM;

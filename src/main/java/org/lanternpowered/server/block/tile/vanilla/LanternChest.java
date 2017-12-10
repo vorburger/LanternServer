@@ -28,7 +28,7 @@ package org.lanternpowered.server.block.tile.vanilla;
 import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
 
 import org.lanternpowered.server.block.trait.LanternEnumTraits;
-import org.lanternpowered.server.data.type.LanternChestConnection;
+import org.lanternpowered.server.data.type.LanternChestAttachment;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.inventory.AbstractGridInventory;
 import org.lanternpowered.server.inventory.behavior.SimpleContainerShiftClickBehavior;
@@ -65,12 +65,12 @@ public class LanternChest extends LanternContainerTile<ChestInventory> implement
     }
 
     public static Direction getConnectedDirection(BlockState blockState) {
-        final LanternChestConnection connection = blockState.getTraitValue(LanternEnumTraits.CHEST_CONNECTION).get();
-        if (connection == LanternChestConnection.SINGLE) {
+        final LanternChestAttachment connection = blockState.getTraitValue(LanternEnumTraits.CHEST_ATTACHMENT).get();
+        if (connection == LanternChestAttachment.SINGLE) {
             return Direction.NONE;
         }
         final Direction direction = blockState.getTraitValue(LanternEnumTraits.HORIZONTAL_FACING).get();
-        boolean left = connection == LanternChestConnection.LEFT;
+        boolean left = connection == LanternChestAttachment.LEFT;
         switch (direction) {
             case NORTH:
                 return left ? Direction.WEST : Direction.EAST;
@@ -107,8 +107,8 @@ public class LanternChest extends LanternContainerTile<ChestInventory> implement
         }
         final Location<World> location =  getLocation();
         final BlockState blockState = location.getBlock();
-        final LanternChestConnection connection = blockState.getTraitValue(LanternEnumTraits.CHEST_CONNECTION).get();
-        if (connection == LanternChestConnection.SINGLE) {
+        final LanternChestAttachment connection = blockState.getTraitValue(LanternEnumTraits.CHEST_ATTACHMENT).get();
+        if (connection == LanternChestAttachment.SINGLE) {
             return Optional.empty();
         }
         final Direction direction = getConnectedDirection(blockState);
@@ -144,9 +144,9 @@ public class LanternChest extends LanternContainerTile<ChestInventory> implement
         }
         final Location<World> location =  getLocation();
         final BlockState blockState = location.getBlock();
-        final LanternChestConnection connection = blockState.getTraitValue(
-                LanternEnumTraits.CHEST_CONNECTION).get();
-        if (connection == LanternChestConnection.SINGLE) {
+        final LanternChestAttachment connection = blockState.getTraitValue(
+                LanternEnumTraits.CHEST_ATTACHMENT).get();
+        if (connection == LanternChestAttachment.SINGLE) {
             return Optional.empty();
         }
         final Direction direction = getConnectedDirection(blockState);

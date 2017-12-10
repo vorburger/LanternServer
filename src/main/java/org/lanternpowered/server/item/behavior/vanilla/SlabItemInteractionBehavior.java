@@ -34,6 +34,7 @@ import org.lanternpowered.server.block.BlockSnapshotBuilder;
 import org.lanternpowered.server.block.LanternBlockType;
 import org.lanternpowered.server.block.trait.LanternEnumTraits;
 import org.lanternpowered.server.data.type.LanternPortionType;
+import org.lanternpowered.server.data.type.LanternSlabPortion;
 import org.lanternpowered.server.item.behavior.types.InteractWithItemBehavior;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.key.Keys;
@@ -59,9 +60,9 @@ public class SlabItemInteractionBehavior implements InteractWithItemBehavior {
         System.out.println(location);
         // There is already a half/double slab placed
         if (state.getType() == blockType) {
-            final LanternPortionType type = state.getTraitValue(LanternEnumTraits.PORTION_TYPE).get();
+            final LanternSlabPortion type = state.getTraitValue(LanternEnumTraits.SLAB_PORTION).get();
             // Already a full block
-            if (type == LanternPortionType.DOUBLE) {
+            if (type == LanternSlabPortion.DOUBLE) {
                 return null;
             }
             final double y = location.getY() - location.getBlockY();
@@ -69,18 +70,18 @@ public class SlabItemInteractionBehavior implements InteractWithItemBehavior {
             if (blockFace == Direction.DOWN) {
                 success = true;
             } else if (blockFace == Direction.UP) {
-                success = type == LanternPortionType.TOP;
-            } else if ((y < 0.5 && type == LanternPortionType.BOTTOM) ||
-                    (y >= 0.5 && type == LanternPortionType.TOP)) {
+                success = type == LanternSlabPortion.TOP;
+            } else if ((y < 0.5 && type == LanternSlabPortion.BOTTOM) ||
+                    (y >= 0.5 && type == LanternSlabPortion.TOP)) {
                 success = true;
             }
             if (!success) {
                 return null;
             }
             System.out.println("SET: " + blockType.getDefaultState()
-                    .withTrait(LanternEnumTraits.PORTION_TYPE, LanternPortionType.DOUBLE).get().getId());
+                    .withTrait(LanternEnumTraits.SLAB_PORTION, LanternSlabPortion.DOUBLE).get().getId());
             return BlockSnapshotBuilder.create().blockState(state
-                    .withTrait(LanternEnumTraits.PORTION_TYPE, LanternPortionType.DOUBLE).get());
+                    .withTrait(LanternEnumTraits.SLAB_PORTION, LanternSlabPortion.DOUBLE).get());
         } else if (!location.getProperty(ReplaceableProperty.class).get().getValue()) {
             return null;
         } else {
@@ -93,9 +94,9 @@ public class SlabItemInteractionBehavior implements InteractWithItemBehavior {
                 type = LanternPortionType.BOTTOM;
             }
             System.out.println("SET: " + blockType.getDefaultState()
-                    .withTrait(LanternEnumTraits.PORTION_TYPE, type).get().getId());
+                    .withTrait(LanternEnumTraits.SLAB_PORTION, type).get().getId());
             return BlockSnapshotBuilder.create().blockState(blockType.getDefaultState()
-                    .withTrait(LanternEnumTraits.PORTION_TYPE, type).get());
+                    .withTrait(LanternEnumTraits.SLAB_PORTION, type).get());
         }
     }
 

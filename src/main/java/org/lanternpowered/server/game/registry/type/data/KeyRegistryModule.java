@@ -48,19 +48,10 @@ import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.Art;
-import org.spongepowered.api.data.type.BigMushroomType;
 import org.spongepowered.api.data.type.BodyPart;
-import org.spongepowered.api.data.type.BrickType;
 import org.spongepowered.api.data.type.Career;
-import org.spongepowered.api.data.type.CoalType;
 import org.spongepowered.api.data.type.ComparatorType;
-import org.spongepowered.api.data.type.CookedFish;
-import org.spongepowered.api.data.type.DirtType;
-import org.spongepowered.api.data.type.DisguisedBlockType;
-import org.spongepowered.api.data.type.DoublePlantType;
 import org.spongepowered.api.data.type.DyeColor;
-import org.spongepowered.api.data.type.Fish;
-import org.spongepowered.api.data.type.GoldenApple;
 import org.spongepowered.api.data.type.HandPreference;
 import org.spongepowered.api.data.type.Hinge;
 import org.spongepowered.api.data.type.HorseColor;
@@ -69,20 +60,14 @@ import org.spongepowered.api.data.type.LlamaVariant;
 import org.spongepowered.api.data.type.NotePitch;
 import org.spongepowered.api.data.type.OcelotType;
 import org.spongepowered.api.data.type.PickupRule;
-import org.spongepowered.api.data.type.PistonType;
-import org.spongepowered.api.data.type.PlantType;
 import org.spongepowered.api.data.type.PortionType;
 import org.spongepowered.api.data.type.Profession;
 import org.spongepowered.api.data.type.RabbitType;
 import org.spongepowered.api.data.type.RailDirection;
-import org.spongepowered.api.data.type.SandType;
-import org.spongepowered.api.data.type.SandstoneType;
-import org.spongepowered.api.data.type.ShrubType;
-import org.spongepowered.api.data.type.SlabType;
+import org.spongepowered.api.data.type.SlabPortion;
 import org.spongepowered.api.data.type.StairShape;
 import org.spongepowered.api.data.type.StructureMode;
 import org.spongepowered.api.data.type.TreeType;
-import org.spongepowered.api.data.type.WallType;
 import org.spongepowered.api.data.type.WireAttachmentType;
 import org.spongepowered.api.effect.potion.PotionEffect;
 import org.spongepowered.api.effect.potion.PotionEffectType;
@@ -170,12 +155,17 @@ public final class KeyRegistryModule extends AdditionalPluginCatalogRegistryModu
         register(makeValueKey(EntitySnapshot.class, of("BaseVehicle"), "sponge:base_vehicle"));
         register(makeOptionalKey(PotionEffectType.class, of("BeaconPrimaryEffect"), "sponge:beacon_primary_effect"));
         register(makeOptionalKey(PotionEffectType.class, of("BeaconSecondaryEffect"), "sponge:beacon_secondary_effect"));
-        register(makeValueKey(BigMushroomType.class, of("BigMushroomType"), "sponge:big_mushroom_type"));
         register(makeMapKeyWithKeyAndValue(BodyPart.class, Vector3d.class, of("BodyRotations"), "sponge:body_rotations"));
         register(makeValueKey(Text.class, of("BookAuthor"), "sponge:book_author"));
         register(makeListKey(Text.class, of("BookPages"), "sponge:book_pages"));
+        register(makeSetKey(Direction.class, of("BigMushroomPores"), "sponge:big_mushroom_pores"));
+        register(makeValueKey(Boolean.class, of("BigMushroomPoresDown"), "sponge:big_mushroom_pores_down"));
+        register(makeValueKey(Boolean.class, of("BigMushroomPoresEast"), "sponge:big_mushroom_pores_east"));
+        register(makeValueKey(Boolean.class, of("BigMushroomPoresNorth"), "sponge:big_mushroom_pores_north"));
+        register(makeValueKey(Boolean.class, of("BigMushroomPoresSouth"), "sponge:big_mushroom_pores_south"));
+        register(makeValueKey(Boolean.class, of("BigMushroomPoresUp"), "sponge:big_mushroom_pores_up"));
+        register(makeValueKey(Boolean.class, of("BigMushroomPoresWest"), "sponge:big_mushroom_pores_west"));
         register(makeSetKey(BlockType.class, of("BreakableBlockTypes"), "sponge:breakable_block_types"));
-        register(makeValueKey(BrickType.class, of("BrickType"), "sponge:brick_type"));
         register(makeValueKey(Boolean.class, of("CanBreed"), "sponge:can_breed"));
         register(makeValueKey(Boolean.class, of("CanDropAsItem"), "sponge:can_drop_as_item"));
         register(makeValueKey(Boolean.class, of("CanFly"), "sponge:can_fly"));
@@ -183,7 +173,6 @@ public final class KeyRegistryModule extends AdditionalPluginCatalogRegistryModu
         register(makeValueKey(Boolean.class, of("CanPlaceAsBlock"), "sponge:can_place_as_block"));
         register(makeValueKey(Career.class, of("Career"), "sponge:career"));
         register(makeValueKey(Vector3d.class, of("ChestRotation"), "sponge:chest_rotation"));
-        register(makeValueKey(CoalType.class, of("CoalType"), "sponge:coal_type"));
         register(makeValueKey(Color.class, of("Color"), "sponge:color"));
         register(makeValueKey(String.class, of("Command"), "sponge:command"));
         register(makeValueKey(ComparatorType.class, of("ComparatorType"), "sponge:comparator_type"));
@@ -193,7 +182,6 @@ public final class KeyRegistryModule extends AdditionalPluginCatalogRegistryModu
         register(makeValueKey(Boolean.class, of("ConnectedSouth"), "sponge:connected_south"));
         register(makeValueKey(Boolean.class, of("ConnectedWest"), "sponge:connected_west"));
         register(makeMutableBoundedValueKey(Integer.class, of("ContainedExperience"), "sponge:contained_experience"));
-        register(makeValueKey(CookedFish.class, of("CookedFish"), "sponge:cooked_fish"));
         register(makeMutableBoundedValueKey(Integer.class, of("Cooldown"), "sponge:cooldown"));
         register(makeValueKey(Boolean.class, of("CreeperCharged"), "sponge:creeper_charged"));
         register(makeValueKey(Boolean.class, of("CriticalHit"), "sponge:critical_hit"));
@@ -203,12 +191,9 @@ public final class KeyRegistryModule extends AdditionalPluginCatalogRegistryModu
         register(makeMutableBoundedValueKey(Integer.class, of("Delay"), "sponge:delay"));
         register(makeMutableBoundedValueKey(Integer.class, of("DespawnDelay"), "sponge:despawn_delay"));
         register(makeValueKey(Direction.class, of("Direction"), "sponge:direction"));
-        register(makeValueKey(DirtType.class, of("DirtType"), "sponge:dirt_type"));
         register(makeValueKey(Boolean.class, of("Disarmed"), "sponge:disarmed"));
-        register(makeValueKey(DisguisedBlockType.class, of("DisguisedBlockType"), "sponge:disguised_block_type"));
         register(makeValueKey(Text.class, of("DisplayName"), "sponge:display_name"));
         register(makeValueKey(HandPreference.class, of("DominantHand"), "sponge:dominant_hand"));
-        register(makeValueKey(DoublePlantType.class, of("DoublePlantType"), "sponge:double_plant_type"));
         register(makeValueKey(DyeColor.class, of("DyeColor"), "sponge:dye_color"));
         register(makeValueKey(Boolean.class, of("ElderGuardian"), "sponge:elder_guardian"));
         register(makeValueKey(Boolean.class, of("EndGatewayAge"), "sponge:end_gateway_age"));
@@ -233,7 +218,6 @@ public final class KeyRegistryModule extends AdditionalPluginCatalogRegistryModu
         register(makeMutableBoundedValueKey(Integer.class, of("FireDamageDelay"), "sponge:fire_damage_delay"));
         register(makeMutableBoundedValueKey(Integer.class, of("FireTicks"), "sponge:fire_ticks"));
         register(makeValueKey(Instant.class, of("FirstDatePlayed"), "sponge:first_date_played"));
-        register(makeValueKey(Fish.class, of("FishType"), "sponge:fish_type"));
         register(makeValueKey(FluidStackSnapshot.class, of("FluidItemStack"), "sponge:fluid_item_stack"));
         register(makeMutableBoundedValueKey(Integer.class, of("FluidLevel"), "sponge:fluid_level"));
         register(makeMapKeyWithKeyAndValue(Direction.class, List.class, of("FluidTankContents"), "sponge:fluid_tank_contents"));
@@ -243,7 +227,6 @@ public final class KeyRegistryModule extends AdditionalPluginCatalogRegistryModu
         register(makeValueKey(GameMode.class, of("GameMode"), "sponge:game_mode"));
         register(makeMutableBoundedValueKey(Integer.class, of("Generation"), "sponge:generation"));
         register(makeValueKey(Boolean.class, of("Glowing"), "sponge:glowing"));
-        register(makeValueKey(GoldenApple.class, of("GoldenAppleType"), "sponge:golden_apple_type"));
         register(makeMutableBoundedValueKey(Integer.class, of("GrowthStage"), "sponge:growth_stage"));
         register(makeValueKey(Boolean.class, of("HasGravity"), "sponge:has_gravity"));
         register(makeValueKey(Vector3d.class, of("HeadRotation"), "sponge:head_rotation"));
@@ -293,6 +276,7 @@ public final class KeyRegistryModule extends AdditionalPluginCatalogRegistryModu
         register(makeValueKey(EntitySnapshot.class, of("LeashHolder"), "sponge:leash_holder"));
         register(makeValueKey(Vector3d.class, of("LeftArmRotation"), "sponge:left_arm_rotation"));
         register(makeValueKey(Vector3d.class, of("LeftLegRotation"), "sponge:left_leg_rotation"));
+        register(makeValueKey(Boolean.class, of("Lit"), "sponge:lit"));
         register(makeMutableBoundedValueKey(Integer.class, of("LlamaStrength"), "sponge:llama_strength"));
         register(makeValueKey(LlamaVariant.class, of("LlamaVariant"), "sponge:llama_variant"));
         register(makeValueKey(String.class, of("LockToken"), "sponge:lock_token"));
@@ -314,9 +298,7 @@ public final class KeyRegistryModule extends AdditionalPluginCatalogRegistryModu
         register(makeMutableBoundedValueKey(Integer.class, of("PickupDelay"), "sponge:pickup_delay"));
         register(makeValueKey(PickupRule.class, of("PickupRule"), "sponge:pickup_rule"));
         register(makeValueKey(Boolean.class, of("PigSaddle"), "sponge:pig_saddle"));
-        register(makeValueKey(PistonType.class, of("PistonType"), "sponge:piston_type"));
         register(makeSetKey(BlockType.class, of("PlaceableBlocks"), "sponge:placeable_blocks"));
-        register(makeValueKey(PlantType.class, of("PlantType"), "sponge:plant_type"));
         register(makeValueKey(Boolean.class, of("PlayerCreated"), "sponge:player_created"));
         register(makeValueKey(PortionType.class, of("PortionType"), "sponge:portion_type"));
         register(makeListKey(PotionEffect.class, of("PotionEffects"), "sponge:potion_effects"));
@@ -333,15 +315,12 @@ public final class KeyRegistryModule extends AdditionalPluginCatalogRegistryModu
         register(makeValueKey(Vector3d.class, of("RightArmRotation"), "sponge:right_arm_rotation"));
         register(makeValueKey(Vector3d.class, of("RightLegRotation"), "sponge:right_leg_rotation"));
         register(makeValueKey(Rotation.class, of("Rotation"), "sponge:rotation"));
-        register(makeValueKey(SandstoneType.class, of("SandstoneType"), "sponge:sandstone_type"));
-        register(makeValueKey(SandType.class, of("SandType"), "sponge:sand_type"));
         register(makeMutableBoundedValueKey(Double.class, of("Saturation"), "sponge:saturation"));
         register(makeMutableBoundedValueKey(Float.class, of("Scale"), "sponge:scale"));
         register(makeValueKey(Boolean.class, of("ShouldDrop"), "sponge:should_drop"));
-        register(makeValueKey(ShrubType.class, of("ShrubType"), "sponge:shrub_type"));
         register(makeListKey(Text.class, of("SignLines"), "sponge:sign_lines"));
         register(makeValueKey(UUID.class, of("SkinUniqueId"), "sponge:skin_unique_id"));
-        register(makeValueKey(SlabType.class, of("SlabType"), "sponge:slab_type"));
+        register(makeValueKey(SlabPortion.class, of("SlabPortion"), "sponge:slab_portion"));
         register(makeMutableBoundedValueKey(Integer.class, of("SlimeSize"), "sponge:slime_size"));
         register(makeValueKey(Boolean.class, of("Snowed"), "sponge:snowed"));
         register(makeValueKey(EntityType.class, of("SpawnableEntityType"), "sponge:spawnable_entity_type"));
@@ -385,7 +364,6 @@ public final class KeyRegistryModule extends AdditionalPluginCatalogRegistryModu
         register(makeValueKey(Vector3d.class, of("Velocity"), "sponge:velocity"));
         register(makeOptionalKey(Profession.class, of("VillagerZombieProfession"), "sponge:villager_zombie_profession"));
         register(makeValueKey(Double.class, of("WalkingSpeed"), "sponge:walking_speed"));
-        register(makeValueKey(WallType.class, of("WallType"), "sponge:wall_type"));
         register(makeValueKey(Boolean.class, of("WillShatter"), "sponge:will_shatter"));
         register(makeMapKeyWithKeyAndValue(Direction.class, WireAttachmentType.class, of("WireAttachments"), "sponge:wire_attachments"));
         register(makeValueKey(WireAttachmentType.class, of("WireAttachmentEast"), "sponge:wire_attachment_east"));
@@ -408,8 +386,6 @@ public final class KeyRegistryModule extends AdditionalPluginCatalogRegistryModu
             }
         }
     }
-
-
 
     private final static class Holder {
         private static final KeyRegistryModule INSTANCE = new KeyRegistryModule();

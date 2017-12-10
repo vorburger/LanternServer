@@ -23,27 +23,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.type;
+package org.lanternpowered.server.data.manipulator.immutable.block;
 
-import org.lanternpowered.server.catalog.PluginCatalogType;
-import org.spongepowered.api.data.type.CoalType;
-import org.spongepowered.api.text.translation.Translation;
+import org.lanternpowered.server.data.IImmutableValueHolder;
+import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.manipulator.immutable.block.ImmutableBigMushroomPoresData;
+import org.spongepowered.api.data.value.immutable.ImmutableSetValue;
+import org.spongepowered.api.util.Direction;
 
-public class LanternCoalType extends PluginCatalogType.Base.Translatable.Internal implements CoalType {
+public interface LanternImmutableBigMushroomPoresData extends ImmutableBigMushroomPoresData, IImmutableValueHolder {
 
-    public LanternCoalType(String pluginId, String name, String translation, int internalId) {
-        super(pluginId, name, translation, internalId);
-    }
-
-    public LanternCoalType(String pluginId, String name, Translation translation, int internalId) {
-        super(pluginId, name, translation, internalId);
-    }
-
-    public LanternCoalType(String pluginId, String id, String name, String translation, int internalId) {
-        super(pluginId, id, name, translation, internalId);
-    }
-
-    public LanternCoalType(String pluginId, String id, String name, Translation translation, int internalId) {
-        super(pluginId, id, name, translation, internalId);
+    @Override
+    default ImmutableSetValue<Direction> sides() {
+        return tryGetImmutableValueFor(Keys.BIG_MUSHROOM_PORES);
     }
 }

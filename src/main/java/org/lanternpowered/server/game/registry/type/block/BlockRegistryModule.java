@@ -67,10 +67,11 @@ import org.lanternpowered.server.block.trait.LanternEnumTraits;
 import org.lanternpowered.server.block.trait.LanternIntegerTraits;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.data.type.LanternBedPart;
-import org.lanternpowered.server.data.type.LanternChestConnection;
+import org.lanternpowered.server.data.type.LanternChestAttachment;
 import org.lanternpowered.server.data.type.LanternInstrumentType;
 import org.lanternpowered.server.data.type.LanternPortionType;
 import org.lanternpowered.server.data.type.LanternRailDirection;
+import org.lanternpowered.server.data.type.LanternSlabPortion;
 import org.lanternpowered.server.data.type.RedstoneConnectionType;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
@@ -1325,10 +1326,10 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
 
     private BlockTypeBuilder chestBuilder() {
         return builder()
-                .traits(LanternEnumTraits.CHEST_CONNECTION, LanternEnumTraits.HORIZONTAL_FACING)
+                .traits(LanternEnumTraits.CHEST_ATTACHMENT, LanternEnumTraits.HORIZONTAL_FACING)
                 .defaultState(state -> state
                         .withTrait(LanternEnumTraits.HORIZONTAL_FACING, Direction.NORTH).get()
-                        .withTrait(LanternEnumTraits.CHEST_CONNECTION, LanternChestConnection.SINGLE).get())
+                        .withTrait(LanternEnumTraits.CHEST_ATTACHMENT, LanternChestAttachment.SINGLE).get())
                 .itemType()
                 .tileEntityType(() -> TileEntityTypes.CHEST)
                 .boundingBox(BoundingBoxes::doubleChest)
@@ -1369,10 +1370,10 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
 
     private BlockTypeBuilder slabBuilder() {
         return simpleBuilder()
-                .traits(LanternEnumTraits.PORTION_TYPE)
+                .traits(LanternEnumTraits.SLAB_PORTION)
                 .boundingBox(BoundingBoxes::slab)
                 .defaultState(state -> state
-                        .withTrait(LanternEnumTraits.PORTION_TYPE, LanternPortionType.BOTTOM).get())
+                        .withTrait(LanternEnumTraits.SLAB_PORTION, LanternSlabPortion.BOTTOM).get())
                 .itemType(builder -> builder
                         .behaviors(pipeline -> pipeline.add(new SlabItemInteractionBehavior())));
     }

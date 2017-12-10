@@ -27,10 +27,10 @@ package org.lanternpowered.server.block.trait;
 
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.data.type.LanternBedPart;
-import org.lanternpowered.server.data.type.LanternChestConnection;
+import org.lanternpowered.server.data.type.LanternChestAttachment;
 import org.lanternpowered.server.data.type.LanternInstrumentType;
-import org.lanternpowered.server.data.type.LanternPortionType;
 import org.lanternpowered.server.data.type.LanternRailDirection;
+import org.lanternpowered.server.data.type.LanternSlabPortion;
 import org.lanternpowered.server.data.type.RedstoneConnectionType;
 import org.spongepowered.api.block.trait.EnumTrait;
 import org.spongepowered.api.data.key.Key;
@@ -54,8 +54,8 @@ public final class LanternEnumTraits {
             LanternEnumTrait.of("facing", Keys.DIRECTION,
                     Direction.DOWN, Direction.UP, Direction.SOUTH, Direction.WEST, Direction.NORTH, Direction.EAST);
 
-    public static final EnumTrait<LanternPortionType> PORTION_TYPE =
-            LanternEnumTrait.of("type", (Key) Keys.PORTION_TYPE, LanternPortionType.class);
+    public static final EnumTrait<LanternSlabPortion> SLAB_PORTION =
+            LanternEnumTrait.of("type", (Key) Keys.SLAB_PORTION, LanternSlabPortion.class);
 
     public static final EnumTrait<Direction> HOPPER_FACING =
             LanternEnumTrait.of("variant", (Key) Keys.DIRECTION, Direction.DOWN, Direction.SOUTH, Direction.WEST, Direction.NORTH, Direction.EAST);
@@ -65,8 +65,8 @@ public final class LanternEnumTraits {
                     type != LanternRailDirection.NORTH_EAST && type != LanternRailDirection.NORTH_WEST &&
                             type != LanternRailDirection.SOUTH_EAST && type != LanternRailDirection.SOUTH_WEST);
 
-    public static final EnumTrait<LanternChestConnection> CHEST_CONNECTION =
-            LanternEnumTrait.of("type", (Key) LanternKeys.CHEST_CONNECTION, LanternChestConnection.class);
+    public static final EnumTrait<LanternChestAttachment> CHEST_ATTACHMENT =
+            LanternEnumTrait.of("type", (Key) Keys.CHEST_ATTACHMENT, LanternChestAttachment.class);
 
     public static final EnumTrait<LanternRailDirection> RAIL_DIRECTION =
             LanternEnumTrait.of("shape", (Key) Keys.RAIL_DIRECTION, LanternRailDirection.class);

@@ -23,43 +23,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.type;
+package org.lanternpowered.server.data.manipulator.mutable.block;
 
-import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
+import org.lanternpowered.server.data.IValueHolder;
+import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.manipulator.mutable.block.BigMushroomPoresData;
+import org.spongepowered.api.data.value.mutable.SetValue;
+import org.spongepowered.api.util.Direction;
 
-import org.lanternpowered.server.catalog.InternalCatalogType;
-import org.lanternpowered.server.catalog.SimpleCatalogType;
-import org.spongepowered.api.data.type.ShrubType;
-import org.spongepowered.api.text.translation.Translation;
-
-public enum LanternShrubType implements ShrubType, SimpleCatalogType, InternalCatalogType {
-
-    DEAD_BUSH       ("dead_bush", "shrub"),
-    GRASS           ("tall_grass", "grass"),
-    FERN            ("fern", "fern"),
-    ;
-
-    private final String identifier;
-    private final Translation translation;
-
-    LanternShrubType(String identifier, String translationPart) {
-        this.translation = tr("tile.tallgrass.%s.name", translationPart);
-        this.identifier = identifier;
-    }
+public interface LanternBigMushroomPoresData extends BigMushroomPoresData, IValueHolder {
 
     @Override
-    public Translation getTranslation() {
-        return this.translation;
+    default SetValue<Direction> sides() {
+        return tryGetValueFor(Keys.BIG_MUSHROOM_PORES);
     }
-
-    @Override
-    public String getId() {
-        return this.identifier;
-    }
-
-    @Override
-    public int getInternalId() {
-        return ordinal();
-    }
-
 }

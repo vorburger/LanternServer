@@ -52,9 +52,11 @@ public class ItemStackValueSerializer implements ValueSerializer<ItemStack> {
         if (object == null || object.isEmpty()) {
             buf.writeShort((short) -1);
         } else {
-            final DataView dataView = DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED);
+            DataView dataView = DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED);
             // Add all the NBT data
             ItemStackStore.INSTANCE.serialize((LanternItemStack) object, dataView);
+            // We only need to write the tag data
+            dataView = dataView.getView(ItemStackStore.TAG).orElseGet(() -> DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED));
             // Add our custom data
             final int[] ids = NetworkItemTypeRegistry.itemTypeToInternalAndNetworkId.get(object.getType());
             if (ids == null) {

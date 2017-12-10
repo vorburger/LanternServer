@@ -86,6 +86,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetReducedDebug;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetWindowSlot;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutStopSounds;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTags;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutUnlockRecipes;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.scoreboard.LanternScoreboard;
@@ -365,6 +366,10 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
                         this.session.getServer().getMaxPlayers(), reducedDebug, false, lowHorizon));
                 // Send the server brand
                 this.session.send(new MessagePlayInOutBrand(Lantern.getImplementationPlugin().getName()));
+                // We just have to send this to prevent the client from crashing in some
+                // occasions, for example when clicking a furnace fuel slot.
+                // It's not used for anything else, so there aren't any arguments.
+                this.session.send(new MessagePlayOutTags());
                 // Send the player list
                 final List<LanternTabListEntry> tabListEntries = new ArrayList<>();
                 final LanternTabListEntryBuilder thisBuilder = createTabListEntryBuilder(this);

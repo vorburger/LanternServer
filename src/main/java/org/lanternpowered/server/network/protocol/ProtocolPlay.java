@@ -122,6 +122,7 @@ import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOut
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutTabComplete;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutTabListEntries;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutTabListHeaderAndFooter;
+import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutTags;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutTeams;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutTitle;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutUnloadChunk;
@@ -285,6 +286,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTabComplete;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTabListEntries;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTabListHeaderAndFooter;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTags;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTeams;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTheEnd;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTitle;
@@ -562,6 +564,6 @@ final class ProtocolPlay extends ProtocolBase {
         outbound.bind(); // TODO: Entity Properties
         outbound.bind(CodecPlayOutAddPotionEffect.class, MessagePlayOutAddPotionEffect.class);
         outbound.bind(CodecPlayOutDefineRecipes.class, MessagePlayOutDefineRecipes.class);
-        outbound.bind(); // Tags message, do we need it? what does the client need the tags for? recipes?
+        outbound.bind(CodecPlayOutTags.class, MessagePlayOutTags.class);
     }
 }
